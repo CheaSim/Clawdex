@@ -143,7 +143,16 @@ Current persistence is intentionally lightweight:
 
 - `docs/maintenance-workflow.md`：更新流程与维护规范
 - `docs/product/reward-and-penalty-system.md`：奖励与惩罚规则
+- `docs/deployment/alicloud-ecs.md`：阿里云 ECS 部署步骤
 - `docs/updates/`：每次功能迭代的更新记录
+
+## Alibaba Cloud deployment
+
+If you want to deploy the main dynamic app to Alibaba Cloud ECS:
+
+- PM2 config: `ecosystem.config.cjs`
+- Nginx sample: `deploy/nginx/clawdex.conf`
+- Full step-by-step guide: `docs/deployment/alicloud-ecs.md`
 
 ## Maintenance Workflow
 

@@ -1,72 +1,71 @@
 import Link from "next/link";
 
 import { SiteShell } from "@/components/site-shell";
+import { PageHero } from "@/components/ui/page-hero";
+import { SurfaceCard } from "@/components/ui/surface-card";
 import { arenaMatches, economyOverview, featureCards, heroMetrics, highlights, rankingLeaders, settlementRules } from "@/data/site-content";
 
 export default function Home() {
   return (
     <SiteShell>
-      <div className="mx-auto flex max-w-7xl flex-col gap-10 px-6 py-10 lg:px-8 lg:py-14">
-        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-[32px] border border-white/10 bg-card/80 p-8 shadow-glow">
-            <div className="inline-flex rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-              爆款版默认首页
-            </div>
-            <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight md:text-6xl">
-              把每一场 OpenClaw 1v1，做成值得围观、站队和分享的故事。
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-muted md:text-lg">
-              Clawdex 不是冷冰冰的匹配大厅，而是内容先行的竞技社区：高光切片、挑战擂台、观众投票、AI 战报，把玩家和观众同时卷进来。
-            </p>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Link href="/watch" className="rounded-full bg-accent px-6 py-3 text-center font-semibold text-slate-950 transition hover:bg-white">
+      <div className="section-grid">
+        <PageHero
+          eyebrow="爆款版默认首页"
+          title="把每一场 OpenClaw 1v1，做成值得围观、站队和分享的故事。"
+          description="Clawdex 不是冷冰冰的匹配大厅，而是内容先行的竞技社区：高光切片、挑战擂台、观众投票、AI 战报，把玩家和观众同时卷进来。"
+          actions={
+            <>
+              <Link href="/watch" className="btn-primary text-center">
                 进入观战中心
               </Link>
-              <Link href="/challenge" className="rounded-full border border-white/10 px-6 py-3 text-center font-semibold transition hover:border-accent/40 hover:text-accent">
+              <Link href="/challenge" className="btn-secondary text-center">
                 查看今日擂台
               </Link>
-            </div>
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {heroMetrics.map((metric) => (
-                <div key={metric.label} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
-                  <p className="text-sm text-muted">{metric.label}</p>
-                  <p className="mt-2 text-2xl font-semibold">{metric.value}</p>
-                  <p className="mt-1 text-sm text-slate-300">{metric.detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <aside className="rounded-[32px] border border-white/10 bg-slate-950/70 p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">正在发生</h2>
-              <span className="rounded-full bg-danger/10 px-3 py-1 text-xs text-danger">LIVE</span>
-            </div>
-            <div className="mt-6 space-y-4">
-              {arenaMatches.map((match) => (
-                <div key={`${match.challenger}-${match.defender}`} className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-accent">{match.status}</p>
-                  <h3 className="mt-2 text-lg font-semibold">
-                    {match.challenger} vs {match.defender}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-muted">{match.hook}</p>
-                </div>
-              ))}
-            </div>
-          </aside>
+            </>
+          }
+          aside={
+            <SurfaceCard className="h-full bg-slate-950/50 p-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">正在发生</h2>
+                <span className="pill-accent bg-danger/10 text-danger">LIVE</span>
+              </div>
+              <div className="mt-5 space-y-3">
+                {arenaMatches.map((match) => (
+                  <div key={`${match.challenger}-${match.defender}`} className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-sm text-accent">{match.status}</p>
+                    <h3 className="mt-2 text-lg font-semibold">{match.challenger} vs {match.defender}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted">{match.hook}</p>
+                  </div>
+                ))}
+              </div>
+            </SurfaceCard>
+          }
+        />
+
+        <section className="grid gap-4 md:grid-cols-3">
+          {heroMetrics.map((metric) => (
+            <SurfaceCard key={metric.label} className="relative overflow-hidden bg-slate-950/55 p-5">
+              <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-accent/10 blur-2xl" />
+              <p className="relative text-sm text-muted">{metric.label}</p>
+              <p className="relative mt-2 text-3xl font-semibold">{metric.value}</p>
+              <p className="relative mt-2 text-sm text-slate-300">{metric.detail}</p>
+            </SurfaceCard>
+          ))}
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">
           {featureCards.map((feature) => (
-            <article key={feature.title} className="rounded-[28px] border border-white/10 bg-white/5 p-6">
+            <SurfaceCard key={feature.title} className="group relative overflow-hidden bg-white/5 p-6 transition hover:-translate-y-1">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent via-accentSecondary to-accent opacity-70" />
               <p className="text-sm text-accentSecondary">核心爆点</p>
               <h3 className="mt-3 text-2xl font-semibold">{feature.title}</h3>
               <p className="mt-3 leading-7 text-muted">{feature.description}</p>
-            </article>
+            </SurfaceCard>
           ))}
         </section>
 
         <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-          <div className="rounded-[32px] border border-white/10 bg-slate-950/70 p-6">
+          <SurfaceCard className="bg-slate-950/70 p-6">
             <p className="text-sm text-accent">胜负必须有后果</p>
             <h2 className="mt-2 text-3xl font-semibold">奖励与惩罚系统</h2>
             <p className="mt-3 leading-7 text-muted">
@@ -81,9 +80,9 @@ export default function Home() {
                 </div>
               ))}
             </div>
-          </div>
+          </SurfaceCard>
 
-          <div className="rounded-[32px] border border-white/10 bg-card/80 p-6">
+          <SurfaceCard className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-accent">赛后结算</p>
@@ -103,11 +102,11 @@ export default function Home() {
                 </article>
               ))}
             </div>
-          </div>
+          </SurfaceCard>
         </section>
 
         <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[32px] border border-white/10 bg-card/80 p-6">
+          <SurfaceCard className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-accent">可刷内容流</p>
@@ -135,10 +134,10 @@ export default function Home() {
                 </article>
               ))}
             </div>
-          </div>
+          </SurfaceCard>
 
           <div className="space-y-6">
-            <section className="rounded-[32px] border border-white/10 bg-card/80 p-6">
+            <SurfaceCard className="p-6">
               <p className="text-sm text-accent">爆款玩法</p>
               <h2 className="mt-2 text-3xl font-semibold">挑战擂台</h2>
               <p className="mt-3 leading-7 text-muted">
@@ -149,9 +148,9 @@ export default function Home() {
                 <span className="rounded-full border border-white/10 px-3 py-1 text-sm">宿敌标签</span>
                 <span className="rounded-full border border-white/10 px-3 py-1 text-sm">周榜冲刺</span>
               </div>
-            </section>
+            </SurfaceCard>
 
-            <section className="rounded-[32px] border border-white/10 bg-slate-950/70 p-6">
+            <SurfaceCard className="bg-slate-950/70 p-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-semibold">今日排行榜</h2>
                 <Link href="/rankings" className="text-sm text-slate-300 transition hover:text-accent">
@@ -174,7 +173,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            </section>
+            </SurfaceCard>
           </div>
         </section>
       </div>

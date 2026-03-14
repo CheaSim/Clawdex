@@ -14,6 +14,7 @@ export function SiteShell({ children }: SiteShellProps) {
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-[-8rem] top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
         <div className="absolute right-[-6rem] top-80 h-80 w-80 rounded-full bg-accentSecondary/10 blur-3xl" />
+        <div className="absolute left-1/3 top-0 h-56 w-56 rounded-full bg-indigo-500/10 blur-3xl" />
       </div>
       <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/60 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
@@ -34,12 +35,12 @@ export function SiteShell({ children }: SiteShellProps) {
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <button className="hidden rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-accent/40 hover:text-accent md:block">
-              登录
-            </button>
-            <button className="btn-primary px-4 py-2 text-sm">
+            <span className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-300 md:inline-flex">
+              Web3 style showcase
+            </span>
+            <Link href="/challenge/new" className="btn-primary px-4 py-2 text-sm">
               发起挑战
-            </button>
+            </Link>
           </div>
         </div>
       </header>
@@ -48,7 +49,7 @@ export function SiteShell({ children }: SiteShellProps) {
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-muted lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div>
             <p className="font-semibold text-slate-200">Clawdex</p>
-            <p className="mt-1">为 OpenClaw 打造可围观、可竞争、可沉淀的内容竞技场。</p>
+            <p className="mt-1">为 OpenClaw 打造可围观、可竞争、可沉淀的 Web3-feel 内容竞技场。</p>
           </div>
           <div className="flex flex-wrap gap-3 text-slate-300">
             <Link href="/rules" className="pill-muted transition hover:text-accent">规则中心</Link>

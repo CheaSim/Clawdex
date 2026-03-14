@@ -3,9 +3,17 @@ import Link from "next/link";
 import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
-import { arenaMatches, fairPlayRules, settlementRules } from "@/data/site-content";
+import { challengeStatusMeta, getModeLabel } from "@/data/product-data";
+import { fairPlayRules, settlementRules } from "@/data/site-content";
+import { listChallenges, listPlayers } from "@/lib/mock-db";
 
-export default function ChallengePage() {
+export const dynamic = "force-dynamic";
+
+export default async function ChallengePage() {
+  const [challengeRecords, playerRecords] = await Promise.all([listChallenges(), listPlayers()]);
+  const playerMap = Object.fromEntries(playerRecords.map((player) => [player.slug, player]));
+  const spotlightChallenges = challengeRecords.slice(0, 6);
+
   return (
     <SiteShell>
       <div className="section-grid">
@@ -61,19 +69,26 @@ export default function ChallengePage() {
             </Link>
           </div>
           <div className="mt-6 space-y-4">
-            {arenaMatches.map((match) => (
-              <div key={match.hook} className="rounded-[28px] border border-white/10 bg-white/5 p-5 md:flex md:items-center md:justify-between">
-                <div>
-                  <p className="text-sm text-accent">{match.status}</p>
-                  <h3 className="mt-2 text-xl font-semibold">{match.challenger} vs {match.defender}</h3>
-                  <p className="mt-2 text-sm leading-6 text-muted">{match.hook}</p>
+            {spotlightChallenges.map((match) => {
+              const challenger = playerMap[match.challengerSlug];
+              const defender = playerMap[match.defenderSlug];
+              const statusMeta = challengeStatusMeta[match.status];
+
+              return (
+                <div key={match.id} className="rounded-[28px] border border-white/10 bg-white/5 p-5 md:flex md:items-center md:justify-between">
+                  <div>
+                    <p className={`text-sm ${statusMeta.tone}`}>{statusMeta.label}</p>
+                    <h3 className="mt-2 text-xl font-semibold">{challenger?.name ?? match.challengerSlug} vs {defender?.name ?? match.defenderSlug}</h3>
+                    <p className="mt-2 text-sm text-slate-300">{getModeLabel(match.mode)} · {match.scheduledFor} · 奖金池 {match.rewardPool} Claw Points</p>
+                    <p className="mt-2 text-sm leading-6 text-muted">{match.storyline}</p>
+                  </div>
+                  <div className="mt-4 flex gap-3 md:mt-0">
+                    <Link href={`/challenge/${match.id}`} className="rounded-full border border-white/10 px-4 py-2 text-sm">查看详情</Link>
+                    <Link href="/challenge/new" className="rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm text-accent">发起挑战</Link>
+                  </div>
                 </div>
-                <div className="mt-4 flex gap-3 md:mt-0">
-                  <Link href="/watch" className="rounded-full border border-white/10 px-4 py-2 text-sm">围观</Link>
-                  <Link href="/challenge/new" className="rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm text-accent">发起挑战</Link>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </SurfaceCard>
 

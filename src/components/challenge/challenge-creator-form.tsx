@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-import { matchModes, players, type CreateChallengePayload, type SettlementPreview } from "@/data/product-data";
+import { matchModes, players, type CreateChallengePayload, type PlayerProfile, type SettlementPreview } from "@/data/product-data";
 import { buildSettlementPreview } from "@/lib/settlement";
 
 const initialPayload: CreateChallengePayload = {
@@ -16,17 +18,43 @@ const initialPayload: CreateChallengePayload = {
 };
 
 export function ChallengeCreatorForm() {
+  const router = useRouter();
   const [payload, setPayload] = useState<CreateChallengePayload>(initialPayload);
   const [serverPreview, setServerPreview] = useState<SettlementPreview | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>("");
+  const [createdChallengeId, setCreatedChallengeId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [challengerProfile, setChallengerProfile] = useState<PlayerProfile | null>(null);
+  const [defenderProfile, setDefenderProfile] = useState<PlayerProfile | null>(null);
 
   const preview = useMemo(() => buildSettlementPreview(payload), [payload]);
+
+  useEffect(() => {
+    async function loadPlayer(slug: string, apply: (player: PlayerProfile | null) => void) {
+      try {
+        const response = await fetch(`/api/players/${slug}`);
+
+        if (!response.ok) {
+          apply(null);
+          return;
+        }
+
+        const result = (await response.json()) as PlayerProfile;
+        apply(result);
+      } catch {
+        apply(null);
+      }
+    }
+
+    loadPlayer(payload.challengerSlug, setChallengerProfile);
+    loadPlayer(payload.defenderSlug, setDefenderProfile);
+  }, [payload.challengerSlug, payload.defenderSlug]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
     setStatusMessage("");
+    setCreatedChallengeId(null);
 
     try {
       const response = await fetch("/api/challenges", {
@@ -45,7 +73,9 @@ export function ChallengeCreatorForm() {
       }
 
       setServerPreview(result.preview ?? null);
-      setStatusMessage(`挑战已创建：${result.challengeId}，已进入待开赛列表。`);
+      setCreatedChallengeId(result.challengeId ?? null);
+      setStatusMessage(result.message ?? "挑战已创建，等待对手接受。");
+      router.refresh();
     } catch {
       setStatusMessage("网络异常，挑战未提交成功。");
     } finally {
@@ -164,12 +194,37 @@ export function ChallengeCreatorForm() {
           <button disabled={isSubmitting} className="btn-primary disabled:cursor-not-allowed disabled:opacity-70">
             {isSubmitting ? "创建中..." : "提交挑战"}
           </button>
-          <span className="text-sm text-muted">提交后会调用 `/api/challenges` 返回结算预览。</span>
+          <span className="text-sm text-muted">提交后会冻结发起方 stake，并生成可分享的挑战详情页。</span>
         </div>
         {statusMessage ? <p className="mt-4 text-sm text-accentSecondary">{statusMessage}</p> : null}
+        {createdChallengeId ? (
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+            <Link href={`/challenge/${createdChallengeId}`} className="text-accentSecondary transition hover:text-accent">
+              进入挑战详情 →
+            </Link>
+          </div>
+        ) : null}
       </form>
 
       <div className="space-y-6">
+        <div className="glass-panel rounded-[28px] p-6">
+          <p className="text-sm text-accent">钱包约束</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+              <p className="text-sm text-muted">发起方余额</p>
+              <p className="mt-2 text-2xl font-semibold text-accentSecondary">{challengerProfile?.clawPoints ?? "--"}</p>
+              <p className="mt-2 text-sm text-muted">
+                提交后预计剩余 {challengerProfile ? Math.max(challengerProfile.clawPoints - payload.stake, 0) : "--"} Claw Points
+              </p>
+            </div>
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+              <p className="text-sm text-muted">对手可接受门槛</p>
+              <p className="mt-2 text-2xl font-semibold">{defenderProfile?.clawPoints ?? "--"}</p>
+              <p className="mt-2 text-sm text-muted">对手至少需要 {payload.stake} Claw Points 才能接战。</p>
+            </div>
+          </div>
+        </div>
+
         <div className="glass-panel rounded-[28px] p-6">
           <p className="text-sm text-accent">即时预览</p>
           <h2 className="mt-3 text-2xl font-semibold">这场挑战值不值得打</h2>

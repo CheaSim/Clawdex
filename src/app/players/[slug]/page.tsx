@@ -4,29 +4,27 @@ import { notFound } from "next/navigation";
 import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
-import { getPlayerBySlug, liveMatches, matchModes, players } from "@/data/product-data";
+import { challengeStatusMeta, getModeLabel } from "@/data/product-data";
+import { getPlayerBySlugFromDb, listChallenges, listPlayers } from "@/lib/mock-db";
+
+export const dynamic = "force-dynamic";
 
 type PlayerProfilePageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return players.map((player) => ({ slug: player.slug }));
-}
-
 export default async function PlayerProfilePage({ params }: PlayerProfilePageProps) {
   const { slug } = await params;
-  const player = getPlayerBySlug(slug);
+  const [player, matches, players] = await Promise.all([getPlayerBySlugFromDb(slug), listChallenges(), listPlayers()]);
 
   if (!player) {
     notFound();
   }
 
-  const relatedMatches = liveMatches.filter(
+  const playerMap = Object.fromEntries(players.map((entry) => [entry.slug, entry]));
+  const relatedMatches = matches.filter(
     (match) => match.challengerSlug === player.slug || match.defenderSlug === player.slug,
   );
-
-  const modeLabels = Object.fromEntries(matchModes.map((mode) => [mode.value, mode.label]));
 
   return (
     <SiteShell>
@@ -34,7 +32,7 @@ export default async function PlayerProfilePage({ params }: PlayerProfilePagePro
         <PageHero
           eyebrow={player.title}
           title={`${player.name} · ${player.bio}`}
-          description={`偏好模式：${player.preferredMode} · 当前 Elo ${player.elo} · Fame ${player.fame.toLocaleString()} · 胜率 ${player.winRate}`}
+          description={`偏好模式：${getModeLabel(player.preferredMode)} · 当前 Elo ${player.elo} · Fame ${player.fame.toLocaleString()} · 胜率 ${player.winRate}`}
           actions={
             <>
               <Link href="/challenge/new" className="btn-primary">
@@ -55,6 +53,11 @@ export default async function PlayerProfilePage({ params }: PlayerProfilePagePro
                   <p className="text-sm text-muted">当前连胜</p>
                   <p className="mt-1 text-3xl font-semibold">{player.streak}</p>
                 </div>
+              </div>
+              <div className="mt-5 rounded-[24px] border border-white/10 bg-white/5 p-4">
+                <p className="text-xs text-muted">可用钱包</p>
+                <p className="mt-2 text-2xl font-semibold text-accentSecondary">{player.clawPoints} Claw Points</p>
+                <p className="mt-2 text-sm text-muted">挑战创建时会先冻结发起方 stake，对手接受后奖金池才会翻倍锁定。</p>
               </div>
               <div className="mt-5 flex flex-wrap gap-2">
                 {player.tags.map((tag) => (
@@ -86,14 +89,20 @@ export default async function PlayerProfilePage({ params }: PlayerProfilePagePro
                 <div key={match.id} className="rounded-[24px] border border-white/10 bg-slate-950/55 p-4">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-sm text-accent">{match.startTime}</p>
+                      <p className={`text-sm ${challengeStatusMeta[match.status].tone}`}>{challengeStatusMeta[match.status].label}</p>
                       <h2 className="mt-2 text-xl font-semibold">
-                        {getPlayerBySlug(match.challengerSlug)?.name ?? match.challengerSlug} vs {getPlayerBySlug(match.defenderSlug)?.name ?? match.defenderSlug}
+                        {playerMap[match.challengerSlug]?.name ?? match.challengerSlug} vs {playerMap[match.defenderSlug]?.name ?? match.defenderSlug}
                       </h2>
                     </div>
-                    <span className="pill-muted text-sm text-slate-200">{modeLabels[match.mode]} · {match.rewardPool} Pool</span>
+                    <span className="pill-muted text-sm text-slate-200">{getModeLabel(match.mode)} · {match.rewardPool} Pool</span>
                   </div>
+                  <p className="mt-3 text-sm text-slate-300">{match.scheduledFor}</p>
                   <p className="mt-3 text-sm leading-6 text-muted">{match.storyline}</p>
+                  <div className="mt-4">
+                    <Link href={`/challenge/${match.id}`} className="text-sm text-accentSecondary transition hover:text-accent">
+                      查看挑战详情 →
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>

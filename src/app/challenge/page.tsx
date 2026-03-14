@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
@@ -11,7 +13,11 @@ export default function ChallengePage() {
           eyebrow="挑战擂台"
           title="守擂、复仇、爆冷，才是最容易出圈的 1v1。"
           description="这里不是简单的房间列表，而是剧情化的对战入口。每个挑战都带着 stakes：榜单变动、连胜纪录、宿敌关系和观众站队。"
-          actions={<button className="btn-primary">创建挑战</button>}
+          actions={
+            <Link href="/challenge/new" className="btn-primary">
+              创建挑战
+            </Link>
+          }
           aside={
             <SurfaceCard className="h-full bg-slate-950/45 p-5">
               <p className="text-sm text-accent">今日擂台状态</p>
@@ -50,7 +56,9 @@ export default function ChallengePage() {
         <SurfaceCard className="p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold">今日对战列表</h2>
-            <button className="btn-primary px-4 py-2 text-sm">创建挑战</button>
+            <Link href="/challenge/new" className="btn-primary px-4 py-2 text-sm">
+              创建挑战
+            </Link>
           </div>
           <div className="mt-6 space-y-4">
             {arenaMatches.map((match) => (
@@ -61,8 +69,8 @@ export default function ChallengePage() {
                   <p className="mt-2 text-sm leading-6 text-muted">{match.hook}</p>
                 </div>
                 <div className="mt-4 flex gap-3 md:mt-0">
-                  <button className="rounded-full border border-white/10 px-4 py-2 text-sm">围观</button>
-                  <button className="rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm text-accent">发起挑战</button>
+                  <Link href="/watch" className="rounded-full border border-white/10 px-4 py-2 text-sm">围观</Link>
+                  <Link href="/challenge/new" className="rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm text-accent">发起挑战</Link>
                 </div>
               </div>
             ))}

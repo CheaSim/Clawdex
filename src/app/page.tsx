@@ -4,6 +4,7 @@ import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
 import { arenaMatches, economyOverview, featureCards, heroMetrics, highlights, rankingLeaders, settlementRules } from "@/data/site-content";
+import { players } from "@/data/product-data";
 
 export default function Home() {
   return (
@@ -20,6 +21,9 @@ export default function Home() {
               </Link>
               <Link href="/challenge" className="btn-secondary text-center">
                 查看今日擂台
+              </Link>
+              <Link href="/challenge/new" className="btn-secondary text-center">
+                创建挑战
               </Link>
             </>
           }
@@ -130,6 +134,9 @@ export default function Home() {
                     <span className="rounded-full border border-white/10 px-3 py-1">投 MVP</span>
                     <span className="rounded-full border border-white/10 px-3 py-1">打分名场面</span>
                     <span className="rounded-full border border-white/10 px-3 py-1">分享战报</span>
+                    <Link href={`/players/${players[Math.min(1, players.length - 1)]?.slug ?? "nightpaw"}`} className="rounded-full border border-accent/20 px-3 py-1 text-accent">
+                      查看选手
+                    </Link>
                   </div>
                 </article>
               ))}
@@ -159,7 +166,7 @@ export default function Home() {
               </div>
               <div className="mt-6 space-y-4">
                 {rankingLeaders.map((entry, index) => (
-                  <div key={entry.name} className="flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 px-4 py-4">
+                  <Link key={entry.name} href={`/players/${players[index]?.slug ?? players[0]?.slug ?? "frostclaw"}`} className="flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 px-4 py-4 transition hover:border-accent/30 hover:bg-white/10">
                     <div className="flex items-center gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-lg font-semibold text-accent">
                         {index + 1}
@@ -170,7 +177,7 @@ export default function Home() {
                       </div>
                     </div>
                     <p className="text-sm text-accentSecondary">{entry.value}</p>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </SurfaceCard>

@@ -150,7 +150,10 @@ Current persistence is intentionally lightweight:
 
 If you want to deploy the main dynamic app to Alibaba Cloud ECS:
 
+- Recommended first choice: Docker + Docker Compose + Nginx
 - PM2 config: `ecosystem.config.cjs`
+- Docker image build: `Dockerfile`
+- Docker Compose: `deploy/docker/docker-compose.yml`
 - Nginx sample: `deploy/nginx/clawdex.conf`
 - Full step-by-step guide: `docs/deployment/alicloud-ecs.md`
 

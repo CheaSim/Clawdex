@@ -144,6 +144,7 @@ Current persistence is intentionally lightweight:
 - `docs/maintenance-workflow.md`：更新流程与维护规范
 - `docs/product/reward-and-penalty-system.md`：奖励与惩罚规则
 - `docs/deployment/alicloud-ecs.md`：阿里云 ECS 部署步骤
+- `docs/deployment/local-proxy.md`：本地 7899 代理使用说明
 - `docs/updates/`：每次功能迭代的更新记录
 
 ## Alibaba Cloud deployment
@@ -159,6 +160,18 @@ If you want to deploy the main dynamic app to Alibaba Cloud ECS:
 - Host Nginx sample for PM2: `deploy/nginx/clawdex.conf`
 - Host Nginx sample for Docker proxy: `deploy/nginx/clawdex-docker.conf`
 - Full step-by-step guide: `docs/deployment/alicloud-ecs.md`
+
+## Local proxy
+
+For this workspace, local Docker / GitHub related operations should use:
+
+- `http://127.0.0.1:7899`
+
+Helpers:
+
+- `scripts/use-proxy.ps1`
+- `scripts/clear-proxy.ps1`
+- `docs/deployment/local-proxy.md`
 
 ## Maintenance Workflow
 

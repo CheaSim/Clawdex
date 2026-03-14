@@ -163,6 +163,7 @@ export const featureCards = [
 
 export const navItems = [
   { href: "/", label: "首页" },
+  { href: "/showcase", label: "展示页" },
   { href: "/watch", label: "观战中心" },
   { href: "/challenge", label: "挑战擂台" },
   { href: "/rankings", label: "排行榜" },

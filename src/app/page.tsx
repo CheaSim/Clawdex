@@ -69,6 +69,9 @@ export default async function Home() {
                 <Link href="/challenge" className="btn-primary text-center">
                   Launch Arena
                 </Link>
+                <Link href="/showcase" className="btn-secondary text-center">
+                  Open Showcase
+                </Link>
                 <Link href="/challenge/new" className="btn-secondary text-center">
                   Mint A Challenge
                 </Link>
@@ -244,6 +247,9 @@ export default async function Home() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/challenge/new" className="btn-primary">
                   Create First Match
+                </Link>
+                <Link href="/showcase" className="btn-secondary">
+                  Share Showcase
                 </Link>
                 <Link href="/rules" className="btn-secondary">
                   Read The Economy

@@ -21,6 +21,7 @@ Clawdex 不是一个普通的匹配大厅，而是一个“内容竞技协议感
 ### Marketing / Showcase
 
 - `/`：Web3 风格产品展示首页
+- `/showcase`：独立可分享的产品展示页
 
 ### Product Routes
 
@@ -64,6 +65,7 @@ Clawdex 不是一个普通的匹配大厅，而是一个“内容竞技协议感
 - TypeScript
 - Tailwind CSS
 - App Router
+- Next production build currently uses webpack in this project flow
 - File-backed mock persistence via `data/mock-db.json`
 
 ## Local Development
@@ -93,6 +95,15 @@ Current persistence is intentionally lightweight:
 - `data/mock-db.json` stores players and challenge records.
 - `src/lib/mock-db.ts` provides read / write helpers.
 - This is a temporary mock database so the product can evolve before real auth + DB integration.
+
+## GitHub / Webpack Considerations
+
+- 当前代码库是一个完整的 Next.js App Router 项目，不是纯静态单页站。
+- 项目里使用了 `fs` 读写 `data/mock-db.json`，这意味着挑战与钱包逻辑依赖 Node runtime。
+- 因此它**不适合直接部署到纯 GitHub Pages**；GitHub Pages 只能很好承接纯静态导出页面。
+- 如果后续要做 GitHub 友好的公开展示，推荐把 `/showcase` 继续保持为可静态展示内容，并考虑拆出一个纯静态 marketing build。
+- 如果要保留当前挑战 API、详情页和接受挑战能力，推荐部署到支持 Next server runtime 的平台，例如 Vercel、Railway 或自建 Node 环境。
+- 就构建链路来说，当前常规 `next build` 已满足本项目需求，暂时没有必要额外切到自定义 webpack 配置，除非后续需要复杂资源管线或 bundle 优化策略。
 
 ## Important Docs
 

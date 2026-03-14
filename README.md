@@ -22,6 +22,7 @@ Clawdex 不是一个普通的匹配大厅，而是一个“内容竞技协议感
 
 - `/`：Web3 风格产品展示首页
 - `/showcase`：独立可分享的产品展示页
+- `github-pages-site/`：专门用于 GitHub Pages 的纯静态展示站
 
 ### Product Routes
 
@@ -101,9 +102,35 @@ Current persistence is intentionally lightweight:
 - 当前代码库是一个完整的 Next.js App Router 项目，不是纯静态单页站。
 - 项目里使用了 `fs` 读写 `data/mock-db.json`，这意味着挑战与钱包逻辑依赖 Node runtime。
 - 因此它**不适合直接部署到纯 GitHub Pages**；GitHub Pages 只能很好承接纯静态导出页面。
-- 如果后续要做 GitHub 友好的公开展示，推荐把 `/showcase` 继续保持为可静态展示内容，并考虑拆出一个纯静态 marketing build。
+- 当前已经新增 `github-pages-site/` 作为 GitHub Pages 专用静态展示目录。
+- 如果后续要做 GitHub 友好的公开展示，推荐继续把 `/showcase` 和 `github-pages-site/` 维持内容同步，前者给主应用访客，后者给纯静态部署。
 - 如果要保留当前挑战 API、详情页和接受挑战能力，推荐部署到支持 Next server runtime 的平台，例如 Vercel、Railway 或自建 Node 环境。
+- 主应用 CI 现在已经从无效的裸 `webpack` 调用改为标准 `npm run build`。
 - 就构建链路来说，当前常规 `next build` 已满足本项目需求，暂时没有必要额外切到自定义 webpack 配置，除非后续需要复杂资源管线或 bundle 优化策略。
+
+## GitHub Pages Deployment
+
+当前仓库已经加入 GitHub Pages 自动部署工作流：
+
+- Workflow: `.github/workflows/github-pages.yml`
+- Deploy source: `github-pages-site/`
+- Trigger: push 到 `main`
+
+### Enable it in GitHub
+
+1. 打开仓库 Settings。
+2. 进入 Pages。
+3. Source 选择 `GitHub Actions`。
+4. 之后每次 push 到 `main`，静态展示站都会自动部署。
+
+### Expected URL
+
+- Project Pages 一般会发布到：`https://<your-github-username>.github.io/Clawdex/`
+
+### What Pages contains
+
+- GitHub Pages 只承载静态产品展示站。
+- Next.js 主应用、挑战 API、接受挑战和钱包逻辑仍应部署在支持 Node runtime 的平台。
 
 ## Important Docs
 

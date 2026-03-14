@@ -123,6 +123,11 @@ Current persistence is intentionally lightweight:
 3. Source 选择 `GitHub Actions`。
 4. 之后每次 push 到 `main`，静态展示站都会自动部署。
 
+### First-run note
+
+- 当前 workflow 已启用 `actions/configure-pages` 的自动 enablement，首次运行会尝试自动打开 Pages。
+- 如果仓库属于组织且策略限制了 Pages 修改权限，GitHub Actions 仍可能失败；这时只需要在仓库 Settings → Pages 里手动选择 `GitHub Actions` 作为来源，再重新运行 workflow。
+
 ### Expected URL
 
 - Project Pages 一般会发布到：`https://<your-github-username>.github.io/Clawdex/`

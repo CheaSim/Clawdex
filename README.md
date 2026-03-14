@@ -114,19 +114,21 @@ Current persistence is intentionally lightweight:
 
 - Workflow: `.github/workflows/github-pages.yml`
 - Deploy source: `github-pages-site/`
+- Publish branch: `gh-pages`
 - Trigger: push 到 `main`
 
 ### Enable it in GitHub
 
 1. 打开仓库 Settings。
 2. 进入 Pages。
-3. Source 选择 `GitHub Actions`。
-4. 之后每次 push 到 `main`，静态展示站都会自动部署。
+3. Source 选择 `Deploy from a branch`。
+4. Branch 选择 `gh-pages`，目录选择 `/ (root)`。
+5. 保存后，之后每次 push 到 `main`，静态展示站都会自动同步到 `gh-pages` 分支并发布。
 
 ### First-run note
 
-- 当前 workflow 已启用 `actions/configure-pages` 的自动 enablement，首次运行会尝试自动打开 Pages。
-- 如果仓库属于组织且策略限制了 Pages 修改权限，GitHub Actions 仍可能失败；这时只需要在仓库 Settings → Pages 里手动选择 `GitHub Actions` 作为来源，再重新运行 workflow。
+- 当前 workflow 不再依赖 Pages API 自动创建站点，因此避开了 `Resource not accessible by integration` 这类权限错误。
+- 首次运行后如果还没有页面，只需要确认仓库 Settings → Pages 已经指向 `gh-pages` 分支。
 
 ### Expected URL
 

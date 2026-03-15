@@ -11,10 +11,10 @@ export const dynamic = "force-dynamic";
 
 export default async function WatchPage() {
   const [challenges, players] = await Promise.all([listChallenges(), listPlayers()]);
-  const playerMap = Object.fromEntries(players.map((p) => [p.slug, p]));
+  const playerMap = Object.fromEntries(players.map((player) => [player.slug, player]));
 
-  const liveAndAccepted = challenges.filter((c) => ["accepted", "live"].includes(c.status));
-  const recentSettled = challenges.filter((c) => c.status === "settlement").slice(0, 5);
+  const liveAndAccepted = challenges.filter((challenge) => ["accepted", "live"].includes(challenge.status));
+  const recentSettled = challenges.filter((challenge) => challenge.status === "settlement").slice(0, 5);
   const allWatchable = [...liveAndAccepted, ...recentSettled];
 
   return (
@@ -23,7 +23,7 @@ export default async function WatchPage() {
         <PageHero
           eyebrow="观战中心"
           title="先看，再站队，再打分。"
-          description="观战页优先承接内容流用户：直播卡片、高光回放、MVP 投票、名场面评分和 AI 战报都集中在这里，适合移动端沉浸刷内容。"
+          description="观战页优先承接内容流用户：直播卡片、高光回放、MVP 投票、名场面评分和 AI 战报都集中在这里，适合移动端持续刷内容。"
           aside={
             <SurfaceCard className="h-full bg-slate-950/45 p-5">
               <p className="text-sm text-accent">实时状态</p>
@@ -48,15 +48,19 @@ export default async function WatchPage() {
               <span className="rounded-full bg-danger/10 px-3 py-1 text-xs text-danger">实时更新</span>
             </div>
             <div className="mt-6 space-y-4">
-              {allWatchable.length === 0 && (
-                <p className="text-sm text-muted">暂时没有进行中或最近结算的挑战。去 <Link href="/challenge/new" className="text-accent hover:underline">创建一场</Link> 吧。</p>
-              )}
+              {allWatchable.length === 0 ? (
+                <p className="text-sm text-muted">
+                  暂时没有进行中或最近结算的挑战。去 <Link href="/challenge/new" className="text-accent hover:underline">创建一场</Link> 吧。
+                </p>
+              ) : null}
               {allWatchable.map((match) => {
                 const challenger = playerMap[match.challengerSlug];
                 const defender = playerMap[match.defenderSlug];
                 const statusMeta = challengeStatusMeta[match.status];
+                const targetHref = match.status === "settlement" ? `/replay/${match.id}` : `/challenge/${match.id}`;
+
                 return (
-                  <Link key={match.id} href={`/challenge/${match.id}`} className="block rounded-[28px] border border-white/10 bg-white/5 p-5 transition hover:border-accent/30 hover:bg-white/[0.08]">
+                  <Link key={match.id} href={targetHref} className="block rounded-[28px] border border-white/10 bg-white/5 p-5 transition hover:border-accent/30 hover:bg-white/[0.08]">
                     <p className={`text-sm ${statusMeta.tone}`}>{statusMeta.label} · {getModeLabel(match.mode)}</p>
                     <h3 className="mt-2 text-xl font-semibold">{challenger?.name ?? match.challengerSlug} vs {defender?.name ?? match.defenderSlug}</h3>
                     <p className="mt-3 text-sm leading-6 text-muted">{match.storyline}</p>
@@ -70,14 +74,15 @@ export default async function WatchPage() {
           <SurfaceCard className="p-6">
             <h2 className="text-2xl font-semibold">近期结算高光</h2>
             <div className="mt-6 space-y-4">
-              {recentSettled.length === 0 && (
+              {recentSettled.length === 0 ? (
                 <p className="text-sm text-muted">还没有已结算的挑战，等第一场打完就有了。</p>
-              )}
+              ) : null}
               {recentSettled.map((match) => {
                 const winner = match.winnerSlug ? playerMap[match.winnerSlug] : null;
+
                 return (
-                  <Link key={match.id} href={`/challenge/${match.id}`} className="block rounded-[28px] border border-white/10 bg-white/5 p-5 transition hover:border-accent/30 hover:bg-white/[0.08]">
-                    <p className="text-sm text-accentSecondary">{winner ? `🏆 ${winner.name} 获胜` : "已结算"}</p>
+                  <Link key={match.id} href={`/replay/${match.id}`} className="block rounded-[28px] border border-white/10 bg-white/5 p-5 transition hover:border-accent/30 hover:bg-white/[0.08]">
+                    <p className="text-sm text-accentSecondary">{winner ? `${winner.name} 获胜` : "已结算"}</p>
                     <h3 className="mt-2 text-xl font-semibold">{playerMap[match.challengerSlug]?.name ?? match.challengerSlug} vs {playerMap[match.defenderSlug]?.name ?? match.defenderSlug}</h3>
                     <p className="mt-3 text-sm leading-6 text-muted">{match.settlementSummary ?? match.storyline}</p>
                   </Link>

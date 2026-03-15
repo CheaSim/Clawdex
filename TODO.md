@@ -23,37 +23,39 @@
 
 ---
 
+## ✅ P0 补充 — 已完成（Round 3 Review）
+
+### 2.1 ~~恢复 Replay 列表页 Polymarket 赔率预览~~ ✅
+- **已修复**（`049f7b2`）：Polymarket odds 行已恢复到辩论预览区块底部。
+- **Review 备注**：实现正确，用 `debate.topic ? ... : null` 守卫，无问题。
+
+### 2.2 ~~开发完成后必须 commit~~ ✅
+- **已修复**：3 个 commit 均已正确提交（`26242c1`, `049f7b2`, `ec54d50`）。
+
+---
+
+## ✅ P1 部分完成（Round 3 Review）
+
+### 3. ~~观战中心 /watch 页面增加跳转到回放~~ ✅
+- **已修复**（`ec54d50`）：已结算卡片 → `/replay/{id}`，进行中卡片 → `/challenge/{id}`。
+- **Review 备注**：
+  - ✅ 用 `targetHref` 变量分流，逻辑清晰
+  - ✅ 近期结算高光区块统一指向 `/replay/{id}`
+  - ⚠️ 额外改动：emoji 🏆 被移除（`watch` 页面高光区 winner 显示），风格统一可接受
+  - ⚠️ 额外改动：description 文案微调（沉浸→持续），可接受
+
+---
+
 ## 🔴 P0 — 必须立即修复
 
-### 2.1 恢复 Replay 列表页 Polymarket 赔率预览（NEW）
-- **问题**：Round 2 开发中，辩论卡片底部的 Polymarket odds 行被移除了（`Polymarket: Yes 65% No 35% Vol $xxx`）。这是一个重要的信息展示，不应该删除。
-- **文件**：`src/app/replay/page.tsx`
-- **改法**：在辩论预览区块（`debate.rounds` 展示之后），恢复如下代码块：
-  ```tsx
-  {debate.topic && (
-    <div className="mt-3 flex items-center gap-4 text-xs text-muted">
-      <span>Polymarket:</span>
-      {debate.topic.outcomes.map((outcome, i) => (
-        <span key={outcome}>
-          {outcome} {((debate.topic!.currentPrices[i] ?? 0) * 100).toFixed(0)}%
-        </span>
-      ))}
-      <span className="ml-auto">Vol ${Math.round(debate.topic.volume).toLocaleString()}</span>
-    </div>
-  )}
-  ```
-
-### 2.2 开发完成后必须 commit
-- **问题**：当前修改仍为 unstaged，开发 Agent 必须在完成修改后执行 `git add -A && git commit`。
-- **指令**：每完成一个 TODO 项就 commit 一次，commit message 格式 `fix: xxx` 或 `feat: xxx`。
+### 3.1 Watch 页面「近期结算高光」区需去重（NEW）
+- **问题**：`/watch` 页面中，`recentSettled` 同时出现在上方 `allWatchable` 列表和下方「近期结算高光」区，导致已结算对战重复显示两次。
+- **文件**：`src/app/watch/page.tsx`
+- **改法**：将上方 `allWatchable` 只包含 `liveAndAccepted`（去掉 recentSettled），或在下方「近期结算高光」标注为独立区块并从上方排除。
 
 ---
 
 ## 🟡 P1 — 本轮迭代核心需求
-
-### 3. 观战中心 /watch 页面增加跳转到回放
-- **现状**：`/watch` 页面的已结算卡片点击无反应。
-- **需求**：已结算对战卡片加上 `<Link href="/replay/{id}">` 指向回放详情页。进行中的卡片加上 `<Link href="/challenge/{id}">` 指向挑战详情。
 
 ### 4. 选手主页增加历史战绩区块
 - **文件**：`src/app/players/[slug]/page.tsx`
@@ -106,5 +108,5 @@
 
 ---
 
-_最后更新：2026-03-15 · PM Review Round 2_
-_上轮 P0 #1 #2 已交付，新增 P0 #2.1 #2.2，P1~P3 保持不变。_
+_最后更新：2026-03-15 · PM Review Round 3_
+_Round 3：P0 #2.1 #2.2 验收通过，P1 #3 验收通过。新增 P0 #3.1（watch 去重）。下一步：P1 #4 #5 #6。_

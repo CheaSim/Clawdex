@@ -5,20 +5,47 @@
 
 ---
 
+## ✅ P0 — 已完成（Round 2 Review）
+
+### 1. ~~Replay 详情页链接修正~~ ✅
+- **已修复**：所有卡片 Link 统一指向 `/replay/${match.id}`。
+- **Review 备注**：实现正确，无问题。
+
+### 2. ~~Replay 列表页筛选标签改为可交互~~ ✅
+- **已修复**：使用 `searchParams.filter` + `<Link>` 实现服务端筛选，高亮逻辑正确。
+- **Review 备注**：
+  - ✅ filterOptions 提取为常量 + `as const`，好
+  - ✅ 不合法 filter 值 fallback 到 `"all"`，防御到位
+  - ✅ 空结果提示文案改为「当前筛选下暂无回放记录」，更准确
+  - ⚠️ **额外改动注意**：emoji 🏆 被替换为文字"冠军"，破分隔符从 `—` 改为 `·`，Polymarket odds 预览被移除。Polymarket 预览移除是退步，下面新增 P0 补回。
+  - ⚠️ **额外改动注意**：代码注释（`{/* ─── Filter Tabs */}` 等）全部被删除（代码清洁化），可以接受。
+  - ⚠️ 变量命名从短名（`c`, `d`, `s`）改为全名（`challenge`, `debate`, `sum`），style 层面可以接受。
+
+---
+
 ## 🔴 P0 — 必须立即修复
 
-### 1. Replay 详情页链接修正
-- **问题**：`/replay` 列表页中，每张卡片的 Link href 指向 `/debate/{debateId}` 或 `/challenge/{matchId}`，但应该统一指向 `/replay/{matchId}`（即 challenge ID）。
+### 2.1 恢复 Replay 列表页 Polymarket 赔率预览（NEW）
+- **问题**：Round 2 开发中，辩论卡片底部的 Polymarket odds 行被移除了（`Polymarket: Yes 65% No 35% Vol $xxx`）。这是一个重要的信息展示，不应该删除。
 - **文件**：`src/app/replay/page.tsx`
-- **改法**：所有卡片的 `<Link href={...}>` 统一改为 `href={/replay/${match.id}}`，不再区分是否有辩论。
+- **改法**：在辩论预览区块（`debate.rounds` 展示之后），恢复如下代码块：
+  ```tsx
+  {debate.topic && (
+    <div className="mt-3 flex items-center gap-4 text-xs text-muted">
+      <span>Polymarket:</span>
+      {debate.topic.outcomes.map((outcome, i) => (
+        <span key={outcome}>
+          {outcome} {((debate.topic!.currentPrices[i] ?? 0) * 100).toFixed(0)}%
+        </span>
+      ))}
+      <span className="ml-auto">Vol ${Math.round(debate.topic.volume).toLocaleString()}</span>
+    </div>
+  )}
+  ```
 
-### 2. Replay 列表页筛选标签改为可交互
-- **问题**：当前筛选标签（全部/已结算/进行中/含辩论）仅为静态 `<span>`，不可点击。
-- **文件**：`src/app/replay/page.tsx`
-- **方案**：
-  - 使用 URL searchParams `?filter=all|settled|live|debate` 控制筛选
-  - 标签改为 `<Link>` 或改成客户端组件用 `useState`
-  - 高亮当前选中标签（`border-accent/40 bg-accent/10`），其余灰色
+### 2.2 开发完成后必须 commit
+- **问题**：当前修改仍为 unstaged，开发 Agent 必须在完成修改后执行 `git add -A && git commit`。
+- **指令**：每完成一个 TODO 项就 commit 一次，commit message 格式 `fix: xxx` 或 `feat: xxx`。
 
 ---
 
@@ -79,4 +106,5 @@
 
 ---
 
-_最后更新：2026-03-15 · PM Review Round 1_
+_最后更新：2026-03-15 · PM Review Round 2_
+_上轮 P0 #1 #2 已交付，新增 P0 #2.1 #2.2，P1~P3 保持不变。_

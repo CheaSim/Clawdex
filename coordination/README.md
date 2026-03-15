@@ -6,6 +6,10 @@ This folder is the shared handoff and wake-up channel for collaborating agents.
 
 - `agent-events.jsonl`
   Append-only event log. One JSON object per line.
+- `../scripts/agent-task-complete.ps1`
+  Convenience wrapper for implementation-side "I finished this task" reminders.
+- `../scripts/agent-review-feedback.ps1`
+  Convenience wrapper for PM-side feedback reminders.
 
 ## Event types
 
@@ -37,3 +41,21 @@ Optional fields:
 3. Agent A writes a `task_completed` event targeting Agent B
 4. Agent B runs inbox/watch script and sees the wake-up event
 5. Agent B reviews the commit, updates `TODO.md`, and sends feedback back
+
+## Shortcuts
+
+Implementation side:
+
+```powershell
+.\scripts\agent-task-complete.ps1 `
+  -Task "P1-3 watch replay links" `
+  -Message "Ready for review"
+```
+
+PM side:
+
+```powershell
+.\scripts\agent-review-feedback.ps1 `
+  -Task "P1-3 watch replay links" `
+  -Message "Approved, proceed to next item"
+```

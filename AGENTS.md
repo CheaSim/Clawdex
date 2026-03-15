@@ -17,6 +17,8 @@
 - `scripts/agent-notify.ps1`
 - `scripts/agent-inbox.ps1`
 - `scripts/agent-watch.ps1`
+- `scripts/agent-task-complete.ps1`
+- `scripts/agent-review-feedback.ps1`
 
 ### 示例
 
@@ -39,6 +41,22 @@ PM 回评：
   -From "pm-agent" `
   -To "impl-agent" `
   -Type "review_feedback" `
+  -Task "P1-3 watch replay links" `
+  -Message "Approved, proceed to next item"
+```
+
+实现方快捷通知：
+
+```powershell
+.\scripts\agent-task-complete.ps1 `
+  -Task "P1-3 watch replay links" `
+  -Message "Ready for review"
+```
+
+PM 快捷回评：
+
+```powershell
+.\scripts\agent-review-feedback.ps1 `
   -Task "P1-3 watch replay links" `
   -Message "Approved, proceed to next item"
 ```

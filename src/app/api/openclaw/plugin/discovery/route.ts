@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 
 import { getPluginAuthMode } from "@/lib/openclaw-plugin-auth";
 import { listChallenges, listPlayers } from "@/lib/mock-db";
+import { resolvePublicAppOrigin } from "@/lib/request-origin";
 
 export async function GET(request: Request) {
-  const origin = new URL(request.url).origin;
+  const origin = resolvePublicAppOrigin(request.headers, request.url);
   const [players, challenges] = await Promise.all([listPlayers(), listChallenges()]);
 
   return NextResponse.json({

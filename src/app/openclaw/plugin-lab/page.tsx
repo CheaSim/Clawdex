@@ -1,12 +1,13 @@
 import Link from "next/link";
 
+import { requireCurrentUser } from "@/lib/auth-guard";
+import { getConfiguredDataBackend } from "@/lib/data-backend";
+import { getDataStoreStatus, listChallenges, listPlayers } from "@/lib/mock-db";
+import { getPluginAuthMode } from "@/lib/openclaw-plugin-auth";
+import { PluginLabSelfTestPanel } from "@/components/openclaw/plugin-lab-selftest-panel";
 import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
-import { getConfiguredDataBackend } from "@/lib/data-backend";
-import { requireCurrentUser } from "@/lib/auth-guard";
-import { getDataStoreStatus, listChallenges, listPlayers } from "@/lib/mock-db";
-import { getPluginAuthMode } from "@/lib/openclaw-plugin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -39,11 +40,7 @@ export default async function PluginLabPage() {
 
   const backend = getConfiguredDataBackend();
   const authMode = getPluginAuthMode();
-  const [status, players, challenges] = await Promise.all([
-    getDataStoreStatus(),
-    listPlayers(),
-    listChallenges(),
-  ]);
+  const [status, players, challenges] = await Promise.all([getDataStoreStatus(), listPlayers(), listChallenges()]);
 
   const readyPlayers = players.filter((player) => player.openClaw.status === "ready").length;
   const activeChallenges = challenges.filter((challenge) => ["accepted", "live"].includes(challenge.status)).length;
@@ -53,12 +50,16 @@ export default async function PluginLabPage() {
       <div className="section-grid">
         <PageHero
           eyebrow="Plugin Lab"
-          title="插件联调状态页"
-          description="这里用于确认 Clawdex control plane 是否准备好承接 OpenClaw 插件，适合在安装插件前后做快速联调。"
+          title="把插件联调、控制面探测和全链路自测，集中到一个真实可用的工作台里。"
+          description="这里不是静态文档页，而是 Clawdex 的集成调试台。你可以先看环境，再跑 quick probe，最后在网页里直接走完一条 full drill。"
           actions={
             <>
-              <Link href="/openclaw" className="btn-primary">返回 OpenClaw 面板</Link>
-              <Link href="/database" className="btn-secondary">查看数据状态</Link>
+              <Link href="/openclaw" className="btn-primary">
+                返回 OpenClaw 面板
+              </Link>
+              <Link href="/database" className="btn-secondary">
+                查看数据状态
+              </Link>
             </>
           }
           aside={
@@ -71,9 +72,7 @@ export default async function PluginLabPage() {
                 <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
                   插件鉴权：{authMode === "token" ? "Bearer Token" : "Open Mode"}
                 </div>
-                <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
-                  Channel ID：`clawdex-channel`
-                </div>
+                <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">Channel ID：`clawdex-channel`</div>
               </div>
             </SurfaceCard>
           }
@@ -98,43 +97,30 @@ export default async function PluginLabPage() {
           </SurfaceCard>
         </section>
 
-        <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-          <SurfaceCard className="p-6">
-            <p className="text-sm text-accent">完整联调前检查</p>
-            <div className="mt-5 space-y-3 text-sm leading-6 text-slate-200">
-              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
-                1. 主站已启动在 `http://127.0.0.1:3000`
-              </div>
-              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
-                2. `CLAWDEX_DATA_BACKEND=prisma`
-              </div>
-              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
-                3. `CLAWDEX_PLUGIN_TOKEN` 已配置，并与 OpenClaw 配置一致
-              </div>
-              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
-                4. OpenClaw 已安装 `@cheasim/clawdex-channel` 或本地插件目录
-              </div>
-              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
-                5. `openclaw.json` 中 `controlPlaneBaseUrl` 指向 `http://127.0.0.1:3000/api`
-              </div>
-            </div>
-          </SurfaceCard>
-
-          <SurfaceCard className="p-6">
-            <p className="text-sm text-accent">推荐执行顺序</p>
-            <div className="mt-5 space-y-3 text-sm leading-6 text-slate-200">
-              <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">先执行 `clawdex-channel.status`</div>
-              <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">再执行 `clawdex-channel.docs`</div>
-              <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">最后执行 `clawdex-channel.selftest.full`</div>
-            </div>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Link href="/openclaw" className="btn-secondary">去改通道配置</Link>
-              <Link href="/challenge" className="btn-secondary">看挑战状态</Link>
-            </div>
-          </SurfaceCard>
-        </section>
+        <PluginLabSelfTestPanel backend={backend} />
 
         <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+          <SurfaceCard className="p-6">
+            <p className="text-sm text-accent">联调前检查</p>
+            <div className="mt-5 space-y-3 text-sm leading-6 text-slate-200">
+              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
+                1. 主站已经通过 Docker 跑在 `http://127.0.0.1/`
+              </div>
+              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
+                2. `CLAWDEX_DATA_BACKEND` 与预期环境一致
+              </div>
+              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
+                3. 如果你开启了 token 模式，`CLAWDEX_PLUGIN_TOKEN` 要和 OpenClaw 配置一致
+              </div>
+              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
+                4. `openclaw.json` 中的 `controlPlaneBaseUrl` 应指向 `http://127.0.0.1/api`
+              </div>
+              <div className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
+                5. Full drill 需要 Prisma / PostgreSQL 才能自动 provision 测试账号
+              </div>
+            </div>
+          </SurfaceCard>
+
           <SurfaceCard className="p-6">
             <p className="text-sm text-accent">OpenClaw 调用模板</p>
             <div className="mt-5 space-y-4">
@@ -146,7 +132,9 @@ export default async function PluginLabPage() {
               ))}
             </div>
           </SurfaceCard>
+        </section>
 
+        <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
           <SurfaceCard className="p-6">
             <p className="text-sm text-accent">手动联调方法链</p>
             <div className="mt-5 space-y-3 text-sm leading-6 text-slate-200">
@@ -156,8 +144,20 @@ export default async function PluginLabPage() {
                 </div>
               ))}
             </div>
-            <div className="mt-5 rounded-[20px] border border-white/10 bg-slate-950/55 p-4 text-sm leading-6 text-slate-300">
-              当前页面展示的是“现在是否适合联调”，还没有持久化“最近一次 self-test 结果”。如果你想要，我下一步可以继续把自测结果入库并做成历史记录面板。
+          </SurfaceCard>
+
+          <SurfaceCard className="p-6">
+            <p className="text-sm text-accent">为什么这页重要</p>
+            <div className="mt-5 space-y-3 text-sm leading-6 text-slate-200">
+              <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
+                它让主站和插件不再是“两套看上去有关联的东西”，而是一个可以从网页里直接验证的完整系统。
+              </div>
+              <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
+                对开发和联调来说，quick probe 能先排除环境问题，full drill 再去证明 battle flow 真正走通。
+              </div>
+              <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
+                对演示和传播来说，一键 drill 之后马上给出 challenge / replay / player 链接，天然适合 demo 和验收。
+              </div>
             </div>
           </SurfaceCard>
         </section>

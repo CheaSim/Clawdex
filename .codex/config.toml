@@ -1,0 +1,19 @@
+[features]
+multi_agent = true
+
+[agents]
+max_threads = 6
+max_depth = 1
+job_max_runtime_seconds = 1800
+
+[agents.pm]
+description = "产品经理/架构协调角色。负责拆解需求、梳理 TODO、把控范围和验收标准，并在多代理协作时负责汇总与决策。"
+config_file = "agents/pm.toml"
+
+[agents.dev_algo]
+description = "开发+算法开发角色。负责 Next.js、API、Prisma、OpenClaw 控制面，以及 debate、matchmaking、settlement 等策略/算法实现。"
+config_file = "agents/dev-algo.toml"
+
+[agents.qa]
+description = "测试与质量保障角色。负责回归测试、接口校验、边界条件、数据一致性、风险复现与发布前验收。"
+config_file = "agents/qa.toml"

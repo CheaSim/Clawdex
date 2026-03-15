@@ -7,7 +7,7 @@ import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
 import { challengeStatusMeta, getModeLabel, isPlayerOpenClawReady, openClawStatusMeta } from "@/data/product-data";
-import { getChallengeById, getPlayerBySlugFromDb } from "@/lib/mock-db";
+import { getChallengeById, getDebateByChallengeId, getPlayerBySlugFromDb } from "@/lib/mock-db";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +22,7 @@ type ChallengeDetailPageProps = {
 
 export default async function ChallengeDetailPage({ params }: ChallengeDetailPageProps) {
   const { id } = await params;
-  const challenge = await getChallengeById(id);
+  const [challenge, debate] = await Promise.all([getChallengeById(id), getDebateByChallengeId(id)]);
 
   if (!challenge) {
     notFound();
@@ -61,7 +61,7 @@ export default async function ChallengeDetailPage({ params }: ChallengeDetailPag
                 <p>挑战编号：{challenge.id}</p>
                 <p>创建时间：{new Date(challenge.createdAt).toLocaleString("zh-CN")}</p>
                 <p>可见范围：{visibilityLabels[challenge.visibility]}</p>
-                <p>接战时间：{challenge.acceptedAt ? new Date(challenge.acceptedAt).toLocaleString("zh-CN") : "等待接受"}</p>
+                <p>接战时间：{challenge.acceptedAt ? new Date(challenge.acceptedAt).toLocaleString("zh-CN") : "等待接战"}</p>
               </div>
             </SurfaceCard>
           }
@@ -112,7 +112,40 @@ export default async function ChallengeDetailPage({ params }: ChallengeDetailPag
               </div>
             </SurfaceCard>
 
-            {["accepted", "live"].includes(challenge.status) && (
+            {debate ? (
+              <SurfaceCard className="bg-slate-950/70 p-6">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm text-accent">辩论入口</p>
+                    <h2 className="mt-3 text-2xl font-semibold">{debate.topic?.question ?? "Polymarket 辩论 PK"}</h2>
+                    <p className="mt-3 text-sm leading-6 text-muted">
+                      {debate.summary ?? `已记录 ${debate.rounds?.length ?? 0} 条发言 · 当前进度 ${debate.currentRound}/${debate.totalRounds} 轮`}
+                    </p>
+                  </div>
+                  <span className="pill-muted text-sm text-slate-200">辩论 PK</span>
+                </div>
+                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                    <p className="text-xs text-muted">发言条数</p>
+                    <p className="mt-2 text-xl font-semibold">{debate.rounds?.length ?? 0}</p>
+                  </div>
+                  <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                    <p className="text-xs text-muted">辩论轮次</p>
+                    <p className="mt-2 text-xl font-semibold">{debate.currentRound}/{debate.totalRounds}</p>
+                  </div>
+                </div>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Link href={`/debate/${debate.id}`} className="btn-primary">
+                    查看辩论实录
+                  </Link>
+                  <Link href={`/replay/${challenge.id}`} className="btn-secondary">
+                    查看对战回放
+                  </Link>
+                </div>
+              </SurfaceCard>
+            ) : null}
+
+            {["accepted", "live"].includes(challenge.status) ? (
               <SpectatorVotePanel
                 challengeId={challenge.id}
                 challengerSlug={challenger.slug}
@@ -120,19 +153,19 @@ export default async function ChallengeDetailPage({ params }: ChallengeDetailPag
                 defenderSlug={defender.slug}
                 defenderName={defender.name}
               />
-            )}
+            ) : null}
 
-            {challenge.status === "settlement" && challenge.winnerSlug && (
+            {challenge.status === "settlement" && challenge.winnerSlug ? (
               <SurfaceCard className="border-accentSecondary/30 bg-accentSecondary/5 p-6">
                 <p className="text-sm text-accentSecondary">结算结果</p>
                 <p className="mt-3 text-2xl font-semibold">
                   {challenge.winnerSlug === challenger.slug ? challenger.name : defender.name} 获胜
                 </p>
-                {challenge.settlementSummary && (
+                {challenge.settlementSummary ? (
                   <p className="mt-3 text-sm leading-6 text-slate-200">{challenge.settlementSummary}</p>
-                )}
+                ) : null}
               </SurfaceCard>
-            )}
+            ) : null}
           </div>
 
           <div className="space-y-6">
@@ -174,13 +207,17 @@ export default async function ChallengeDetailPage({ params }: ChallengeDetailPag
                 </div>
                 <div className="mt-5">
                   <Link href={`/players/${player.slug}`} className="text-sm text-accentSecondary transition hover:text-accent">
-                    查看玩家主页 →
+                    查看选手主页 →
                   </Link>
                 </div>
                 <div className="mt-4 rounded-[20px] border border-white/10 bg-slate-950/55 p-3 text-sm text-slate-200">
                   <p className="font-medium text-slate-100">OpenClaw 通道</p>
-                  <p className="mt-2">{player.openClaw.channel} · {player.openClaw.region}</p>
-                  <p className="mt-2 text-muted">账号 {player.openClaw.accountId} · 客户端 {player.openClaw.clientVersion}</p>
+                  <p className="mt-2">
+                    {player.openClaw.channel} · {player.openClaw.region}
+                  </p>
+                  <p className="mt-2 text-muted">
+                    账号 {player.openClaw.accountId} · 客户端 {player.openClaw.clientVersion}
+                  </p>
                 </div>
               </SurfaceCard>
             ))}

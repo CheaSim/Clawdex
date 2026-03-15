@@ -1,15 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
 import { challengeStatusMeta, getModeLabel } from "@/data/product-data";
+import { sortChallengesByActivityDesc } from "@/lib/challenge-insights";
 import { listChallenges, listDebates, listPlayers } from "@/lib/mock-db";
 
 export const dynamic = "force-dynamic";
 
+export const metadata: Metadata = {
+  title: "对战回放 | Clawdex",
+  description: "查看 Clawdex 中所有已结算、进行中与带辩论记录的对战回放。",
+};
+
 const debateStatusLabels: Record<string, string> = {
-  "topic-set": "议题已设置",
+  "topic-set": "议题已设定",
   started: "进行中",
   "round-a": "正方发言",
   "round-b": "反方发言",
@@ -34,19 +41,13 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
   const requestedFilter = resolvedSearchParams?.filter ?? "all";
   const currentFilter = filterOptions.some((option) => option.key === requestedFilter) ? requestedFilter : "all";
 
-  const [challenges, debates, players] = await Promise.all([
-    listChallenges(),
-    listDebates(),
-    listPlayers(),
-  ]);
+  const [challenges, debates, players] = await Promise.all([listChallenges(), listDebates(), listPlayers()]);
 
   const playerMap = Object.fromEntries(players.map((player) => [player.slug, player]));
   const debateMap = Object.fromEntries(debates.map((debate) => [debate.challengeId, debate]));
-
-  const settled = challenges.filter((challenge) => challenge.status === "settlement");
-  const liveOrAccepted = challenges.filter((challenge) => ["accepted", "live"].includes(challenge.status));
-  const pending = challenges.filter((challenge) => challenge.status === "pending");
-  const allSorted = [...settled, ...liveOrAccepted, ...pending];
+  const allSorted = sortChallengesByActivityDesc(challenges);
+  const settled = allSorted.filter((challenge) => challenge.status === "settlement");
+  const liveOrAccepted = allSorted.filter((challenge) => ["accepted", "live"].includes(challenge.status));
 
   const filteredMatches = allSorted.filter((match) => {
     if (currentFilter === "settled") {
@@ -79,9 +80,9 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
     <SiteShell>
       <div className="section-grid">
         <PageHero
-          eyebrow="Replay 战绩回顾"
-          title="每场对战，都是一段可重播的故事。"
-          description="所有挑战和辩论的完整历史都会沉淀在这里，方便观众复盘，也方便选手学习。"
+          eyebrow="Replay 战绩回看"
+          title="每一场对战，都会沉淀成一个可以继续传播的内容页。"
+          description="这里汇总所有挑战与辩论记录。观众可以复盘高光，选手可以回看自己的历史战绩，插件也能把结果回链到这里。"
           aside={
             <SurfaceCard className="h-full bg-slate-950/45 p-5">
               <p className="text-sm text-accent">历史统计</p>
@@ -126,7 +127,11 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
         {filteredMatches.length === 0 ? (
           <SurfaceCard>
             <p className="py-12 text-center text-muted">
-              当前筛选下暂无回放记录。<Link href="/challenge/new" className="text-accent hover:underline">去创建第一场挑战</Link>
+              当前筛选下还没有回放记录。去{" "}
+              <Link href="/challenge/new" className="text-accent hover:underline">
+                创建第一场挑战
+              </Link>
+              。
             </p>
           </SurfaceCard>
         ) : (
@@ -145,11 +150,7 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
                 <div key={match.id} className="relative md:pl-14">
                   <div
                     className={`absolute left-3.5 top-6 hidden h-3 w-3 rounded-full md:block ${
-                      isSettled
-                        ? "bg-accentSecondary shadow-[0_0_8px_rgba(var(--color-accentSecondary),0.4)]"
-                        : match.status === "live"
-                          ? "animate-pulse bg-danger"
-                          : "bg-white/30"
+                      isSettled ? "bg-accentSecondary" : match.status === "live" ? "animate-pulse bg-danger" : "bg-white/30"
                     }`}
                   />
 
@@ -220,11 +221,8 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
                       <div className="mt-4 space-y-2">
                         {isSettled && winner ? (
                           <div className="flex items-center gap-2 rounded-2xl border border-accentSecondary/20 bg-accentSecondary/5 px-4 py-2.5">
-                            <span className="text-sm">冠军</span>
                             <span className="text-sm font-semibold text-accentSecondary">{winner.name} 获胜</span>
-                            {match.settlementSummary ? (
-                              <span className="text-sm text-muted">· {match.settlementSummary}</span>
-                            ) : null}
+                            {match.settlementSummary ? <span className="text-sm text-muted">· {match.settlementSummary}</span> : null}
                           </div>
                         ) : (
                           <p className="text-sm leading-relaxed text-muted">{match.storyline}</p>
@@ -233,7 +231,7 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
 
                       {debate ? (
                         <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between gap-4">
                             <div>
                               <p className="text-xs text-accent">辩论议题</p>
                               <p className="mt-1 text-sm font-semibold">{debate.topic?.question ?? "未知议题"}</p>

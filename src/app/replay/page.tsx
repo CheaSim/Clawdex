@@ -269,6 +269,18 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
                               })}
                             </div>
                           ) : null}
+
+                          {debate.topic ? (
+                            <div className="mt-3 flex items-center gap-4 text-xs text-muted">
+                              <span>Polymarket:</span>
+                              {debate.topic.outcomes.map((outcome, index) => (
+                                <span key={outcome}>
+                                  {outcome} {((debate.topic!.currentPrices[index] ?? 0) * 100).toFixed(0)}%
+                                </span>
+                              ))}
+                              <span className="ml-auto">Vol ${Math.round(debate.topic.volume).toLocaleString()}</span>
+                            </div>
+                          ) : null}
                         </div>
                       ) : null}
 

@@ -95,6 +95,7 @@ export const navItems = [
   { href: "/watch", label: "观战中心" },
   { href: "/challenge", label: "挑战擂台" },
   { href: "/debate", label: "辩论 PK" },
+  { href: "/replay", label: "对战回放" },
   { href: "/rankings", label: "排行榜" },
   { href: "/rules", label: "规则中心" },
 ];

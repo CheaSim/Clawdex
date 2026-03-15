@@ -2,6 +2,47 @@
 
 > 本文件面向 AI Agent / Copilot / 自动化工具。每次更新后 commit，完成大需求后 push。
 
+## Agent 协作机制
+
+当前仓库使用 `TODO.md` 作为任务源，使用 `coordination/agent-events.jsonl` 作为双向提醒通道。
+
+### 规则
+
+1. 实现方完成任务后，先 commit，再发送通知
+2. PM / 架构方 review 完后，更新 `TODO.md`，再回发通知
+3. 双方都可以运行轮询脚本，每分钟自动检查 `TODO.md` 和收件箱
+
+### 脚本
+
+- `scripts/agent-notify.ps1`
+- `scripts/agent-inbox.ps1`
+- `scripts/agent-watch.ps1`
+
+### 示例
+
+实现方完成任务后：
+
+```powershell
+.\scripts\agent-notify.ps1 `
+  -From "impl-agent" `
+  -To "pm-agent" `
+  -Type "task_completed" `
+  -Task "P1-3 watch replay links" `
+  -Message "Ready for review" `
+  -Commit (git rev-parse --short HEAD)
+```
+
+PM 回评：
+
+```powershell
+.\scripts\agent-notify.ps1 `
+  -From "pm-agent" `
+  -To "impl-agent" `
+  -Type "review_feedback" `
+  -Task "P1-3 watch replay links" `
+  -Message "Approved, proceed to next item"
+```
+
 ---
 
 ## 产品定位

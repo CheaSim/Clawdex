@@ -1,0 +1,39 @@
+# Agent Coordination
+
+This folder is the shared handoff and wake-up channel for collaborating agents.
+
+## Files
+
+- `agent-events.jsonl`
+  Append-only event log. One JSON object per line.
+
+## Event types
+
+- `task_claimed`
+- `task_completed`
+- `review_requested`
+- `review_feedback`
+- `wake_ping`
+
+## Required fields
+
+- `timestamp`
+- `from`
+- `to`
+- `type`
+- `task`
+- `message`
+
+Optional fields:
+
+- `commit`
+- `todo_version`
+- `meta`
+
+## Intended flow
+
+1. Agent A claims a task from `TODO.md`
+2. Agent A completes work and commits
+3. Agent A writes a `task_completed` event targeting Agent B
+4. Agent B runs inbox/watch script and sees the wake-up event
+5. Agent B reviews the commit, updates `TODO.md`, and sends feedback back

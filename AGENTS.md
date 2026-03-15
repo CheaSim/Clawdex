@@ -19,6 +19,8 @@
 - `scripts/agent-watch.ps1`
 - `scripts/agent-task-complete.ps1`
 - `scripts/agent-review-feedback.ps1`
+- `scripts/install-agent-hooks.ps1`
+- `scripts/agent-loop.ps1`
 
 ### 示例
 
@@ -59,6 +61,18 @@ PM 快捷回评：
 .\scripts\agent-review-feedback.ps1 `
   -Task "P1-3 watch replay links" `
   -Message "Approved, proceed to next item"
+```
+
+安装自动 commit 提醒 hook：
+
+```powershell
+.\scripts\install-agent-hooks.ps1
+```
+
+常驻循环（最后一步永远是获取信息、等待）：
+
+```powershell
+.\scripts\agent-loop.ps1 -Agent "impl-agent" -IntervalSeconds 60
 ```
 
 ---

@@ -1,0 +1,26 @@
+#!/usr/bin/env pwsh
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+$repoRoot = git rev-parse --show-toplevel
+$scriptPath = Join-Path $repoRoot "scripts\agent-task-complete.ps1"
+
+if (-not (Test-Path $scriptPath)) {
+  exit 0
+}
+
+$task = $env:AGENT_NOTIFY_TASK
+$message = $env:AGENT_NOTIFY_MESSAGE
+$from = if ($env:AGENT_NOTIFY_FROM) { $env:AGENT_NOTIFY_FROM } else { "impl-agent" }
+$to = if ($env:AGENT_NOTIFY_TO) { $env:AGENT_NOTIFY_TO } else { "pm-agent" }
+
+if (-not $task) {
+  $task = "unspecified-task"
+}
+
+if (-not $message) {
+  $message = "New commit is ready for review."
+}
+
+powershell -ExecutionPolicy Bypass -File $scriptPath -Task $task -Message $message -From $from -To $to | Out-Null

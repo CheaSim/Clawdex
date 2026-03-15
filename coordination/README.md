@@ -10,6 +10,10 @@ This folder is the shared handoff and wake-up channel for collaborating agents.
   Convenience wrapper for implementation-side "I finished this task" reminders.
 - `../scripts/agent-review-feedback.ps1`
   Convenience wrapper for PM-side feedback reminders.
+- `../scripts/install-agent-hooks.ps1`
+  Install git hooks so commits can auto-notify the other agent.
+- `../scripts/agent-loop.ps1`
+  Continuous loop: fetch information, then wait.
 
 ## Event types
 
@@ -58,4 +62,16 @@ PM side:
 .\scripts\agent-review-feedback.ps1 `
   -Task "P1-3 watch replay links" `
   -Message "Approved, proceed to next item"
+```
+
+Install auto-notify hook:
+
+```powershell
+.\scripts\install-agent-hooks.ps1
+```
+
+Start the long-running loop:
+
+```powershell
+.\scripts\agent-loop.ps1 -Agent "impl-agent" -IntervalSeconds 60
 ```

@@ -518,6 +518,40 @@ export type EnumSpectatorVoteTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumSpectatorVoteTypeFilter<$PrismaModel>
 }
 
+export type EnumDebateStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.DebateStatus | Prisma.EnumDebateStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DebateStatus[] | Prisma.ListEnumDebateStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DebateStatus[] | Prisma.ListEnumDebateStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDebateStatusFilter<$PrismaModel> | $Enums.DebateStatus
+}
+
+export type EnumDebateSideFilter<$PrismaModel = never> = {
+  equals?: $Enums.DebateSide | Prisma.EnumDebateSideFieldRefInput<$PrismaModel>
+  in?: $Enums.DebateSide[] | Prisma.ListEnumDebateSideFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DebateSide[] | Prisma.ListEnumDebateSideFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDebateSideFilter<$PrismaModel> | $Enums.DebateSide
+}
+
+export type EnumDebateStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DebateStatus | Prisma.EnumDebateStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DebateStatus[] | Prisma.ListEnumDebateStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DebateStatus[] | Prisma.ListEnumDebateStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDebateStatusWithAggregatesFilter<$PrismaModel> | $Enums.DebateStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDebateStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDebateStatusFilter<$PrismaModel>
+}
+
+export type EnumDebateSideWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DebateSide | Prisma.EnumDebateSideFieldRefInput<$PrismaModel>
+  in?: $Enums.DebateSide[] | Prisma.ListEnumDebateSideFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DebateSide[] | Prisma.ListEnumDebateSideFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDebateSideWithAggregatesFilter<$PrismaModel> | $Enums.DebateSide
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDebateSideFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDebateSideFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -968,6 +1002,40 @@ export type NestedEnumSpectatorVoteTypeWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSpectatorVoteTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSpectatorVoteTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumDebateStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.DebateStatus | Prisma.EnumDebateStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DebateStatus[] | Prisma.ListEnumDebateStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DebateStatus[] | Prisma.ListEnumDebateStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDebateStatusFilter<$PrismaModel> | $Enums.DebateStatus
+}
+
+export type NestedEnumDebateSideFilter<$PrismaModel = never> = {
+  equals?: $Enums.DebateSide | Prisma.EnumDebateSideFieldRefInput<$PrismaModel>
+  in?: $Enums.DebateSide[] | Prisma.ListEnumDebateSideFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DebateSide[] | Prisma.ListEnumDebateSideFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDebateSideFilter<$PrismaModel> | $Enums.DebateSide
+}
+
+export type NestedEnumDebateStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DebateStatus | Prisma.EnumDebateStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DebateStatus[] | Prisma.ListEnumDebateStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DebateStatus[] | Prisma.ListEnumDebateStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDebateStatusWithAggregatesFilter<$PrismaModel> | $Enums.DebateStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDebateStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDebateStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumDebateSideWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DebateSide | Prisma.EnumDebateSideFieldRefInput<$PrismaModel>
+  in?: $Enums.DebateSide[] | Prisma.ListEnumDebateSideFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DebateSide[] | Prisma.ListEnumDebateSideFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDebateSideWithAggregatesFilter<$PrismaModel> | $Enums.DebateSide
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDebateSideFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDebateSideFilter<$PrismaModel>
 }
 
 

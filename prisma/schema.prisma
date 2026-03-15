@@ -101,6 +101,8 @@ model Player {
   eventActors       ChallengeEvent[]
   spectatorVotes    SpectatorVote[]     @relation("VoteTarget")
   castedVotes       SpectatorVote[]     @relation("VoteCaster")
+  debatesAsSideA    Debate[]            @relation("DebateSideA")
+  debatesAsSideB    Debate[]            @relation("DebateSideB")
 
   @@index([elo])
   @@index([fame])
@@ -256,6 +258,7 @@ model Challenge {
   settlement        ChallengeSettlement?
   events            ChallengeEvent[]
   spectatorVotes    SpectatorVote[]
+  debate            Debate?
 
   @@index([status, createdAt])
   @@index([challengerId, createdAt])
@@ -311,4 +314,83 @@ model SpectatorVote {
   @@index([challengeId, voteType])
   @@index([voterId])
   @@index([playerId])
+}
+
+// ─── Debate PK System (Polymarket Topics) ─────────────────────────
+
+enum DebateStatus {
+  TOPIC_SET  @map("topic-set")   // 议题已设定，等待双方就位
+  STARTED    @map("started")     // 辩论已启动
+  ROUND_A    @map("round-a")     // 等待 A 方发言
+  ROUND_B    @map("round-b")     // 等待 B 方发言
+  CLOSING    @map("closing")     // 结辩阶段
+  JUDGING    @map("judging")     // 等待评委投票
+  SETTLED    @map("settled")     // 已结算
+}
+
+enum DebateSide {
+  YES  @map("yes")
+  NO   @map("no")
+}
+
+model DebateTopic {
+  id              String      @id @default(cuid())
+  polymarketId    String      @unique
+  question        String
+  description     String
+  outcomes        String[]    @default(["Yes", "No"])
+  currentPrices   Float[]     @default([0.5, 0.5])
+  imageUrl        String?
+  polymarketSlug  String?
+  endDate         DateTime?
+  volume          Float       @default(0)
+  liquidity       Float       @default(0)
+  active          Boolean     @default(true)
+  syncedAt        DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  debates         Debate[]
+
+  @@index([active, syncedAt])
+}
+
+model Debate {
+  id              String        @id @default(cuid())
+  challengeId     String        @unique
+  topicId         String
+  status          DebateStatus  @default(TOPIC_SET)
+  sideAPlayerId   String        // 正方选手 (Yes)
+  sideBPlayerId   String        // 反方选手 (No)
+  sideAPosition   DebateSide    @default(YES)
+  sideBPosition   DebateSide    @default(NO)
+  totalRounds     Int           @default(3)
+  currentRound    Int           @default(0)
+  startedAt       DateTime?
+  endedAt         DateTime?
+  summary         String?       // AI 或管理员总结
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  challenge       Challenge     @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  topic           DebateTopic   @relation(fields: [topicId], references: [id], onDelete: Restrict)
+  sideA           Player        @relation("DebateSideA", fields: [sideAPlayerId], references: [id], onDelete: Restrict)
+  sideB           Player        @relation("DebateSideB", fields: [sideBPlayerId], references: [id], onDelete: Restrict)
+  rounds          DebateRound[]
+
+  @@index([status, createdAt])
+  @@index([topicId])
+}
+
+model DebateRound {
+  id            String    @id @default(cuid())
+  debateId      String
+  roundNumber   Int       // 1, 2, 3, ...
+  side          DebateSide
+  playerId      String
+  argument      String    // 辩论内容
+  wordCount     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  debate        Debate    @relation(fields: [debateId], references: [id], onDelete: Cascade)
+
+  @@unique([debateId, roundNumber, side])
+  @@index([debateId, roundNumber])
 }

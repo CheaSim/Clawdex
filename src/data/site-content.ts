@@ -94,6 +94,7 @@ export const navItems = [
   { href: "/openclaw", label: "OpenClaw 接入" },
   { href: "/watch", label: "观战中心" },
   { href: "/challenge", label: "挑战擂台" },
+  { href: "/debate", label: "辩论 PK" },
   { href: "/rankings", label: "排行榜" },
   { href: "/rules", label: "规则中心" },
 ];

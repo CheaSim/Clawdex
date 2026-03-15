@@ -105,3 +105,24 @@ export const SpectatorVoteType = {
 } as const
 
 export type SpectatorVoteType = (typeof SpectatorVoteType)[keyof typeof SpectatorVoteType]
+
+
+export const DebateStatus = {
+  TOPIC_SET: 'TOPIC_SET',
+  STARTED: 'STARTED',
+  ROUND_A: 'ROUND_A',
+  ROUND_B: 'ROUND_B',
+  CLOSING: 'CLOSING',
+  JUDGING: 'JUDGING',
+  SETTLED: 'SETTLED'
+} as const
+
+export type DebateStatus = (typeof DebateStatus)[keyof typeof DebateStatus]
+
+
+export const DebateSide = {
+  YES: 'YES',
+  NO: 'NO'
+} as const
+
+export type DebateSide = (typeof DebateSide)[keyof typeof DebateSide]

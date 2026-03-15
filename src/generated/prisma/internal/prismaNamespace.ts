@@ -396,7 +396,10 @@ export const ModelName = {
   Challenge: 'Challenge',
   ChallengeSettlement: 'ChallengeSettlement',
   ChallengeEvent: 'ChallengeEvent',
-  SpectatorVote: 'SpectatorVote'
+  SpectatorVote: 'SpectatorVote',
+  DebateTopic: 'DebateTopic',
+  Debate: 'Debate',
+  DebateRound: 'DebateRound'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -412,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "player" | "user" | "account" | "session" | "verificationToken" | "playerWallet" | "walletLedger" | "openClawAccount" | "openClawBinding" | "challenge" | "challengeSettlement" | "challengeEvent" | "spectatorVote"
+    modelProps: "player" | "user" | "account" | "session" | "verificationToken" | "playerWallet" | "walletLedger" | "openClawAccount" | "openClawBinding" | "challenge" | "challengeSettlement" | "challengeEvent" | "spectatorVote" | "debateTopic" | "debate" | "debateRound"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1378,6 +1381,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DebateTopic: {
+      payload: Prisma.$DebateTopicPayload<ExtArgs>
+      fields: Prisma.DebateTopicFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DebateTopicFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DebateTopicFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>
+        }
+        findFirst: {
+          args: Prisma.DebateTopicFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DebateTopicFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>
+        }
+        findMany: {
+          args: Prisma.DebateTopicFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>[]
+        }
+        create: {
+          args: Prisma.DebateTopicCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>
+        }
+        createMany: {
+          args: Prisma.DebateTopicCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DebateTopicCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>[]
+        }
+        delete: {
+          args: Prisma.DebateTopicDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>
+        }
+        update: {
+          args: Prisma.DebateTopicUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>
+        }
+        deleteMany: {
+          args: Prisma.DebateTopicDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DebateTopicUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DebateTopicUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>[]
+        }
+        upsert: {
+          args: Prisma.DebateTopicUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateTopicPayload>
+        }
+        aggregate: {
+          args: Prisma.DebateTopicAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDebateTopic>
+        }
+        groupBy: {
+          args: Prisma.DebateTopicGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DebateTopicGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DebateTopicCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DebateTopicCountAggregateOutputType> | number
+        }
+      }
+    }
+    Debate: {
+      payload: Prisma.$DebatePayload<ExtArgs>
+      fields: Prisma.DebateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DebateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DebateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>
+        }
+        findFirst: {
+          args: Prisma.DebateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DebateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>
+        }
+        findMany: {
+          args: Prisma.DebateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>[]
+        }
+        create: {
+          args: Prisma.DebateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>
+        }
+        createMany: {
+          args: Prisma.DebateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DebateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>[]
+        }
+        delete: {
+          args: Prisma.DebateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>
+        }
+        update: {
+          args: Prisma.DebateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>
+        }
+        deleteMany: {
+          args: Prisma.DebateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DebateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DebateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>[]
+        }
+        upsert: {
+          args: Prisma.DebateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebatePayload>
+        }
+        aggregate: {
+          args: Prisma.DebateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDebate>
+        }
+        groupBy: {
+          args: Prisma.DebateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DebateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DebateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DebateCountAggregateOutputType> | number
+        }
+      }
+    }
+    DebateRound: {
+      payload: Prisma.$DebateRoundPayload<ExtArgs>
+      fields: Prisma.DebateRoundFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DebateRoundFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DebateRoundFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>
+        }
+        findFirst: {
+          args: Prisma.DebateRoundFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DebateRoundFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>
+        }
+        findMany: {
+          args: Prisma.DebateRoundFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>[]
+        }
+        create: {
+          args: Prisma.DebateRoundCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>
+        }
+        createMany: {
+          args: Prisma.DebateRoundCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DebateRoundCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>[]
+        }
+        delete: {
+          args: Prisma.DebateRoundDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>
+        }
+        update: {
+          args: Prisma.DebateRoundUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>
+        }
+        deleteMany: {
+          args: Prisma.DebateRoundDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DebateRoundUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DebateRoundUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>[]
+        }
+        upsert: {
+          args: Prisma.DebateRoundUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebateRoundPayload>
+        }
+        aggregate: {
+          args: Prisma.DebateRoundAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDebateRound>
+        }
+        groupBy: {
+          args: Prisma.DebateRoundGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DebateRoundGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DebateRoundCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DebateRoundCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1627,6 +1852,62 @@ export const SpectatorVoteScalarFieldEnum = {
 } as const
 
 export type SpectatorVoteScalarFieldEnum = (typeof SpectatorVoteScalarFieldEnum)[keyof typeof SpectatorVoteScalarFieldEnum]
+
+
+export const DebateTopicScalarFieldEnum = {
+  id: 'id',
+  polymarketId: 'polymarketId',
+  question: 'question',
+  description: 'description',
+  outcomes: 'outcomes',
+  currentPrices: 'currentPrices',
+  imageUrl: 'imageUrl',
+  polymarketSlug: 'polymarketSlug',
+  endDate: 'endDate',
+  volume: 'volume',
+  liquidity: 'liquidity',
+  active: 'active',
+  syncedAt: 'syncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DebateTopicScalarFieldEnum = (typeof DebateTopicScalarFieldEnum)[keyof typeof DebateTopicScalarFieldEnum]
+
+
+export const DebateScalarFieldEnum = {
+  id: 'id',
+  challengeId: 'challengeId',
+  topicId: 'topicId',
+  status: 'status',
+  sideAPlayerId: 'sideAPlayerId',
+  sideBPlayerId: 'sideBPlayerId',
+  sideAPosition: 'sideAPosition',
+  sideBPosition: 'sideBPosition',
+  totalRounds: 'totalRounds',
+  currentRound: 'currentRound',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  summary: 'summary',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DebateScalarFieldEnum = (typeof DebateScalarFieldEnum)[keyof typeof DebateScalarFieldEnum]
+
+
+export const DebateRoundScalarFieldEnum = {
+  id: 'id',
+  debateId: 'debateId',
+  roundNumber: 'roundNumber',
+  side: 'side',
+  playerId: 'playerId',
+  argument: 'argument',
+  wordCount: 'wordCount',
+  createdAt: 'createdAt'
+} as const
+
+export type DebateRoundScalarFieldEnum = (typeof DebateRoundScalarFieldEnum)[keyof typeof DebateRoundScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1899,6 +2180,34 @@ export type EnumSpectatorVoteTypeFieldRefInput<$PrismaModel> = FieldRefInputType
 export type ListEnumSpectatorVoteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SpectatorVoteType[]'>
     
 
+
+/**
+ * Reference to a field of type 'DebateStatus'
+ */
+export type EnumDebateStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DebateStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DebateStatus[]'
+ */
+export type ListEnumDebateStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DebateStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DebateSide'
+ */
+export type EnumDebateSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DebateSide'>
+    
+
+
+/**
+ * Reference to a field of type 'DebateSide[]'
+ */
+export type ListEnumDebateSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DebateSide[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2007,6 +2316,9 @@ export type GlobalOmitConfig = {
   challengeSettlement?: Prisma.ChallengeSettlementOmit
   challengeEvent?: Prisma.ChallengeEventOmit
   spectatorVote?: Prisma.SpectatorVoteOmit
+  debateTopic?: Prisma.DebateTopicOmit
+  debate?: Prisma.DebateOmit
+  debateRound?: Prisma.DebateRoundOmit
 }
 
 /* Types for Logging */

@@ -97,6 +97,74 @@ export type AcceptChallengePayload = {
   sourceSessionId?: string;
 };
 
+// ─── Debate PK Types ──────────────────────────────────
+
+export type DebateStatus = "topic-set" | "started" | "round-a" | "round-b" | "closing" | "judging" | "settled";
+
+export type DebateSide = "yes" | "no";
+
+export type DebateTopicInfo = {
+  id: string;
+  polymarketId: string;
+  question: string;
+  description: string;
+  outcomes: string[];
+  currentPrices: number[];
+  imageUrl?: string;
+  polymarketSlug?: string;
+  endDate?: string;
+  volume: number;
+  liquidity: number;
+  active: boolean;
+  syncedAt: string;
+};
+
+export type DebateInfo = {
+  id: string;
+  challengeId: string;
+  topicId: string;
+  status: DebateStatus;
+  sideAPlayerSlug: string;
+  sideBPlayerSlug: string;
+  sideAPosition: DebateSide;
+  sideBPosition: DebateSide;
+  totalRounds: number;
+  currentRound: number;
+  startedAt?: string;
+  endedAt?: string;
+  summary?: string;
+  createdAt: string;
+  topic?: DebateTopicInfo;
+  rounds?: DebateRoundInfo[];
+};
+
+export type DebateRoundInfo = {
+  id: string;
+  debateId: string;
+  roundNumber: number;
+  side: DebateSide;
+  playerSlug: string;
+  argument: string;
+  wordCount: number;
+  createdAt: string;
+};
+
+export type CreateDebatePayload = {
+  challengeId: string;
+  topicId: string;
+  sideAPlayerSlug: string;
+  sideBPlayerSlug: string;
+  sideAPosition?: DebateSide;
+  sideBPosition?: DebateSide;
+  totalRounds?: number;
+};
+
+export type SubmitArgumentPayload = {
+  debateId: string;
+  playerSlug: string;
+  argument: string;
+};
+
 export type MockDatabase = {
   players: PlayerProfile[];
   challenges: MatchListing[];

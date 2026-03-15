@@ -82,3 +82,18 @@ export type ChallengeEvent = Prisma.ChallengeEventModel
  * 
  */
 export type SpectatorVote = Prisma.SpectatorVoteModel
+/**
+ * Model DebateTopic
+ * 
+ */
+export type DebateTopic = Prisma.DebateTopicModel
+/**
+ * Model Debate
+ * 
+ */
+export type Debate = Prisma.DebateModel
+/**
+ * Model DebateRound
+ * 
+ */
+export type DebateRound = Prisma.DebateRoundModel

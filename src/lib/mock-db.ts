@@ -8,11 +8,13 @@ import {
   seedDatabase,
   type AcceptChallengePayload,
   type CreateChallengePayload,
+  type CreateDebatePayload,
   type MatchListing,
   type MockDatabase,
   type OpenClawIntegration,
   type PlayerProfile,
   type SettleChallengePayload,
+  type SubmitArgumentPayload,
   type UpdateOpenClawPayload,
 } from "@/data/product-data";
 import { isPrismaBackendEnabled } from "@/lib/data-backend";
@@ -398,4 +400,92 @@ export async function getDataStoreStatus() {
     challenges: database.challenges.length,
     readyPlayers: database.players.filter((player) => player.openClaw.status === "ready").length,
   };
+}
+
+// ─── Debate PK (routing layer) ──────────────────────────────
+
+import type { DebateInfo, DebateTopicInfo } from "@/data/product-data";
+import { fetchPolymarketTopics } from "@/lib/debate";
+
+export async function syncPolymarketTopics(limit = 10) {
+  const topics = await fetchPolymarketTopics(limit);
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.upsertDebateTopicsFromPrisma(topics);
+  }
+  // mock: 直接返回爬取结果（不持久化）
+  return topics;
+}
+
+export async function listDebateTopics(activeOnly = true) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.listDebateTopicsFromPrisma(activeOnly);
+  }
+  // mock: 直接从 Polymarket 拉
+  return fetchPolymarketTopics(10);
+}
+
+export async function getDebateTopicById(id: string) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.getDebateTopicByIdFromPrisma(id);
+  }
+  return null;
+}
+
+export async function createDebate(payload: CreateDebatePayload) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.createDebateFromPrisma(payload);
+  }
+  throw new Error("辩论功能需要 Prisma 后端");
+}
+
+export async function getDebateById(id: string) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.getDebateByIdFromPrisma(id);
+  }
+  return null;
+}
+
+export async function getDebateByChallengeId(challengeId: string) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.getDebateByChallengeIdFromPrisma(challengeId);
+  }
+  return null;
+}
+
+export async function listDebates() {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.listDebatesFromPrisma();
+  }
+  return [];
+}
+
+export async function startDebate(debateId: string) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.startDebateFromPrisma(debateId);
+  }
+  throw new Error("辩论功能需要 Prisma 后端");
+}
+
+export async function submitArgument(payload: SubmitArgumentPayload) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.submitArgumentFromPrisma(payload);
+  }
+  throw new Error("辩论功能需要 Prisma 后端");
+}
+
+export async function endDebate(debateId: string, summary?: string) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.endDebateFromPrisma(debateId, summary);
+  }
+  throw new Error("辩论功能需要 Prisma 后端");
 }

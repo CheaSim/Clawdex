@@ -588,3 +588,324 @@ export async function getDataStoreStatusFromPrisma() {
     readyPlayers,
   };
 }
+
+// ─── Debate PK (Prisma) ─────────────────────────────────────
+
+import { DebateStatus as PrismaDebateStatus, DebateSide as PrismaDebateSide } from "@/generated/prisma/client";
+import type { CreateDebatePayload, DebateInfo, DebateRoundInfo, DebateTopicInfo, SubmitArgumentPayload } from "@/data/product-data";
+import { computeDebateStatus, type PolymarketMarket } from "@/lib/debate";
+
+const debateStatusFromPrisma: Record<PrismaDebateStatus, DebateInfo["status"]> = {
+  [PrismaDebateStatus.TOPIC_SET]: "topic-set",
+  [PrismaDebateStatus.STARTED]: "started",
+  [PrismaDebateStatus.ROUND_A]: "round-a",
+  [PrismaDebateStatus.ROUND_B]: "round-b",
+  [PrismaDebateStatus.CLOSING]: "closing",
+  [PrismaDebateStatus.JUDGING]: "judging",
+  [PrismaDebateStatus.SETTLED]: "settled",
+};
+
+const debateStatusToPrisma: Record<DebateInfo["status"], PrismaDebateStatus> = {
+  "topic-set": PrismaDebateStatus.TOPIC_SET,
+  "started": PrismaDebateStatus.STARTED,
+  "round-a": PrismaDebateStatus.ROUND_A,
+  "round-b": PrismaDebateStatus.ROUND_B,
+  "closing": PrismaDebateStatus.CLOSING,
+  "judging": PrismaDebateStatus.JUDGING,
+  "settled": PrismaDebateStatus.SETTLED,
+};
+
+const debateSideFromPrisma: Record<PrismaDebateSide, DebateInfo["sideAPosition"]> = {
+  [PrismaDebateSide.YES]: "yes",
+  [PrismaDebateSide.NO]: "no",
+};
+
+const debateSideToPrisma: Record<DebateInfo["sideAPosition"], PrismaDebateSide> = {
+  "yes": PrismaDebateSide.YES,
+  "no": PrismaDebateSide.NO,
+};
+
+function buildTopicInfo(t: Prisma.DebateTopicGetPayload<{}>): DebateTopicInfo {
+  return {
+    id: t.id,
+    polymarketId: t.polymarketId,
+    question: t.question,
+    description: t.description,
+    outcomes: t.outcomes,
+    currentPrices: t.currentPrices,
+    imageUrl: t.imageUrl ?? undefined,
+    polymarketSlug: t.polymarketSlug ?? undefined,
+    endDate: t.endDate?.toISOString(),
+    volume: t.volume,
+    liquidity: t.liquidity,
+    active: t.active,
+    syncedAt: t.syncedAt.toISOString(),
+  };
+}
+
+function buildDebateInfo(d: Prisma.DebateGetPayload<{
+  include: { topic: true; rounds: true; sideA: true; sideB: true };
+}>): DebateInfo {
+  return {
+    id: d.id,
+    challengeId: d.challengeId,
+    topicId: d.topicId,
+    status: debateStatusFromPrisma[d.status],
+    sideAPlayerSlug: d.sideA.slug,
+    sideBPlayerSlug: d.sideB.slug,
+    sideAPosition: debateSideFromPrisma[d.sideAPosition],
+    sideBPosition: debateSideFromPrisma[d.sideBPosition],
+    totalRounds: d.totalRounds,
+    currentRound: d.currentRound,
+    startedAt: d.startedAt?.toISOString(),
+    endedAt: d.endedAt?.toISOString(),
+    summary: d.summary ?? undefined,
+    createdAt: d.createdAt.toISOString(),
+    topic: d.topic ? buildTopicInfo(d.topic) : undefined,
+    rounds: d.rounds.map(r => ({
+      id: r.id,
+      debateId: r.debateId,
+      roundNumber: r.roundNumber,
+      side: debateSideFromPrisma[r.side],
+      playerSlug: d[r.side === PrismaDebateSide.YES ? "sideA" : "sideB"].slug,
+      argument: r.argument,
+      wordCount: r.wordCount,
+      createdAt: r.createdAt.toISOString(),
+    })),
+  };
+}
+
+function buildRoundInfo(
+  r: Prisma.DebateRoundGetPayload<{}>,
+  playerSlug: string,
+): DebateRoundInfo {
+  return {
+    id: r.id,
+    debateId: r.debateId,
+    roundNumber: r.roundNumber,
+    side: debateSideFromPrisma[r.side],
+    playerSlug,
+    argument: r.argument,
+    wordCount: r.wordCount,
+    createdAt: r.createdAt.toISOString(),
+  };
+}
+
+// ─── Topic CRUD ──────────────────────────────────
+
+export async function upsertDebateTopicsFromPrisma(topics: DebateTopicInfo[]) {
+  const results = [];
+  for (const t of topics) {
+    const upserted = await prisma.debateTopic.upsert({
+      where: { polymarketId: t.polymarketId },
+      create: {
+        polymarketId: t.polymarketId,
+        question: t.question,
+        description: t.description,
+        outcomes: t.outcomes,
+        currentPrices: t.currentPrices,
+        imageUrl: t.imageUrl,
+        polymarketSlug: t.polymarketSlug,
+        endDate: t.endDate ? new Date(t.endDate) : null,
+        volume: t.volume,
+        liquidity: t.liquidity,
+        active: t.active,
+        syncedAt: new Date(),
+      },
+      update: {
+        currentPrices: t.currentPrices,
+        volume: t.volume,
+        liquidity: t.liquidity,
+        active: t.active,
+        syncedAt: new Date(),
+      },
+    });
+    results.push(buildTopicInfo(upserted));
+  }
+  return results;
+}
+
+export async function listDebateTopicsFromPrisma(activeOnly = true) {
+  const topics = await prisma.debateTopic.findMany({
+    where: activeOnly ? { active: true } : {},
+    orderBy: { volume: "desc" },
+  });
+  return topics.map(buildTopicInfo);
+}
+
+export async function getDebateTopicByIdFromPrisma(id: string) {
+  const topic = await prisma.debateTopic.findUnique({ where: { id } });
+  return topic ? buildTopicInfo(topic) : null;
+}
+
+// ─── Debate CRUD ─────────────────────────────────
+
+export async function createDebateFromPrisma(payload: CreateDebatePayload) {
+  const sideA = await prisma.player.findUnique({ where: { slug: payload.sideAPlayerSlug } });
+  const sideB = await prisma.player.findUnique({ where: { slug: payload.sideBPlayerSlug } });
+  if (!sideA || !sideB) throw new Error("选手不存在");
+
+  const challenge = await prisma.challenge.findUnique({ where: { id: payload.challengeId } });
+  if (!challenge) throw new Error("对应的挑战不存在");
+
+  const debate = await prisma.debate.create({
+    data: {
+      challengeId: payload.challengeId,
+      topicId: payload.topicId,
+      sideAPlayerId: sideA.id,
+      sideBPlayerId: sideB.id,
+      sideAPosition: debateSideToPrisma[payload.sideAPosition ?? "yes"],
+      sideBPosition: debateSideToPrisma[payload.sideBPosition ?? "no"],
+      totalRounds: payload.totalRounds ?? 3,
+      currentRound: 0,
+      status: PrismaDebateStatus.TOPIC_SET,
+    },
+    include: { topic: true, rounds: true, sideA: true, sideB: true },
+  });
+
+  return buildDebateInfo(debate);
+}
+
+export async function getDebateByIdFromPrisma(id: string) {
+  const debate = await prisma.debate.findUnique({
+    where: { id },
+    include: { topic: true, rounds: { orderBy: { roundNumber: "asc" } }, sideA: true, sideB: true },
+  });
+  return debate ? buildDebateInfo(debate) : null;
+}
+
+export async function getDebateByChallengeIdFromPrisma(challengeId: string) {
+  const debate = await prisma.debate.findUnique({
+    where: { challengeId },
+    include: { topic: true, rounds: { orderBy: { roundNumber: "asc" } }, sideA: true, sideB: true },
+  });
+  return debate ? buildDebateInfo(debate) : null;
+}
+
+export async function listDebatesFromPrisma() {
+  const debates = await prisma.debate.findMany({
+    include: { topic: true, rounds: { orderBy: { roundNumber: "asc" } }, sideA: true, sideB: true },
+    orderBy: { createdAt: "desc" },
+  });
+  return debates.map(buildDebateInfo);
+}
+
+export async function startDebateFromPrisma(debateId: string) {
+  const debate = await prisma.debate.findUnique({
+    where: { id: debateId },
+    include: { topic: true, rounds: true, sideA: true, sideB: true },
+  });
+  if (!debate) throw new Error("辩论不存在");
+  if (debate.status !== PrismaDebateStatus.TOPIC_SET) throw new Error("辩论状态不正确，只有 topic-set 状态可以启动");
+
+  const updated = await prisma.debate.update({
+    where: { id: debateId },
+    data: {
+      status: PrismaDebateStatus.ROUND_A,
+      currentRound: 1,
+      startedAt: new Date(),
+    },
+    include: { topic: true, rounds: true, sideA: true, sideB: true },
+  });
+
+  // 同时更新 Challenge 状态为 LIVE
+  await prisma.challenge.update({
+    where: { id: updated.challengeId },
+    data: { status: ChallengeStatus.LIVE },
+  });
+
+  return buildDebateInfo(updated);
+}
+
+export async function submitArgumentFromPrisma(payload: SubmitArgumentPayload) {
+  const debate = await prisma.debate.findUnique({
+    where: { id: payload.debateId },
+    include: { topic: true, rounds: { orderBy: { roundNumber: "asc" } }, sideA: true, sideB: true },
+  });
+  if (!debate) throw new Error("辩论不存在");
+
+  const debateInfo = buildDebateInfo(debate);
+
+  // 确认轮到此选手发言
+  const player = await prisma.player.findUnique({ where: { slug: payload.playerSlug } });
+  if (!player) throw new Error("选手不存在");
+
+  const isPlayerA = debate.sideAPlayerId === player.id;
+  const isPlayerB = debate.sideBPlayerId === player.id;
+  if (!isPlayerA && !isPlayerB) throw new Error("你不是这场辩论的参与者");
+
+  const side = isPlayerA ? PrismaDebateSide.YES : PrismaDebateSide.NO;
+
+  // 计算当前应该是第几轮
+  const rounds = debateInfo.rounds ?? [];
+  let roundNumber = debate.currentRound;
+  if (roundNumber === 0) roundNumber = 1;
+
+  // 检查该轮该方是否已发言
+  const alreadySpoke = rounds.some(
+    r => r.roundNumber === roundNumber && r.side === (isPlayerA ? "yes" : "no"),
+  );
+  if (alreadySpoke) throw new Error(`你在第 ${roundNumber} 轮已经发言`);
+
+  // A 必须先于 B 发言
+  if (isPlayerB) {
+    const aSpoke = rounds.some(r => r.roundNumber === roundNumber && r.side === "yes");
+    if (!aSpoke) throw new Error("正方（A）尚未发言，请等待");
+  }
+
+  const wordCount = payload.argument.length;
+
+  const round = await prisma.debateRound.create({
+    data: {
+      debateId: payload.debateId,
+      roundNumber,
+      side,
+      playerId: player.id,
+      argument: payload.argument,
+      wordCount,
+    },
+  });
+
+  // 更新辩论状态
+  const allRounds = [...rounds, buildRoundInfo(round, payload.playerSlug)];
+  const newStatus = computeDebateStatus(debate.totalRounds, allRounds);
+  const newCurrentRound = newStatus === "round-a" && roundNumber < debate.totalRounds && isPlayerB
+    ? roundNumber + 1
+    : roundNumber;
+
+  await prisma.debate.update({
+    where: { id: payload.debateId },
+    data: {
+      status: debateStatusToPrisma[newStatus],
+      currentRound: newCurrentRound,
+    },
+  });
+
+  // 重新加载完整辩论
+  const refreshed = await prisma.debate.findUnique({
+    where: { id: payload.debateId },
+    include: { topic: true, rounds: { orderBy: { roundNumber: "asc" } }, sideA: true, sideB: true },
+  });
+
+  return buildDebateInfo(refreshed!);
+}
+
+export async function endDebateFromPrisma(debateId: string, summary?: string) {
+  const debate = await prisma.debate.findUnique({
+    where: { id: debateId },
+    include: { topic: true, rounds: true, sideA: true, sideB: true },
+  });
+  if (!debate) throw new Error("辩论不存在");
+
+  const updated = await prisma.debate.update({
+    where: { id: debateId },
+    data: {
+      status: PrismaDebateStatus.JUDGING,
+      endedAt: new Date(),
+      summary: summary ?? null,
+    },
+    include: { topic: true, rounds: { orderBy: { roundNumber: "asc" } }, sideA: true, sideB: true },
+  });
+
+  return buildDebateInfo(updated);
+}

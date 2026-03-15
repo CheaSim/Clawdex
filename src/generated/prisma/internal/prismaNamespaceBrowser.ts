@@ -63,7 +63,10 @@ export const ModelName = {
   Challenge: 'Challenge',
   ChallengeSettlement: 'ChallengeSettlement',
   ChallengeEvent: 'ChallengeEvent',
-  SpectatorVote: 'SpectatorVote'
+  SpectatorVote: 'SpectatorVote',
+  DebateTopic: 'DebateTopic',
+  Debate: 'Debate',
+  DebateRound: 'DebateRound'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -292,6 +295,62 @@ export const SpectatorVoteScalarFieldEnum = {
 } as const
 
 export type SpectatorVoteScalarFieldEnum = (typeof SpectatorVoteScalarFieldEnum)[keyof typeof SpectatorVoteScalarFieldEnum]
+
+
+export const DebateTopicScalarFieldEnum = {
+  id: 'id',
+  polymarketId: 'polymarketId',
+  question: 'question',
+  description: 'description',
+  outcomes: 'outcomes',
+  currentPrices: 'currentPrices',
+  imageUrl: 'imageUrl',
+  polymarketSlug: 'polymarketSlug',
+  endDate: 'endDate',
+  volume: 'volume',
+  liquidity: 'liquidity',
+  active: 'active',
+  syncedAt: 'syncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DebateTopicScalarFieldEnum = (typeof DebateTopicScalarFieldEnum)[keyof typeof DebateTopicScalarFieldEnum]
+
+
+export const DebateScalarFieldEnum = {
+  id: 'id',
+  challengeId: 'challengeId',
+  topicId: 'topicId',
+  status: 'status',
+  sideAPlayerId: 'sideAPlayerId',
+  sideBPlayerId: 'sideBPlayerId',
+  sideAPosition: 'sideAPosition',
+  sideBPosition: 'sideBPosition',
+  totalRounds: 'totalRounds',
+  currentRound: 'currentRound',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  summary: 'summary',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DebateScalarFieldEnum = (typeof DebateScalarFieldEnum)[keyof typeof DebateScalarFieldEnum]
+
+
+export const DebateRoundScalarFieldEnum = {
+  id: 'id',
+  debateId: 'debateId',
+  roundNumber: 'roundNumber',
+  side: 'side',
+  playerId: 'playerId',
+  argument: 'argument',
+  wordCount: 'wordCount',
+  createdAt: 'createdAt'
+} as const
+
+export type DebateRoundScalarFieldEnum = (typeof DebateRoundScalarFieldEnum)[keyof typeof DebateRoundScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -1,26 +1,15 @@
-#!/usr/bin/env pwsh
+#!/bin/sh
 
-Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+repo_root="$(git rev-parse --show-toplevel)"
+script_path="$repo_root\\scripts\\agent-task-complete.ps1"
 
-$repoRoot = git rev-parse --show-toplevel
-$scriptPath = Join-Path $repoRoot "scripts\agent-task-complete.ps1"
+task="${AGENT_NOTIFY_TASK:-unspecified-task}"
+message="${AGENT_NOTIFY_MESSAGE:-New commit is ready for review.}"
+from="${AGENT_NOTIFY_FROM:-impl-agent}"
+to="${AGENT_NOTIFY_TO:-pm-agent}"
 
-if (-not (Test-Path $scriptPath)) {
+if [ ! -f "$repo_root/scripts/agent-task-complete.ps1" ]; then
   exit 0
-}
+fi
 
-$task = $env:AGENT_NOTIFY_TASK
-$message = $env:AGENT_NOTIFY_MESSAGE
-$from = if ($env:AGENT_NOTIFY_FROM) { $env:AGENT_NOTIFY_FROM } else { "impl-agent" }
-$to = if ($env:AGENT_NOTIFY_TO) { $env:AGENT_NOTIFY_TO } else { "pm-agent" }
-
-if (-not $task) {
-  $task = "unspecified-task"
-}
-
-if (-not $message) {
-  $message = "New commit is ready for review."
-}
-
-powershell -ExecutionPolicy Bypass -File $scriptPath -Task $task -Message $message -From $from -To $to | Out-Null
+powershell.exe -ExecutionPolicy Bypass -File "$script_path" -Task "$task" -Message "$message" -From "$from" -To "$to" > /dev/null 2>&1 || exit 0

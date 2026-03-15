@@ -1,0 +1,314 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MatchMode {
+  PUBLIC_ARENA @map("public-arena")
+  RIVALRY @map("rivalry")
+  RANKED_1V1 @map("ranked-1v1")
+}
+
+enum ChallengeVisibility {
+  PUBLIC @map("public")
+  FOLLOWERS @map("followers")
+}
+
+enum ChallengeStatus {
+  PENDING @map("pending")
+  ACCEPTED @map("accepted")
+  LIVE @map("live")
+  SETTLEMENT @map("settlement")
+}
+
+enum OpenClawRegion {
+  CN
+  SEA
+  EU
+  NA
+}
+
+enum OpenClawConnectionStatus {
+  DISCONNECTED @map("disconnected")
+  CONFIGURED @map("configured")
+  READY @map("ready")
+}
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum ChallengeEventType {
+  CREATED
+  ACCEPTED
+  LIVE_STARTED
+  SETTLED
+  READINESS_SYNCED
+  PLUGIN_SYNCED
+}
+
+enum WalletLedgerType {
+  DEPOSIT
+  WITHDRAW
+  CHALLENGE_LOCK
+  CHALLENGE_UNLOCK
+  CHALLENGE_REWARD
+  CHALLENGE_PENALTY
+  JUDGE_REWARD
+  ADMIN_ADJUSTMENT
+}
+
+enum SpectatorVoteType {
+  MVP
+  MOMENT
+  SUPPORT
+}
+
+model Player {
+  id                String              @id @default(cuid())
+  slug              String              @unique
+  name              String
+  title             String?
+  avatar            String?
+  elo               Int                 @default(1200)
+  fame              Int                 @default(0)
+  streak            Int                 @default(0)
+  winRate           Float               @default(0)
+  clawPoints        Int                 @default(0)
+  preferredMode     MatchMode           @default(PUBLIC_ARENA)
+  bio               String?
+  tags              String[]            @default([])
+  recentMoments     String[]            @default([])
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  user              User?
+  wallet            PlayerWallet?
+  openClawAccount   OpenClawAccount?
+  challengerMatches Challenge[]         @relation("ChallengeChallenger")
+  defenderMatches   Challenge[]         @relation("ChallengeDefender")
+  wonSettlements    ChallengeSettlement[] @relation("SettlementWinner")
+  eventActors       ChallengeEvent[]
+  spectatorVotes    SpectatorVote[]     @relation("VoteTarget")
+  castedVotes       SpectatorVote[]     @relation("VoteCaster")
+
+  @@index([elo])
+  @@index([fame])
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String       @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          UserRole     @default(USER)
+  status        UserStatus   @default(ACTIVE)
+  playerId      String?      @unique
+  lastLoginAt   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  player        Player?      @relation(fields: [playerId], references: [id], onDelete: SetNull)
+  accounts      Account[]
+  sessions      Session[]
+
+  @@index([role, status])
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model PlayerWallet {
+  id               String         @id @default(cuid())
+  playerId         String         @unique
+  availableBalance Int            @default(0)
+  lockedBalance    Int            @default(0)
+  lastSyncedAt     DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  player           Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  ledgerEntries    WalletLedger[]
+}
+
+model WalletLedger {
+  id           String           @id @default(cuid())
+  walletId     String
+  challengeId  String?
+  type         WalletLedgerType
+  delta        Int
+  balanceAfter Int
+  reason       String
+  metadata     Json?
+  createdAt    DateTime         @default(now())
+  wallet       PlayerWallet     @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  challenge    Challenge?       @relation(fields: [challengeId], references: [id], onDelete: SetNull)
+
+  @@index([walletId, createdAt])
+  @@index([challengeId])
+}
+
+model OpenClawAccount {
+  id             String                    @id @default(cuid())
+  playerId       String                    @unique
+  channel        String
+  accountId      String
+  region         OpenClawRegion
+  clientVersion  String
+  status         OpenClawConnectionStatus  @default(DISCONNECTED)
+  sourceChannel  String                    @default("clawdex-channel")
+  configuredAt   DateTime?
+  lastVerifiedAt DateTime?
+  notes          String?
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  player         Player                    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([channel, accountId])
+  @@index([status])
+}
+
+model OpenClawBinding {
+  id         String     @id @default(cuid())
+  agentId    String
+  mode       MatchMode?
+  scope      String?
+  peerKind   String?
+  peerId     String?
+  enabled    Boolean    @default(true)
+  priority   Int        @default(100)
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([enabled, priority])
+  @@index([mode, scope])
+  @@index([peerKind, peerId])
+}
+
+model Challenge {
+  id                String              @id @default(cuid())
+  mode              MatchMode
+  challengerId      String
+  defenderId        String
+  stake             Int
+  rewardPool        Int                 @default(0)
+  visibility        ChallengeVisibility @default(PUBLIC)
+  status            ChallengeStatus     @default(PENDING)
+  scheduledLabel    String
+  storyline         String
+  rulesNote         String?
+  sourceChannel     String?             @default("clawdex-channel")
+  sourceSessionId   String?
+  winnerPlayerId    String?
+  settlementSummary String?
+  preview           Json
+  createdAt         DateTime            @default(now())
+  acceptedAt        DateTime?
+  settledAt         DateTime?
+  updatedAt         DateTime            @updatedAt
+  challenger        Player              @relation("ChallengeChallenger", fields: [challengerId], references: [id], onDelete: Restrict)
+  defender          Player              @relation("ChallengeDefender", fields: [defenderId], references: [id], onDelete: Restrict)
+  walletEntries     WalletLedger[]
+  settlement        ChallengeSettlement?
+  events            ChallengeEvent[]
+  spectatorVotes    SpectatorVote[]
+
+  @@index([status, createdAt])
+  @@index([challengerId, createdAt])
+  @@index([defenderId, createdAt])
+  @@index([sourceChannel])
+}
+
+model ChallengeSettlement {
+  id              String     @id @default(cuid())
+  challengeId     String     @unique
+  winnerPlayerId  String
+  summary         String?
+  payload         Json?
+  sourceChannel   String?    @default("clawdex-channel")
+  sourceSessionId String?
+  settledAt       DateTime   @default(now())
+  createdAt       DateTime   @default(now())
+  challenge       Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  winner          Player     @relation("SettlementWinner", fields: [winnerPlayerId], references: [id], onDelete: Restrict)
+
+  @@index([winnerPlayerId, settledAt])
+}
+
+model ChallengeEvent {
+  id              String             @id @default(cuid())
+  challengeId     String
+  actorPlayerId   String?
+  type            ChallengeEventType
+  sourceChannel   String?            @default("clawdex-channel")
+  sourceSessionId String?
+  payload         Json?
+  createdAt       DateTime           @default(now())
+  challenge       Challenge          @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  actor           Player?            @relation(fields: [actorPlayerId], references: [id], onDelete: SetNull)
+
+  @@index([challengeId, createdAt])
+  @@index([type, createdAt])
+}
+
+model SpectatorVote {
+  id          String           @id @default(cuid())
+  challengeId String
+  voterId     String?
+  playerId    String?
+  voteType    SpectatorVoteType
+  score       Int?
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+  challenge   Challenge        @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  voter       Player?          @relation("VoteCaster", fields: [voterId], references: [id], onDelete: SetNull)
+  player      Player?          @relation("VoteTarget", fields: [playerId], references: [id], onDelete: SetNull)
+
+  @@index([challengeId, voteType])
+  @@index([voterId])
+  @@index([playerId])
+}

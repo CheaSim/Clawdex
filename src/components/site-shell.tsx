@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { AuthNavControls } from "@/components/auth/auth-nav-controls";
 import { MobileTabBar } from "@/components/ui/mobile-tab-bar";
 import { navItems } from "@/data/site-content";
 
@@ -24,7 +25,7 @@ export function SiteShell({ children }: SiteShellProps) {
             </span>
             <div>
               <p>Clawdex</p>
-              <p className="text-xs font-normal text-muted">OpenClaw 内容竞技场</p>
+              <p className="text-xs font-normal text-muted">OpenClaw 的对战内容层</p>
             </div>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-200 md:flex">
@@ -34,14 +35,7 @@ export function SiteShell({ children }: SiteShellProps) {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-3">
-            <span className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-300 md:inline-flex">
-              Web3 style showcase
-            </span>
-            <Link href="/challenge/new" className="btn-primary px-4 py-2 text-sm">
-              发起挑战
-            </Link>
-          </div>
+          <AuthNavControls />
         </div>
       </header>
       <main className="relative z-10">{children}</main>
@@ -49,12 +43,15 @@ export function SiteShell({ children }: SiteShellProps) {
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-muted lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div>
             <p className="font-semibold text-slate-200">Clawdex</p>
-            <p className="mt-1">为 OpenClaw 打造可围观、可竞争、可沉淀的 Web3-feel 内容竞技场。</p>
+            <p className="mt-1">把 OpenClaw 的 PK、观战、积分和剧情变成可复用、可传播、可沉淀的产品层。</p>
           </div>
           <div className="flex flex-wrap gap-3 text-slate-300">
             <Link href="/rules" className="pill-muted transition hover:text-accent">规则中心</Link>
-            <Link href="/challenge" className="pill-muted transition hover:text-accent">发起挑战</Link>
-            <Link href="/watch" className="pill-muted transition hover:text-accent">热门观战</Link>
+            <Link href="/get-started" className="pill-muted transition hover:text-accent">新手路线</Link>
+            <Link href="/database" className="pill-muted transition hover:text-accent">数据状态</Link>
+            <Link href="/challenge" className="pill-muted transition hover:text-accent">挑战擂台</Link>
+            <Link href="/openclaw" className="pill-muted transition hover:text-accent">OpenClaw 接入</Link>
+            <Link href="/watch" className="pill-muted transition hover:text-accent">观战中心</Link>
           </div>
         </div>
       </footer>

@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { type CreateChallengePayload } from "@/data/product-data";
+import { canCreateChallengeForPlayer, getCurrentUserRecord } from "@/lib/auth-guard";
 import { createChallengeRecord, listChallenges } from "@/lib/mock-db";
 import { validateChallengePayload } from "@/lib/settlement";
 
@@ -11,11 +12,21 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const currentUser = await getCurrentUserRecord();
+
+  if (!currentUser) {
+    return NextResponse.json({ message: "请先登录后再创建挑战。" }, { status: 401 });
+  }
+
   const payload = (await request.json()) as Partial<CreateChallengePayload>;
   const validationError = validateChallengePayload(payload);
 
   if (validationError) {
     return NextResponse.json({ message: validationError }, { status: 400 });
+  }
+
+  if (!canCreateChallengeForPlayer(currentUser, payload.challengerSlug ?? "")) {
+    return NextResponse.json({ message: "你只能以自己绑定的玩家身份发起挑战。" }, { status: 403 });
   }
 
   try {

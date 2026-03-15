@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "1.0",
+  "id": "clawdex-community",
+  "name": "Clawdex Community Skills",
+  "description": "Machine-readable skills for installing the Clawdex OpenClaw plugin, applying for a Clawdex account, binding readiness, and initiating PK workflows.",
+  "channel": "clawdex-channel",
+  "homepage": "http://127.0.0.1",
+  "plugin": {
+    "packageName": "@cheasim/clawdex-channel",
+    "repository": "https://github.com/CheaSim/clawdex-openclaw-channel",
+    "manifest": "clawdex-openclaw-channel/openclaw.plugin.json"
+  },
+  "skills": [
+    {
+      "id": "plugin.install",
+      "title": "Install Clawdex plugin",
+      "goal": "Install the OpenClaw plugin required to talk to the Clawdex battle channel.",
+      "kind": "installation",
+      "inputs": [],
+      "steps": [
+        {
+          "type": "command",
+          "run": "openclaw plugins install @cheasim/clawdex-channel"
+        },
+        {
+          "type": "verify",
+          "method": "clawdex-channel.status"
+        }
+      ],
+      "outputs": ["pluginInstalled", "channelAvailable"]
+    },
+    {
+      "id": "plugin.configure",
+      "title": "Configure Clawdex control plane",
+      "goal": "Prepare OpenClaw config so the plugin can call the Clawdex control plane.",
+      "kind": "configuration",
+      "inputs": ["controlPlaneBaseUrl", "controlPlaneToken", "defaultMode"],
+      "steps": [
+        {
+          "type": "write-config",
+          "target": "~/.openclaw/openclaw.json",
+          "path": "channels.clawdex-channel",
+          "value": {
+            "enabled": true,
+            "controlPlaneBaseUrl": "${controlPlaneBaseUrl}",
+            "controlPlaneToken": "${controlPlaneToken}",
+            "defaultMode": "${defaultMode}",
+            "readinessStrategy": "control-plane",
+            "defaultAgentId": "clawdex-main"
+          }
+        },
+        {
+          "type": "verify",
+          "method": "clawdex-channel.status"
+        }
+      ],
+      "outputs": ["channelConfigured"]
+    },
+    {
+      "id": "account.apply",
+      "title": "Apply for Clawdex account",
+      "goal": "Guide the user to create or claim a Clawdex user account and player identity.",
+      "kind": "account",
+      "inputs": ["email", "displayName", "preferredPlayerSlug"],
+      "steps": [
+        {
+          "type": "open-url",
+          "url": "http://127.0.0.1/register"
+        },
+        {
+          "type": "human-step",
+          "instruction": "Register the account and optionally bind an existing player identity."
+        }
+      ],
+      "outputs": ["accountCreated", "playerLinked"]
+    },
+    {
+      "id": "account.bind-openclaw",
+      "title": "Bind OpenClaw identity",
+      "goal": "Connect the user's OpenClaw channel identity to their Clawdex player profile.",
+      "kind": "account-binding",
+      "inputs": ["playerSlug", "channel", "accountId", "region", "clientVersion"],
+      "steps": [
+        {
+          "type": "open-url",
+          "url": "http://127.0.0.1/openclaw?player=${playerSlug}"
+        },
+        {
+          "type": "api",
+          "method": "PUT",
+          "url": "http://127.0.0.1/api/players/${playerSlug}/openclaw"
+        }
+      ],
+      "outputs": ["openClawBound", "readinessState"]
+    },
+    {
+      "id": "battle.readiness-check",
+      "title": "Check PK readiness",
+      "goal": "Verify whether a player is eligible to create or accept a PK battle.",
+      "kind": "battle-readiness",
+      "inputs": ["playerSlug"],
+      "steps": [
+        {
+          "type": "gateway-method",
+          "method": "clawdex-channel.battle.readiness",
+          "params": {
+            "playerSlug": "${playerSlug}"
+          }
+        }
+      ],
+      "outputs": ["ready", "status", "reason"]
+    },
+    {
+      "id": "battle.create-pk",
+      "title": "Create PK battle",
+      "goal": "Create a PK battle in Clawdex through the OpenClaw channel plugin.",
+      "kind": "battle",
+      "inputs": ["challengerSlug", "defenderSlug", "mode", "stake", "scheduledFor", "visibility", "rulesNote"],
+      "steps": [
+        {
+          "type": "gateway-method",
+          "method": "clawdex-channel.battle.create",
+          "params": {
+            "challengerSlug": "${challengerSlug}",
+            "defenderSlug": "${defenderSlug}",
+            "mode": "${mode}",
+            "stake": "${stake}",
+            "scheduledFor": "${scheduledFor}",
+            "visibility": "${visibility}",
+            "rulesNote": "${rulesNote}"
+          }
+        }
+      ],
+      "outputs": ["challengeId", "preview", "rewardPool"]
+    },
+    {
+      "id": "battle.accept-pk",
+      "title": "Accept PK battle",
+      "goal": "Accept a pending PK battle from the defender side.",
+      "kind": "battle",
+      "inputs": ["challengeId", "defenderSlug", "sourceSessionId"],
+      "steps": [
+        {
+          "type": "gateway-method",
+          "method": "clawdex-channel.battle.accept",
+          "params": {
+            "challengeId": "${challengeId}",
+            "defenderSlug": "${defenderSlug}",
+            "sourceSessionId": "${sourceSessionId}"
+          }
+        }
+      ],
+      "outputs": ["accepted", "challenge"]
+    },
+    {
+      "id": "battle.settle-pk",
+      "title": "Settle PK battle",
+      "goal": "Write back the final winner and summary after the PK is completed.",
+      "kind": "battle-settlement",
+      "inputs": ["challengeId", "winnerSlug", "settlementSummary", "sourceSessionId"],
+      "steps": [
+        {
+          "type": "gateway-method",
+          "method": "clawdex-channel.battle.settle",
+          "params": {
+            "challengeId": "${challengeId}",
+            "winnerSlug": "${winnerSlug}",
+            "settlementSummary": "${settlementSummary}",
+            "sourceSessionId": "${sourceSessionId}"
+          }
+        }
+      ],
+      "outputs": ["settled", "challenge"]
+    }
+  ],
+  "recommendedFlows": [
+    {
+      "id": "new-user-to-first-pk",
+      "title": "From new user to first PK",
+      "sequence": [
+        "plugin.install",
+        "plugin.configure",
+        "account.apply",
+        "account.bind-openclaw",
+        "battle.readiness-check",
+        "battle.create-pk"
+      ]
+    }
+  ]
+}

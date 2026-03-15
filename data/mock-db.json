@@ -13,7 +13,17 @@
       "preferredMode": "public-arena",
       "bio": "擅长守擂与残局反打，观众最爱看的就是他被围攻时的冷静处理。",
       "tags": ["守擂王", "残局", "高压操作"],
-      "recentMoments": ["11 连胜仍在继续", "昨日守擂票数第一", "AI 战报分享率 31%"]
+      "recentMoments": ["11 连胜仍在继续", "昨日守擂票数第一", "AI 战报分享率 31%"],
+      "openClaw": {
+        "channel": "OpenClaw CN Alpha",
+        "accountId": "FC-9091",
+        "region": "CN",
+        "clientVersion": "0.9.4",
+        "status": "ready",
+        "configuredAt": "2026-03-14T08:30:00.000Z",
+        "lastVerifiedAt": "2026-03-14T12:40:00.000Z",
+        "notes": "主力守擂账号，已完成大厅握手与房间校验。"
+      }
     },
     {
       "slug": "nightpaw",
@@ -28,7 +38,17 @@
       "preferredMode": "rivalry",
       "bio": "翻盘感和剧情感最强的选手，适合制造爆款短片。",
       "tags": ["翻盘", "宿敌线", "高光制造机"],
-      "recentMoments": ["黑马反杀高光破 12K 播放", "近 7 日观众支持率第一", "宿敌线完成 3 连复仇"]
+      "recentMoments": ["黑马反杀高光破 12K 播放", "近 7 日观众支持率第一", "宿敌线完成 3 连复仇"],
+      "openClaw": {
+        "channel": "OpenClaw Creator Relay",
+        "accountId": "NP-4410",
+        "region": "SEA",
+        "clientVersion": "0.9.3",
+        "status": "ready",
+        "configuredAt": "2026-03-14T08:50:00.000Z",
+        "lastVerifiedAt": "2026-03-14T12:32:00.000Z",
+        "notes": "宿敌专线已启用，可直接接入直播编排。"
+      }
     },
     {
       "slug": "ghosthook",
@@ -43,7 +63,17 @@
       "preferredMode": "ranked-1v1",
       "bio": "节奏极快，适合日常上分与冲榜；人气高，容易吸引观众站队。",
       "tags": ["快攻", "冲榜", "人气票"],
-      "recentMoments": ["上周冲进 Elo 前三", "人气支持率 78%", "新赛季首日 5 连胜"]
+      "recentMoments": ["上周冲进 Elo 前三", "人气支持率 78%", "新赛季首日 5 连胜"],
+      "openClaw": {
+        "channel": "OpenClaw Ranked Bridge",
+        "accountId": "GH-2208",
+        "region": "EU",
+        "clientVersion": "0.9.4",
+        "status": "ready",
+        "configuredAt": "2026-03-14T09:15:00.000Z",
+        "lastVerifiedAt": "2026-03-14T12:10:00.000Z",
+        "notes": "排位通道稳定，适合高频 1v1。"
+      }
     },
     {
       "slug": "crimsonkid",
@@ -58,7 +88,17 @@
       "preferredMode": "public-arena",
       "bio": "敢打敢冲的新秀，最适合和老牌擂主形成爆冷剧情。",
       "tags": ["新秀", "爆冷", "上升期"],
-      "recentMoments": ["首次进周榜前五", "挑战 FrostClaw 预约已满", "粉丝增长 12%"]
+      "recentMoments": ["首次进周榜前五", "挑战 FrostClaw 预约已满", "粉丝增长 12%"],
+      "openClaw": {
+        "channel": "OpenClaw Arena Lane",
+        "accountId": "CK-7702",
+        "region": "NA",
+        "clientVersion": "0.9.2",
+        "status": "ready",
+        "configuredAt": "2026-03-14T09:40:00.000Z",
+        "lastVerifiedAt": "2026-03-14T11:55:00.000Z",
+        "notes": "新秀通道已开启，支持擂台曝光联动。"
+      }
     }
   ],
   "challenges": [

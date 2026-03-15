@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
-import { challengeStatusMeta, getModeLabel } from "@/data/product-data";
+import { challengeStatusMeta, getModeLabel, openClawStatusMeta } from "@/data/product-data";
 import { getPlayerBySlugFromDb, listChallenges, listPlayers } from "@/lib/mock-db";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +38,9 @@ export default async function PlayerProfilePage({ params }: PlayerProfilePagePro
               <Link href="/challenge/new" className="btn-primary">
                 向 Ta 发起挑战
               </Link>
+              <Link href={`/openclaw?player=${player.slug}`} className="btn-secondary">
+                管理 OpenClaw 接入
+              </Link>
               <Link href="/watch" className="btn-secondary">
                 观看相关对战
               </Link>
@@ -59,6 +62,12 @@ export default async function PlayerProfilePage({ params }: PlayerProfilePagePro
                 <p className="mt-2 text-2xl font-semibold text-accentSecondary">{player.clawPoints} Claw Points</p>
                 <p className="mt-2 text-sm text-muted">挑战创建时会先冻结发起方 stake，对手接受后奖金池才会翻倍锁定。</p>
               </div>
+              <div className="mt-5 rounded-[24px] border border-white/10 bg-white/5 p-4">
+                <p className="text-xs text-muted">OpenClaw 状态</p>
+                <p className={`mt-2 text-2xl font-semibold ${openClawStatusMeta[player.openClaw.status].tone}`}>{openClawStatusMeta[player.openClaw.status].label}</p>
+                <p className="mt-2 text-sm text-muted">{player.openClaw.channel} · {player.openClaw.region} · {player.openClaw.accountId}</p>
+                <p className="mt-2 text-sm text-muted">{openClawStatusMeta[player.openClaw.status].description}</p>
+              </div>
               <div className="mt-5 flex flex-wrap gap-2">
                 {player.tags.map((tag) => (
                   <span key={tag} className="pill-muted text-sm text-slate-200">
@@ -71,6 +80,33 @@ export default async function PlayerProfilePage({ params }: PlayerProfilePagePro
         />
 
         <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <SurfaceCard className="bg-slate-950/70 p-6">
+            <p className="text-sm text-accent">OpenClaw 接入档案</p>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                <p className="text-xs text-muted">渠道</p>
+                <p className="mt-2 text-lg font-semibold">{player.openClaw.channel}</p>
+              </div>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                <p className="text-xs text-muted">客户端版本</p>
+                <p className="mt-2 text-lg font-semibold">{player.openClaw.clientVersion}</p>
+              </div>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                <p className="text-xs text-muted">配置时间</p>
+                <p className="mt-2 text-sm text-slate-200">{player.openClaw.configuredAt ? new Date(player.openClaw.configuredAt).toLocaleString("zh-CN") : "尚未配置"}</p>
+              </div>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                <p className="text-xs text-muted">最近校验</p>
+                <p className="mt-2 text-sm text-slate-200">{player.openClaw.lastVerifiedAt ? new Date(player.openClaw.lastVerifiedAt).toLocaleString("zh-CN") : "等待首次校验"}</p>
+              </div>
+            </div>
+            {player.openClaw.notes ? (
+              <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm leading-6 text-slate-200">
+                {player.openClaw.notes}
+              </div>
+            ) : null}
+          </SurfaceCard>
+
           <SurfaceCard className="bg-slate-950/70 p-6">
             <p className="text-sm text-accent">近期高光</p>
             <div className="mt-5 space-y-3">

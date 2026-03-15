@@ -1,0 +1,372 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Clawdex Dev Server",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"dev"
+			],
+			"isBackground": true,
+			"group": "build"
+		},
+		{
+			"label": "Check Docker Version",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"version"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Start Clawdex Postgres",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"deploy/docker/docker-compose.yml",
+				"up",
+				"-d",
+				"postgres"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Prisma DB Push",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"prisma:db:push"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Prisma Seed",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"prisma:seed"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Start Clawdex Docker Stack",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"deploy/docker/docker-compose.yml",
+				"up",
+				"-d",
+				"--build"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "List Clawdex Containers",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"ps",
+				"--format",
+				"table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Rebuild Clawdex Docker Stack",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"deploy/docker/docker-compose.yml",
+				"up",
+				"-d",
+				"--build",
+				"--force-recreate"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Docker Build Refresh",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Rebuild Updated Docker Stack",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"deploy/docker/docker-compose.yml",
+				"up",
+				"-d",
+				"--build",
+				"--force-recreate"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Refresh Next Build",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Check Docker Containers Now",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"ps",
+				"--format",
+				"table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Final Docker Rebuild",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"deploy/docker/docker-compose.yml",
+				"up",
+				"-d",
+				"--build",
+				"--force-recreate"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Rebuild App Artifacts",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Restore Node Modules",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Compose App Logs",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"deploy/docker/docker-compose.yml",
+				"logs",
+				"--tail",
+				"80",
+				"app",
+				"nginx"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Clean NPM Install",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Verify Host Build After Restore",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Inspect App Container FS",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"sh",
+				"-lc",
+				"ls -la /app && echo '---' && ls -la /app/.next 2>/dev/null || true && echo '---' && ls -la /app/public 2>/dev/null || true"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Inspect App Container Process",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"sh",
+				"-lc",
+				"ps aux"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Fresh Host Build",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Inspect App Env",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"sh",
+				"-lc",
+				"printenv | sort"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Check Standalone Server File",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"sh",
+				"-lc",
+				"sed -n '1,120p' /app/server.js"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Inspect DB Env In Container",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"sh",
+				"-lc",
+				"printenv | grep -E 'DATABASE_URL|DIRECT_URL|CLAWDEX_DATA_BACKEND|AUTH_'"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Read Server JS Header",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"sh",
+				"-lc",
+				"head -n 60 /app/server.js"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Read Container DB Vars",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"printenv",
+				"DATABASE_URL",
+				"DIRECT_URL",
+				"CLAWDEX_DATA_BACKEND",
+				"AUTH_SECRET",
+				"AUTH_TRUST_HOST"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Read Container Server JS",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"head",
+				"-n",
+				"60",
+				"/app/server.js"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Prepare App Container For Hot Swap",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"exec",
+				"clawdex-app",
+				"sh",
+				"-lc",
+				"rm -rf /app/.next /app/skills /app/clawdex-openclaw-channel && mkdir -p /app"
+			],
+			"isBackground": false,
+			"group": "build"
+		}
+	]
+}

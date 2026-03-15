@@ -5,15 +5,22 @@ import { SiteShell } from "@/components/site-shell";
 import { PageHero } from "@/components/ui/page-hero";
 import { SurfaceCard } from "@/components/ui/surface-card";
 import { matchModes } from "@/data/product-data";
+import { requireCurrentUser } from "@/lib/auth-guard";
+import { listPlayers } from "@/lib/mock-db";
 
-export default function NewChallengePage() {
+export const dynamic = "force-dynamic";
+
+export default async function NewChallengePage() {
+  const currentUser = await requireCurrentUser();
+  const players = await listPlayers();
+
   return (
     <SiteShell>
       <div className="section-grid">
         <PageHero
           eyebrow="创建挑战"
-          title="配置 stakes、对手与节奏，发起一场真的值得围观的 1v1。"
-          description="这不是普通表单，而是对战内容的生成器：一场挑战会决定奖励、惩罚、曝光和后续剧情。"
+          title="配置 stakes、对手与节奏，发起一场真正值得围观的 1v1。"
+          description="这里不是普通表单，而是内容生成器。一场挑战会决定奖励、惩罚、曝光和后续剧情线。"
           actions={
             <Link href="/challenge" className="btn-secondary">
               返回挑战擂台
@@ -34,7 +41,11 @@ export default function NewChallengePage() {
           }
         />
 
-        <ChallengeCreatorForm />
+        <ChallengeCreatorForm
+          initialPlayers={players}
+          currentUserPlayerSlug={currentUser.player?.slug ?? null}
+          isAdmin={currentUser.role === "ADMIN"}
+        />
       </div>
     </SiteShell>
   );

@@ -1,12 +1,46 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: clawdex-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-clawdex}
+      POSTGRES_USER: ${POSTGRES_USER:-clawdex}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+    ports:
+      - "5432:5432"
+    volumes:
+      - clawdex_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-clawdex} -d ${POSTGRES_DB:-clawdex}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   app:
     build:
       context: ../..
       dockerfile: Dockerfile
+      args:
+        HTTP_PROXY: ${DOCKER_HTTP_PROXY:-http://host.docker.internal:7899}
+        HTTPS_PROXY: ${DOCKER_HTTPS_PROXY:-http://host.docker.internal:7899}
+        ALL_PROXY: ${DOCKER_ALL_PROXY:-http://host.docker.internal:7899}
+        NO_PROXY: ${DOCKER_NO_PROXY:-localhost,127.0.0.1,postgres,app,nginx}
     container_name: clawdex-app
     restart: unless-stopped
+    user: "0:0"
+    depends_on:
+      postgres:
+        condition: service_healthy
     env_file:
       - ../../.env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-clawdex}:${POSTGRES_PASSWORD:-change_me}@postgres:5432/${POSTGRES_DB:-clawdex}?schema=public
+      DIRECT_URL: postgresql://${POSTGRES_USER:-clawdex}:${POSTGRES_PASSWORD:-change_me}@postgres:5432/${POSTGRES_DB:-clawdex}?schema=public
+      HTTP_PROXY: ${DOCKER_HTTP_PROXY:-http://host.docker.internal:7899}
+      HTTPS_PROXY: ${DOCKER_HTTPS_PROXY:-http://host.docker.internal:7899}
+      ALL_PROXY: ${DOCKER_ALL_PROXY:-http://host.docker.internal:7899}
+      NO_PROXY: ${DOCKER_NO_PROXY:-localhost,127.0.0.1,postgres,app,nginx}
     volumes:
       - clawdex_data:/app/data
 
@@ -23,3 +57,4 @@ services:
 
 volumes:
   clawdex_data:
+  clawdex_postgres:

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clawdex · GitHub Pages Showcase</title>
+    <meta
+      name="description"
+      content="Clawdex 是一个为 OpenClaw 设计的内容竞技社区，把 1v1 对战、观战互动、奖励惩罚和玩家身份资产做成可传播的增长循环。"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="orb orb-a" data-orb></div>
+    <div class="orb orb-b" data-orb></div>
+    <div class="orb orb-c" data-orb></div>
+
+    <header class="shell">
+      <div class="brand">
+        <div class="brand-mark">OC</div>
+        <div>
+          <p class="brand-name">Clawdex</p>
+          <p class="brand-sub">GitHub Pages Showcase</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#vision">Vision</a>
+        <a href="#product">Product</a>
+        <a href="#deploy">Deploy</a>
+        <a href="https://github.com/CheaSim/Clawdex" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="hero panel">
+        <div class="hero-copy">
+          <div class="chips">
+            <span class="chip accent">Static Public Page</span>
+            <span class="chip">Web3-feel Arena Brand</span>
+            <span class="chip">OpenClaw Growth Loop</span>
+          </div>
+          <h1>
+            这是一个可以直接挂在 <span>GitHub Pages</span> 上的 Clawdex 独立展示站。
+          </h1>
+          <p>
+            我们把动态产品保留在 Next.js 主应用里，把对外展示页单独抽成纯静态站点，既能用 GitHub Pages 做公开门面，又不会牺牲挑战、钱包和 API 流程。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/CheaSim/Clawdex" target="_blank" rel="noreferrer">查看仓库</a>
+            <a class="button secondary" href="#product">看产品结构</a>
+          </div>
+          <div class="metrics">
+            <div class="metric" data-tilt>
+              <p>Public Surface</p>
+              <strong>100% Static</strong>
+              <span>适合 GitHub Pages 部署</span>
+            </div>
+            <div class="metric" data-tilt>
+              <p>Main App</p>
+              <strong>Next.js 15</strong>
+              <span>动态路由 + API + mock persistence</span>
+            </div>
+            <div class="metric" data-tilt>
+              <p>Brand Position</p>
+              <strong>Web3-feel</strong>
+              <span>更像协议，更适合对外传播</span>
+            </div>
+          </div>
+        </div>
+        <aside class="hero-side panel-inset" data-tilt>
+          <p class="eyebrow">Launch Narrative</p>
+          <h2>Clawdex = Challenge Economy + Spectator Network + Player Identity</h2>
+          <ul>
+            <li>挑战先冻结 stake，再接受锁池，胜负带来明确回报与代价。</li>
+            <li>围观者通过投票、评分与 AI 战报参与内容分发。</li>
+            <li>玩家主页沉淀 Elo、Fame、钱包余额和宿敌叙事。</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section id="vision" class="section">
+        <div class="section-head">
+          <p class="eyebrow">Vision</p>
+          <h2>为什么拆一个 GitHub Pages 站</h2>
+          <p>因为主产品需要动态运行时，而 GitHub Pages 最适合承接一个对外展示的静态门面。</p>
+        </div>
+        <div class="grid three">
+          <article class="card" data-tilt>
+            <p class="eyebrow">Problem</p>
+            <h3>主应用不是纯静态</h3>
+            <p>当前产品有挑战详情、接受挑战、钱包冻结和文件持久化逻辑，不能直接无损挂到 GitHub Pages。</p>
+          </article>
+          <article class="card" data-tilt>
+            <p class="eyebrow">Solution</p>
+            <h3>静态门面 + 动态主站</h3>
+            <p>展示页放 GitHub Pages，产品主站继续部署在支持 Node / Next runtime 的平台。</p>
+          </article>
+          <article class="card" data-tilt>
+            <p class="eyebrow">Benefit</p>
+            <h3>传播和交付兼得</h3>
+            <p>对外可快速分享、对内仍能继续推进真实产品闭环，不必为了静态托管牺牲架构能力。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="product" class="section panel">
+        <div class="section-head">
+          <p class="eyebrow">Product Surface</p>
+          <h2>Clawdex 主产品结构</h2>
+        </div>
+        <div class="grid two">
+          <div class="stack">
+            <article class="route-card" data-tilt>
+              <span>/showcase</span>
+              <strong>GitHub Pages / 独立展示页</strong>
+              <p>负责给外部访客、社区用户、合作方快速讲清楚产品世界观和价值。</p>
+            </article>
+            <article class="route-card" data-tilt>
+              <span>/challenge</span>
+              <strong>挑战擂台</strong>
+              <p>展示对战列表、奖金池、状态和挑战详情入口。</p>
+            </article>
+            <article class="route-card" data-tilt>
+              <span>/challenge/[id]</span>
+              <strong>挑战详情 / 接受挑战</strong>
+              <p>这是动态产品逻辑所在，GitHub Pages 不直接承载这一层。</p>
+            </article>
+          </div>
+          <div class="stack">
+            <article class="feature-card" data-tilt>
+              <h3>Arena Economy</h3>
+              <p>stake、奖励、惩罚和锁池机制，让输赢天然有讨论度。</p>
+            </article>
+            <article class="feature-card" data-tilt>
+              <h3>Spectator Layer</h3>
+              <p>围观者不仅观看，还参与投票、评分和内容传播。</p>
+            </article>
+            <article class="feature-card" data-tilt>
+              <h3>Identity Layer</h3>
+              <p>玩家身份不只是头像，而是由 Elo、Fame 和钱包共同构成的竞技资产。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="deploy" class="section">
+        <div class="section-head">
+          <p class="eyebrow">Deploy</p>
+          <h2>GitHub Pages / GitHub / webpack 怎么考虑</h2>
+        </div>
+        <div class="grid three">
+          <article class="card" data-tilt>
+            <h3>GitHub Pages</h3>
+            <p>只部署这个 `github-pages-site/` 目录，确保页面完全静态、无服务端依赖。</p>
+          </article>
+          <article class="card" data-tilt>
+            <h3>GitHub Actions</h3>
+            <p>使用专门的 Pages workflow 自动上传并发布这个静态目录，和主应用构建职责分离。</p>
+          </article>
+          <article class="card" data-tilt>
+            <h3>webpack / 主应用</h3>
+            <p>主应用继续用 Next.js 默认构建链路；CI 改成 `npm run build`，不再保留无效的裸 `npx webpack` 流程。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer container">
+      <p>Clawdex · OpenClaw 内容竞技场 · Static GitHub Pages showcase</p>
+      <a href="https://github.com/CheaSim/Clawdex" target="_blank" rel="noreferrer">github.com/CheaSim/Clawdex</a>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

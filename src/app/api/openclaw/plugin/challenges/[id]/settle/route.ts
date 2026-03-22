@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { type SettleChallengePayload } from "@/data/product-data";
 import { getChallengeById, settleChallengeRecord } from "@/lib/mock-db";
+import { buildOpenClawErrorResponse } from "@/lib/openclaw-plugin-diagnostics";
 import { assertPluginAuthorized } from "@/lib/openclaw-plugin-auth";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -16,7 +17,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const payload = (await request.json()) as Partial<SettleChallengePayload>;
 
   if (!payload.winnerSlug) {
-    return NextResponse.json({ message: "winnerSlug is required" }, { status: 400 });
+    return NextResponse.json(
+      buildOpenClawErrorResponse(new Error("winnerSlug is required"), { status: 400 }),
+      { status: 400 },
+    );
   }
 
   try {
@@ -37,6 +41,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   } catch (error) {
     const message = error instanceof Error ? error.message : "Challenge settlement failed";
     const status = message === "挑战不存在" ? 404 : 400;
-    return NextResponse.json({ message }, { status });
+    return NextResponse.json(
+      buildOpenClawErrorResponse(error, { status, fallbackMessage: "Challenge settlement failed" }),
+      { status },
+    );
   }
 }

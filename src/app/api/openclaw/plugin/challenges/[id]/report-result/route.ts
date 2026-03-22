@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { type SettleChallengePayload } from "@/data/product-data";
 import { getChallengeById, reportChallengeResultFromPluginRecord } from "@/lib/mock-db";
+import { buildOpenClawErrorResponse } from "@/lib/openclaw-plugin-diagnostics";
 import { assertPluginAuthorized } from "@/lib/openclaw-plugin-auth";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -16,7 +17,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const payload = (await request.json()) as Partial<SettleChallengePayload>;
 
   if (!payload.winnerSlug) {
-    return NextResponse.json({ message: "winnerSlug is required" }, { status: 400 });
+    return NextResponse.json(
+      buildOpenClawErrorResponse(new Error("winnerSlug is required"), { status: 400 }),
+      { status: 400 },
+    );
   }
 
   try {
@@ -38,7 +42,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     });
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : "Challenge result reporting failed" },
+      buildOpenClawErrorResponse(error, { status: 400, fallbackMessage: "Challenge result reporting failed" }),
       { status: 400 },
     );
   }

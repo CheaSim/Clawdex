@@ -16,6 +16,27 @@
 
 本项目使用 **Git Bash** 作为默认终端环境。VS Code 已配置为默认使用 Git Bash。
 Agent 在执行命令时也应**优先使用 Git Bash / bash 语法**；只有在 bash 不可用或必须调用 PowerShell 专属能力时，才回退到 PowerShell。
+涉及构建、优化、较大重构或多步骤实现时，Agent 应**默认优先使用 `git worktree`** 创建隔离工作目录，再在 worktree 中开发、验证与整理提交；只有在任务极小或 worktree 明显不适合时，才直接在当前工作区操作。
+
+### Agent 默认执行流程
+
+除非用户明确要求跳过，Agent 处理开发需求时默认遵循以下顺序：
+
+1. **优先使用 Git Bash**
+   - 默认通过 `bash` / Git Bash 执行搜索、构建、测试、git 操作
+   - 只有在 bash 不可用或命令必须依赖 PowerShell 时才切回 PowerShell
+2. **优先使用 `git worktree` 隔离实现**
+   - 对中等及以上复杂度需求，先创建独立 worktree，再在 worktree 中完成开发
+   - 如主仓中存在独立 git 仓库 / gitlink / 子仓库，也应优先在对应仓库内单独创建 worktree，而不是直接在脏工作区修改
+   - 如果当前目录没有 worktree 存放位置，优先使用项目内 `.worktrees/`
+   - 项目内 `.worktrees/` 必须先加入 `.gitignore`，再创建 worktree
+3. **先验证，再宣称完成**
+   - 代码修改后必须运行与变更相关的测试、构建或类型检查
+   - 未经验证，不应声称“已完成”或“已修复”
+4. **完成后立即 commit**
+   - 每一轮明确完成的实现应形成独立 commit
+   - commit message 使用：`feat:` / `fix:` / `chore:` / `docs:` + 简短中文描述
+   - 若需求较大，可拆成多个可验证的小提交，但不应长期停留在未提交状态
 
 #### 在 VS Code 中使用 Bash
 

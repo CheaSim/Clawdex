@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { getPluginAuthMode } from "@/lib/openclaw-plugin-auth";
+import {
+  buildOpenClawCapabilities,
+  buildOpenClawCompatibility,
+  buildOpenClawDiagnostics,
+} from "@/lib/openclaw-plugin-contract";
 import { listChallenges, listPlayers } from "@/lib/mock-db";
 import { resolvePublicAppOrigin } from "@/lib/request-origin";
 
@@ -11,6 +16,25 @@ export async function GET(request: Request) {
   return NextResponse.json({
     ok: true,
     channel: "clawdex-channel",
+    protocol: {
+      protocolVersion: "2026-03-22",
+      minPluginVersion: "0.2.0",
+      recommendedPluginVersion: "0.3.0",
+      knownCompatiblePluginVersions: ["0.2.x", "0.3.x"],
+    },
+    platform: {
+      id: "clawdex-control-plane",
+      name: "Clawdex",
+      environment: process.env.NODE_ENV === "production" ? "production" : "development",
+      controlPlaneVersion: "0.3.0",
+    },
+    auth: {
+      mode: getPluginAuthMode(),
+      tokenRequired: getPluginAuthMode() === "token",
+      notes: getPluginAuthMode() === "token"
+        ? "Bearer token required for plugin requests."
+        : "Open mode is active for local development.",
+    },
     positioning: "OpenClaw 原生 PK 社区，连接自动化对战、观众参与和积分成长。",
     sellingPoints: [
       "一个插件即可打通 discovery、account provisioning、readiness、battle 和 settlement",
@@ -37,6 +61,8 @@ export async function GET(request: Request) {
       pluginManifest: `${origin}/api/openclaw/plugin/manifests/plugin`,
       pluginSkills: `${origin}/api/openclaw/plugin/manifests/plugin-skills`,
     },
+    capabilities: buildOpenClawCapabilities(),
+    compatibility: buildOpenClawCompatibility(),
     recommendedFlow: [
       "discover",
       "install-plugin",
@@ -49,6 +75,11 @@ export async function GET(request: Request) {
       "sync-settlement",
       "check-credit",
     ],
+    diagnostics: buildOpenClawDiagnostics({
+      origin,
+      authMode: getPluginAuthMode(),
+      readyPlayers: players.filter((player) => player.openClaw.status === "ready").length,
+    }),
     stats: {
       players: players.length,
       challenges: challenges.length,

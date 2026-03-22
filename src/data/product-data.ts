@@ -150,6 +150,80 @@ export type ReadyChallengePayload = {
   sourceSessionId?: string;
 };
 
+export type OpenClawDiagnosticsStatus = "pass" | "warn" | "fail";
+
+export type OpenClawDiagnosticsCheck = {
+  id: string;
+  status: OpenClawDiagnosticsStatus;
+  message: string;
+  suggestion?: string;
+};
+
+export type OpenClawCapabilityDescriptor = {
+  supported: boolean;
+  preferred: boolean;
+  deprecated?: boolean;
+  replacement?: string;
+  notes?: string;
+};
+
+export type OpenClawCompatibilityInfo = {
+  deprecatedMethods: string[];
+  replacementMap: Record<string, string>;
+  fallbackFlow: string[];
+  sunsetHints?: Record<string, string>;
+};
+
+export type OpenClawHandshakeProtocol = {
+  protocolVersion: string;
+  minPluginVersion: string;
+  recommendedPluginVersion: string;
+  knownCompatiblePluginVersions: string[];
+};
+
+export type OpenClawHandshakePlatform = {
+  id: string;
+  name: string;
+  environment: "development" | "production";
+  controlPlaneVersion: string;
+};
+
+export type OpenClawHandshakeAuth = {
+  mode: "open" | "token";
+  tokenRequired: boolean;
+  notes?: string;
+};
+
+export type OpenClawCapabilityMap = {
+  readiness: OpenClawCapabilityDescriptor;
+  credits: OpenClawCapabilityDescriptor;
+  accountProvision: OpenClawCapabilityDescriptor;
+  manualBattleCreate: OpenClawCapabilityDescriptor;
+  manualBattleAccept: OpenClawCapabilityDescriptor;
+  manualBattleSettle: OpenClawCapabilityDescriptor;
+  matchmakingJoin: OpenClawCapabilityDescriptor;
+  matchmakingStatus: OpenClawCapabilityDescriptor;
+  matchmakingLeave: OpenClawCapabilityDescriptor;
+  matchmakingReady: OpenClawCapabilityDescriptor;
+  matchmakingReportResult: OpenClawCapabilityDescriptor;
+  debate: OpenClawCapabilityDescriptor;
+};
+
+export type OpenClawHandshakeRecord = {
+  ok: true;
+  channel: string;
+  protocol: OpenClawHandshakeProtocol;
+  platform: OpenClawHandshakePlatform;
+  auth: OpenClawHandshakeAuth;
+  capabilities: OpenClawCapabilityMap;
+  compatibility: OpenClawCompatibilityInfo;
+  diagnostics: {
+    connectionState: "ok" | "degraded" | "blocked";
+    checks: OpenClawDiagnosticsCheck[];
+    recommendedActions: string[];
+  };
+};
+
 // ─── Debate PK Types ──────────────────────────────────
 
 export type DebateStatus = "topic-set" | "started" | "round-a" | "round-b" | "closing" | "judging" | "settled";

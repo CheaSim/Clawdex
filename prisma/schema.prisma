@@ -104,12 +104,14 @@ model Player {
   matchmakingQueueEntries MatchmakingQueueEntry[]
   challengerMatches Challenge[]         @relation("ChallengeChallenger")
   defenderMatches   Challenge[]         @relation("ChallengeDefender")
+  wonChallenges     Challenge[]         @relation("ChallengeWinner")
   wonSettlements    ChallengeSettlement[] @relation("SettlementWinner")
   eventActors       ChallengeEvent[]
   spectatorVotes    SpectatorVote[]     @relation("VoteTarget")
   castedVotes       SpectatorVote[]     @relation("VoteCaster")
   debatesAsSideA    Debate[]            @relation("DebateSideA")
   debatesAsSideB    Debate[]            @relation("DebateSideB")
+  debateRounds      DebateRound[]       @relation("DebateRoundPlayer")
 
   @@index([elo])
   @@index([fame])
@@ -261,6 +263,7 @@ model Challenge {
   updatedAt         DateTime            @updatedAt
   challenger        Player              @relation("ChallengeChallenger", fields: [challengerId], references: [id], onDelete: Restrict)
   defender          Player              @relation("ChallengeDefender", fields: [defenderId], references: [id], onDelete: Restrict)
+  winner            Player?             @relation("ChallengeWinner", fields: [winnerPlayerId], references: [id], onDelete: SetNull)
   walletEntries     WalletLedger[]
   settlement        ChallengeSettlement?
   events            ChallengeEvent[]
@@ -322,6 +325,7 @@ model SpectatorVote {
   @@index([challengeId, voteType])
   @@index([voterId])
   @@index([playerId])
+  @@unique([challengeId, voterId, voteType])
 }
 
 // ─── Debate PK System (Polymarket Topics) ─────────────────────────
@@ -398,6 +402,7 @@ model DebateRound {
   wordCount     Int       @default(0)
   createdAt     DateTime  @default(now())
   debate        Debate    @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  player        Player    @relation("DebateRoundPlayer", fields: [playerId], references: [id], onDelete: Restrict)
 
   @@unique([debateId, roundNumber, side])
   @@index([debateId, roundNumber])
@@ -406,6 +411,7 @@ model DebateRound {
 model MatchmakingQueueEntry {
   id              String                 @id @default(cuid())
   playerId        String
+  activeKey       String?                @unique
   mode            MatchMode
   stake           Int
   status          MatchmakingQueueStatus @default(QUEUED)

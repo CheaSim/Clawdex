@@ -338,6 +338,7 @@ export type ChallengeWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   challenger?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
   defender?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
+  winner?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
   walletEntries?: Prisma.WalletLedgerListRelationFilter
   settlement?: Prisma.XOR<Prisma.ChallengeSettlementNullableScalarRelationFilter, Prisma.ChallengeSettlementWhereInput> | null
   events?: Prisma.ChallengeEventListRelationFilter
@@ -369,6 +370,7 @@ export type ChallengeOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   challenger?: Prisma.PlayerOrderByWithRelationInput
   defender?: Prisma.PlayerOrderByWithRelationInput
+  winner?: Prisma.PlayerOrderByWithRelationInput
   walletEntries?: Prisma.WalletLedgerOrderByRelationAggregateInput
   settlement?: Prisma.ChallengeSettlementOrderByWithRelationInput
   events?: Prisma.ChallengeEventOrderByRelationAggregateInput
@@ -403,6 +405,7 @@ export type ChallengeWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   challenger?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
   defender?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
+  winner?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
   walletEntries?: Prisma.WalletLedgerListRelationFilter
   settlement?: Prisma.XOR<Prisma.ChallengeSettlementNullableScalarRelationFilter, Prisma.ChallengeSettlementWhereInput> | null
   events?: Prisma.ChallengeEventListRelationFilter
@@ -477,7 +480,6 @@ export type ChallengeCreateInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -486,6 +488,7 @@ export type ChallengeCreateInput = {
   updatedAt?: Date | string
   challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
   defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
   settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
   events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
@@ -535,7 +538,6 @@ export type ChallengeUpdateInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -544,6 +546,7 @@ export type ChallengeUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
   defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
   settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
   events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
@@ -616,7 +619,6 @@ export type ChallengeUpdateManyMutationInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -759,6 +761,13 @@ export type ChallengeCreateNestedManyWithoutDefenderInput = {
   connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
 }
 
+export type ChallengeCreateNestedManyWithoutWinnerInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutWinnerInput, Prisma.ChallengeUncheckedCreateWithoutWinnerInput> | Prisma.ChallengeCreateWithoutWinnerInput[] | Prisma.ChallengeUncheckedCreateWithoutWinnerInput[]
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutWinnerInput | Prisma.ChallengeCreateOrConnectWithoutWinnerInput[]
+  createMany?: Prisma.ChallengeCreateManyWinnerInputEnvelope
+  connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+}
+
 export type ChallengeUncheckedCreateNestedManyWithoutChallengerInput = {
   create?: Prisma.XOR<Prisma.ChallengeCreateWithoutChallengerInput, Prisma.ChallengeUncheckedCreateWithoutChallengerInput> | Prisma.ChallengeCreateWithoutChallengerInput[] | Prisma.ChallengeUncheckedCreateWithoutChallengerInput[]
   connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutChallengerInput | Prisma.ChallengeCreateOrConnectWithoutChallengerInput[]
@@ -770,6 +779,13 @@ export type ChallengeUncheckedCreateNestedManyWithoutDefenderInput = {
   create?: Prisma.XOR<Prisma.ChallengeCreateWithoutDefenderInput, Prisma.ChallengeUncheckedCreateWithoutDefenderInput> | Prisma.ChallengeCreateWithoutDefenderInput[] | Prisma.ChallengeUncheckedCreateWithoutDefenderInput[]
   connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutDefenderInput | Prisma.ChallengeCreateOrConnectWithoutDefenderInput[]
   createMany?: Prisma.ChallengeCreateManyDefenderInputEnvelope
+  connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+}
+
+export type ChallengeUncheckedCreateNestedManyWithoutWinnerInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutWinnerInput, Prisma.ChallengeUncheckedCreateWithoutWinnerInput> | Prisma.ChallengeCreateWithoutWinnerInput[] | Prisma.ChallengeUncheckedCreateWithoutWinnerInput[]
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutWinnerInput | Prisma.ChallengeCreateOrConnectWithoutWinnerInput[]
+  createMany?: Prisma.ChallengeCreateManyWinnerInputEnvelope
   connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
 }
 
@@ -801,6 +817,20 @@ export type ChallengeUpdateManyWithoutDefenderNestedInput = {
   deleteMany?: Prisma.ChallengeScalarWhereInput | Prisma.ChallengeScalarWhereInput[]
 }
 
+export type ChallengeUpdateManyWithoutWinnerNestedInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutWinnerInput, Prisma.ChallengeUncheckedCreateWithoutWinnerInput> | Prisma.ChallengeCreateWithoutWinnerInput[] | Prisma.ChallengeUncheckedCreateWithoutWinnerInput[]
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutWinnerInput | Prisma.ChallengeCreateOrConnectWithoutWinnerInput[]
+  upsert?: Prisma.ChallengeUpsertWithWhereUniqueWithoutWinnerInput | Prisma.ChallengeUpsertWithWhereUniqueWithoutWinnerInput[]
+  createMany?: Prisma.ChallengeCreateManyWinnerInputEnvelope
+  set?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  disconnect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  delete?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  update?: Prisma.ChallengeUpdateWithWhereUniqueWithoutWinnerInput | Prisma.ChallengeUpdateWithWhereUniqueWithoutWinnerInput[]
+  updateMany?: Prisma.ChallengeUpdateManyWithWhereWithoutWinnerInput | Prisma.ChallengeUpdateManyWithWhereWithoutWinnerInput[]
+  deleteMany?: Prisma.ChallengeScalarWhereInput | Prisma.ChallengeScalarWhereInput[]
+}
+
 export type ChallengeUncheckedUpdateManyWithoutChallengerNestedInput = {
   create?: Prisma.XOR<Prisma.ChallengeCreateWithoutChallengerInput, Prisma.ChallengeUncheckedCreateWithoutChallengerInput> | Prisma.ChallengeCreateWithoutChallengerInput[] | Prisma.ChallengeUncheckedCreateWithoutChallengerInput[]
   connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutChallengerInput | Prisma.ChallengeCreateOrConnectWithoutChallengerInput[]
@@ -826,6 +856,20 @@ export type ChallengeUncheckedUpdateManyWithoutDefenderNestedInput = {
   connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
   update?: Prisma.ChallengeUpdateWithWhereUniqueWithoutDefenderInput | Prisma.ChallengeUpdateWithWhereUniqueWithoutDefenderInput[]
   updateMany?: Prisma.ChallengeUpdateManyWithWhereWithoutDefenderInput | Prisma.ChallengeUpdateManyWithWhereWithoutDefenderInput[]
+  deleteMany?: Prisma.ChallengeScalarWhereInput | Prisma.ChallengeScalarWhereInput[]
+}
+
+export type ChallengeUncheckedUpdateManyWithoutWinnerNestedInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutWinnerInput, Prisma.ChallengeUncheckedCreateWithoutWinnerInput> | Prisma.ChallengeCreateWithoutWinnerInput[] | Prisma.ChallengeUncheckedCreateWithoutWinnerInput[]
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutWinnerInput | Prisma.ChallengeCreateOrConnectWithoutWinnerInput[]
+  upsert?: Prisma.ChallengeUpsertWithWhereUniqueWithoutWinnerInput | Prisma.ChallengeUpsertWithWhereUniqueWithoutWinnerInput[]
+  createMany?: Prisma.ChallengeCreateManyWinnerInputEnvelope
+  set?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  disconnect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  delete?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  update?: Prisma.ChallengeUpdateWithWhereUniqueWithoutWinnerInput | Prisma.ChallengeUpdateWithWhereUniqueWithoutWinnerInput[]
+  updateMany?: Prisma.ChallengeUpdateManyWithWhereWithoutWinnerInput | Prisma.ChallengeUpdateManyWithWhereWithoutWinnerInput[]
   deleteMany?: Prisma.ChallengeScalarWhereInput | Prisma.ChallengeScalarWhereInput[]
 }
 
@@ -937,7 +981,6 @@ export type ChallengeCreateWithoutChallengerInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -945,6 +988,7 @@ export type ChallengeCreateWithoutChallengerInput = {
   settledAt?: Date | string | null
   updatedAt?: Date | string
   defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
   settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
   events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
@@ -1003,7 +1047,6 @@ export type ChallengeCreateWithoutDefenderInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -1011,6 +1054,7 @@ export type ChallengeCreateWithoutDefenderInput = {
   settledAt?: Date | string | null
   updatedAt?: Date | string
   challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
   settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
   events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
@@ -1054,6 +1098,72 @@ export type ChallengeCreateOrConnectWithoutDefenderInput = {
 
 export type ChallengeCreateManyDefenderInputEnvelope = {
   data: Prisma.ChallengeCreateManyDefenderInput | Prisma.ChallengeCreateManyDefenderInput[]
+  skipDuplicates?: boolean
+}
+
+export type ChallengeCreateWithoutWinnerInput = {
+  id?: string
+  mode: $Enums.MatchMode
+  stake: number
+  rewardPool?: number
+  visibility?: $Enums.ChallengeVisibility
+  status?: $Enums.ChallengeStatus
+  scheduledLabel: string
+  storyline: string
+  rulesNote?: string | null
+  sourceChannel?: string | null
+  sourceSessionId?: string | null
+  settlementSummary?: string | null
+  preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  acceptedAt?: Date | string | null
+  settledAt?: Date | string | null
+  updatedAt?: Date | string
+  challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
+  defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
+  settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
+  events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
+  spectatorVotes?: Prisma.SpectatorVoteCreateNestedManyWithoutChallengeInput
+  debate?: Prisma.DebateCreateNestedOneWithoutChallengeInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutChallengeInput
+}
+
+export type ChallengeUncheckedCreateWithoutWinnerInput = {
+  id?: string
+  mode: $Enums.MatchMode
+  challengerId: string
+  defenderId: string
+  stake: number
+  rewardPool?: number
+  visibility?: $Enums.ChallengeVisibility
+  status?: $Enums.ChallengeStatus
+  scheduledLabel: string
+  storyline: string
+  rulesNote?: string | null
+  sourceChannel?: string | null
+  sourceSessionId?: string | null
+  settlementSummary?: string | null
+  preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  acceptedAt?: Date | string | null
+  settledAt?: Date | string | null
+  updatedAt?: Date | string
+  walletEntries?: Prisma.WalletLedgerUncheckedCreateNestedManyWithoutChallengeInput
+  settlement?: Prisma.ChallengeSettlementUncheckedCreateNestedOneWithoutChallengeInput
+  events?: Prisma.ChallengeEventUncheckedCreateNestedManyWithoutChallengeInput
+  spectatorVotes?: Prisma.SpectatorVoteUncheckedCreateNestedManyWithoutChallengeInput
+  debate?: Prisma.DebateUncheckedCreateNestedOneWithoutChallengeInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutChallengeInput
+}
+
+export type ChallengeCreateOrConnectWithoutWinnerInput = {
+  where: Prisma.ChallengeWhereUniqueInput
+  create: Prisma.XOR<Prisma.ChallengeCreateWithoutWinnerInput, Prisma.ChallengeUncheckedCreateWithoutWinnerInput>
+}
+
+export type ChallengeCreateManyWinnerInputEnvelope = {
+  data: Prisma.ChallengeCreateManyWinnerInput | Prisma.ChallengeCreateManyWinnerInput[]
   skipDuplicates?: boolean
 }
 
@@ -1115,6 +1225,22 @@ export type ChallengeUpdateManyWithWhereWithoutDefenderInput = {
   data: Prisma.XOR<Prisma.ChallengeUpdateManyMutationInput, Prisma.ChallengeUncheckedUpdateManyWithoutDefenderInput>
 }
 
+export type ChallengeUpsertWithWhereUniqueWithoutWinnerInput = {
+  where: Prisma.ChallengeWhereUniqueInput
+  update: Prisma.XOR<Prisma.ChallengeUpdateWithoutWinnerInput, Prisma.ChallengeUncheckedUpdateWithoutWinnerInput>
+  create: Prisma.XOR<Prisma.ChallengeCreateWithoutWinnerInput, Prisma.ChallengeUncheckedCreateWithoutWinnerInput>
+}
+
+export type ChallengeUpdateWithWhereUniqueWithoutWinnerInput = {
+  where: Prisma.ChallengeWhereUniqueInput
+  data: Prisma.XOR<Prisma.ChallengeUpdateWithoutWinnerInput, Prisma.ChallengeUncheckedUpdateWithoutWinnerInput>
+}
+
+export type ChallengeUpdateManyWithWhereWithoutWinnerInput = {
+  where: Prisma.ChallengeScalarWhereInput
+  data: Prisma.XOR<Prisma.ChallengeUpdateManyMutationInput, Prisma.ChallengeUncheckedUpdateManyWithoutWinnerInput>
+}
+
 export type ChallengeCreateWithoutWalletEntriesInput = {
   id?: string
   mode: $Enums.MatchMode
@@ -1127,7 +1253,6 @@ export type ChallengeCreateWithoutWalletEntriesInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -1136,6 +1261,7 @@ export type ChallengeCreateWithoutWalletEntriesInput = {
   updatedAt?: Date | string
   challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
   defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
   events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
   spectatorVotes?: Prisma.SpectatorVoteCreateNestedManyWithoutChallengeInput
@@ -1199,7 +1325,6 @@ export type ChallengeUpdateWithoutWalletEntriesInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1208,6 +1333,7 @@ export type ChallengeUpdateWithoutWalletEntriesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
   defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
   events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
   spectatorVotes?: Prisma.SpectatorVoteUpdateManyWithoutChallengeNestedInput
@@ -1255,7 +1381,6 @@ export type ChallengeCreateWithoutSettlementInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -1264,6 +1389,7 @@ export type ChallengeCreateWithoutSettlementInput = {
   updatedAt?: Date | string
   challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
   defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
   events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
   spectatorVotes?: Prisma.SpectatorVoteCreateNestedManyWithoutChallengeInput
@@ -1327,7 +1453,6 @@ export type ChallengeUpdateWithoutSettlementInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1336,6 +1461,7 @@ export type ChallengeUpdateWithoutSettlementInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
   defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
   events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
   spectatorVotes?: Prisma.SpectatorVoteUpdateManyWithoutChallengeNestedInput
@@ -1383,7 +1509,6 @@ export type ChallengeCreateWithoutEventsInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -1392,6 +1517,7 @@ export type ChallengeCreateWithoutEventsInput = {
   updatedAt?: Date | string
   challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
   defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
   settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
   spectatorVotes?: Prisma.SpectatorVoteCreateNestedManyWithoutChallengeInput
@@ -1455,7 +1581,6 @@ export type ChallengeUpdateWithoutEventsInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1464,6 +1589,7 @@ export type ChallengeUpdateWithoutEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
   defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
   settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
   spectatorVotes?: Prisma.SpectatorVoteUpdateManyWithoutChallengeNestedInput
@@ -1511,7 +1637,6 @@ export type ChallengeCreateWithoutSpectatorVotesInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -1520,6 +1645,7 @@ export type ChallengeCreateWithoutSpectatorVotesInput = {
   updatedAt?: Date | string
   challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
   defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
   settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
   events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
@@ -1583,7 +1709,6 @@ export type ChallengeUpdateWithoutSpectatorVotesInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1592,6 +1717,7 @@ export type ChallengeUpdateWithoutSpectatorVotesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
   defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
   settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
   events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
@@ -1639,7 +1765,6 @@ export type ChallengeCreateWithoutDebateInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -1648,6 +1773,7 @@ export type ChallengeCreateWithoutDebateInput = {
   updatedAt?: Date | string
   challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
   defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
   settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
   events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
@@ -1711,7 +1837,6 @@ export type ChallengeUpdateWithoutDebateInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1720,6 +1845,7 @@ export type ChallengeUpdateWithoutDebateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
   defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
   settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
   events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
@@ -1767,7 +1893,6 @@ export type ChallengeCreateWithoutMatchmakingQueueEntriesInput = {
   rulesNote?: string | null
   sourceChannel?: string | null
   sourceSessionId?: string | null
-  winnerPlayerId?: string | null
   settlementSummary?: string | null
   preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -1776,6 +1901,7 @@ export type ChallengeCreateWithoutMatchmakingQueueEntriesInput = {
   updatedAt?: Date | string
   challenger: Prisma.PlayerCreateNestedOneWithoutChallengerMatchesInput
   defender: Prisma.PlayerCreateNestedOneWithoutDefenderMatchesInput
+  winner?: Prisma.PlayerCreateNestedOneWithoutWonChallengesInput
   walletEntries?: Prisma.WalletLedgerCreateNestedManyWithoutChallengeInput
   settlement?: Prisma.ChallengeSettlementCreateNestedOneWithoutChallengeInput
   events?: Prisma.ChallengeEventCreateNestedManyWithoutChallengeInput
@@ -1839,7 +1965,6 @@ export type ChallengeUpdateWithoutMatchmakingQueueEntriesInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1848,6 +1973,7 @@ export type ChallengeUpdateWithoutMatchmakingQueueEntriesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
   defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
   settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
   events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
@@ -1927,6 +2053,28 @@ export type ChallengeCreateManyDefenderInput = {
   updatedAt?: Date | string
 }
 
+export type ChallengeCreateManyWinnerInput = {
+  id?: string
+  mode: $Enums.MatchMode
+  challengerId: string
+  defenderId: string
+  stake: number
+  rewardPool?: number
+  visibility?: $Enums.ChallengeVisibility
+  status?: $Enums.ChallengeStatus
+  scheduledLabel: string
+  storyline: string
+  rulesNote?: string | null
+  sourceChannel?: string | null
+  sourceSessionId?: string | null
+  settlementSummary?: string | null
+  preview: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  acceptedAt?: Date | string | null
+  settledAt?: Date | string | null
+  updatedAt?: Date | string
+}
+
 export type ChallengeUpdateWithoutChallengerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
@@ -1939,7 +2087,6 @@ export type ChallengeUpdateWithoutChallengerInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1947,6 +2094,7 @@ export type ChallengeUpdateWithoutChallengerInput = {
   settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
   settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
   events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
@@ -2017,7 +2165,6 @@ export type ChallengeUpdateWithoutDefenderInput = {
   rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2025,6 +2172,7 @@ export type ChallengeUpdateWithoutDefenderInput = {
   settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
+  winner?: Prisma.PlayerUpdateOneWithoutWonChallengesNestedInput
   walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
   settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
   events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
@@ -2075,6 +2223,84 @@ export type ChallengeUncheckedUpdateManyWithoutDefenderInput = {
   sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerPlayerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ChallengeUpdateWithoutWinnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
+  stake?: Prisma.IntFieldUpdateOperationsInput | number
+  rewardPool?: Prisma.IntFieldUpdateOperationsInput | number
+  visibility?: Prisma.EnumChallengeVisibilityFieldUpdateOperationsInput | $Enums.ChallengeVisibility
+  status?: Prisma.EnumChallengeStatusFieldUpdateOperationsInput | $Enums.ChallengeStatus
+  scheduledLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  storyline?: Prisma.StringFieldUpdateOperationsInput | string
+  rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  challenger?: Prisma.PlayerUpdateOneRequiredWithoutChallengerMatchesNestedInput
+  defender?: Prisma.PlayerUpdateOneRequiredWithoutDefenderMatchesNestedInput
+  walletEntries?: Prisma.WalletLedgerUpdateManyWithoutChallengeNestedInput
+  settlement?: Prisma.ChallengeSettlementUpdateOneWithoutChallengeNestedInput
+  events?: Prisma.ChallengeEventUpdateManyWithoutChallengeNestedInput
+  spectatorVotes?: Prisma.SpectatorVoteUpdateManyWithoutChallengeNestedInput
+  debate?: Prisma.DebateUpdateOneWithoutChallengeNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutChallengeNestedInput
+}
+
+export type ChallengeUncheckedUpdateWithoutWinnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
+  challengerId?: Prisma.StringFieldUpdateOperationsInput | string
+  defenderId?: Prisma.StringFieldUpdateOperationsInput | string
+  stake?: Prisma.IntFieldUpdateOperationsInput | number
+  rewardPool?: Prisma.IntFieldUpdateOperationsInput | number
+  visibility?: Prisma.EnumChallengeVisibilityFieldUpdateOperationsInput | $Enums.ChallengeVisibility
+  status?: Prisma.EnumChallengeStatusFieldUpdateOperationsInput | $Enums.ChallengeStatus
+  scheduledLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  storyline?: Prisma.StringFieldUpdateOperationsInput | string
+  rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  walletEntries?: Prisma.WalletLedgerUncheckedUpdateManyWithoutChallengeNestedInput
+  settlement?: Prisma.ChallengeSettlementUncheckedUpdateOneWithoutChallengeNestedInput
+  events?: Prisma.ChallengeEventUncheckedUpdateManyWithoutChallengeNestedInput
+  spectatorVotes?: Prisma.SpectatorVoteUncheckedUpdateManyWithoutChallengeNestedInput
+  debate?: Prisma.DebateUncheckedUpdateOneWithoutChallengeNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutChallengeNestedInput
+}
+
+export type ChallengeUncheckedUpdateManyWithoutWinnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
+  challengerId?: Prisma.StringFieldUpdateOperationsInput | string
+  defenderId?: Prisma.StringFieldUpdateOperationsInput | string
+  stake?: Prisma.IntFieldUpdateOperationsInput | number
+  rewardPool?: Prisma.IntFieldUpdateOperationsInput | number
+  visibility?: Prisma.EnumChallengeVisibilityFieldUpdateOperationsInput | $Enums.ChallengeVisibility
+  status?: Prisma.EnumChallengeStatusFieldUpdateOperationsInput | $Enums.ChallengeStatus
+  scheduledLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  storyline?: Prisma.StringFieldUpdateOperationsInput | string
+  rulesNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceChannel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlementSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preview?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2164,6 +2390,7 @@ export type ChallengeSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   updatedAt?: boolean
   challenger?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   defender?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
+  winner?: boolean | Prisma.Challenge$winnerArgs<ExtArgs>
   walletEntries?: boolean | Prisma.Challenge$walletEntriesArgs<ExtArgs>
   settlement?: boolean | Prisma.Challenge$settlementArgs<ExtArgs>
   events?: boolean | Prisma.Challenge$eventsArgs<ExtArgs>
@@ -2196,6 +2423,7 @@ export type ChallengeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   updatedAt?: boolean
   challenger?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   defender?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
+  winner?: boolean | Prisma.Challenge$winnerArgs<ExtArgs>
 }, ExtArgs["result"]["challenge"]>
 
 export type ChallengeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2221,6 +2449,7 @@ export type ChallengeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   updatedAt?: boolean
   challenger?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   defender?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
+  winner?: boolean | Prisma.Challenge$winnerArgs<ExtArgs>
 }, ExtArgs["result"]["challenge"]>
 
 export type ChallengeSelectScalar = {
@@ -2250,6 +2479,7 @@ export type ChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type ChallengeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   challenger?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   defender?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
+  winner?: boolean | Prisma.Challenge$winnerArgs<ExtArgs>
   walletEntries?: boolean | Prisma.Challenge$walletEntriesArgs<ExtArgs>
   settlement?: boolean | Prisma.Challenge$settlementArgs<ExtArgs>
   events?: boolean | Prisma.Challenge$eventsArgs<ExtArgs>
@@ -2261,10 +2491,12 @@ export type ChallengeInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type ChallengeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   challenger?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   defender?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
+  winner?: boolean | Prisma.Challenge$winnerArgs<ExtArgs>
 }
 export type ChallengeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   challenger?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   defender?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
+  winner?: boolean | Prisma.Challenge$winnerArgs<ExtArgs>
 }
 
 export type $ChallengePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2272,6 +2504,7 @@ export type $ChallengePayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     challenger: Prisma.$PlayerPayload<ExtArgs>
     defender: Prisma.$PlayerPayload<ExtArgs>
+    winner: Prisma.$PlayerPayload<ExtArgs> | null
     walletEntries: Prisma.$WalletLedgerPayload<ExtArgs>[]
     settlement: Prisma.$ChallengeSettlementPayload<ExtArgs> | null
     events: Prisma.$ChallengeEventPayload<ExtArgs>[]
@@ -2696,6 +2929,7 @@ export interface Prisma__ChallengeClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   challenger<T extends Prisma.PlayerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlayerDefaultArgs<ExtArgs>>): Prisma.Prisma__PlayerClient<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   defender<T extends Prisma.PlayerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlayerDefaultArgs<ExtArgs>>): Prisma.Prisma__PlayerClient<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  winner<T extends Prisma.Challenge$winnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$winnerArgs<ExtArgs>>): Prisma.Prisma__PlayerClient<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   walletEntries<T extends Prisma.Challenge$walletEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$walletEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WalletLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settlement<T extends Prisma.Challenge$settlementArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$settlementArgs<ExtArgs>>): Prisma.Prisma__ChallengeSettlementClient<runtime.Types.Result.GetResult<Prisma.$ChallengeSettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   events<T extends Prisma.Challenge$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengeEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3149,6 +3383,25 @@ export type ChallengeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many Challenges to delete.
    */
   limit?: number
+}
+
+/**
+ * Challenge.winner
+ */
+export type Challenge$winnerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Player
+   */
+  select?: Prisma.PlayerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Player
+   */
+  omit?: Prisma.PlayerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlayerInclude<ExtArgs> | null
+  where?: Prisma.PlayerWhereInput
 }
 
 /**

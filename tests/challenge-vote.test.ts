@@ -73,4 +73,12 @@ describe("challenge vote rules", () => {
   test("computes the post-reward wallet balance for ledger entries", () => {
     assert.equal(computeJudgeWalletBalanceAfter(12, 5), 17);
   });
+
+  test("database schema now guarantees one vote per challenge, voter, and vote type", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const schema = readFileSync(join(process.cwd(), "prisma", "schema.prisma"), "utf8");
+
+    assert.match(schema, /@@unique\(\[challengeId, voterId, voteType\]\)/);
+  });
 });

@@ -37,6 +37,7 @@ export type MatchmakingQueueEntrySumAggregateOutputType = {
 export type MatchmakingQueueEntryMinAggregateOutputType = {
   id: string | null
   playerId: string | null
+  activeKey: string | null
   mode: $Enums.MatchMode | null
   stake: number | null
   status: $Enums.MatchmakingQueueStatus | null
@@ -52,6 +53,7 @@ export type MatchmakingQueueEntryMinAggregateOutputType = {
 export type MatchmakingQueueEntryMaxAggregateOutputType = {
   id: string | null
   playerId: string | null
+  activeKey: string | null
   mode: $Enums.MatchMode | null
   stake: number | null
   status: $Enums.MatchmakingQueueStatus | null
@@ -67,6 +69,7 @@ export type MatchmakingQueueEntryMaxAggregateOutputType = {
 export type MatchmakingQueueEntryCountAggregateOutputType = {
   id: number
   playerId: number
+  activeKey: number
   mode: number
   stake: number
   status: number
@@ -92,6 +95,7 @@ export type MatchmakingQueueEntrySumAggregateInputType = {
 export type MatchmakingQueueEntryMinAggregateInputType = {
   id?: true
   playerId?: true
+  activeKey?: true
   mode?: true
   stake?: true
   status?: true
@@ -107,6 +111,7 @@ export type MatchmakingQueueEntryMinAggregateInputType = {
 export type MatchmakingQueueEntryMaxAggregateInputType = {
   id?: true
   playerId?: true
+  activeKey?: true
   mode?: true
   stake?: true
   status?: true
@@ -122,6 +127,7 @@ export type MatchmakingQueueEntryMaxAggregateInputType = {
 export type MatchmakingQueueEntryCountAggregateInputType = {
   id?: true
   playerId?: true
+  activeKey?: true
   mode?: true
   stake?: true
   status?: true
@@ -224,6 +230,7 @@ export type MatchmakingQueueEntryGroupByArgs<ExtArgs extends runtime.Types.Exten
 export type MatchmakingQueueEntryGroupByOutputType = {
   id: string
   playerId: string
+  activeKey: string | null
   mode: $Enums.MatchMode
   stake: number
   status: $Enums.MatchmakingQueueStatus
@@ -262,6 +269,7 @@ export type MatchmakingQueueEntryWhereInput = {
   NOT?: Prisma.MatchmakingQueueEntryWhereInput | Prisma.MatchmakingQueueEntryWhereInput[]
   id?: Prisma.StringFilter<"MatchmakingQueueEntry"> | string
   playerId?: Prisma.StringFilter<"MatchmakingQueueEntry"> | string
+  activeKey?: Prisma.StringNullableFilter<"MatchmakingQueueEntry"> | string | null
   mode?: Prisma.EnumMatchModeFilter<"MatchmakingQueueEntry"> | $Enums.MatchMode
   stake?: Prisma.IntFilter<"MatchmakingQueueEntry"> | number
   status?: Prisma.EnumMatchmakingQueueStatusFilter<"MatchmakingQueueEntry"> | $Enums.MatchmakingQueueStatus
@@ -279,6 +287,7 @@ export type MatchmakingQueueEntryWhereInput = {
 export type MatchmakingQueueEntryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  activeKey?: Prisma.SortOrderInput | Prisma.SortOrder
   mode?: Prisma.SortOrder
   stake?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -295,6 +304,7 @@ export type MatchmakingQueueEntryOrderByWithRelationInput = {
 
 export type MatchmakingQueueEntryWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  activeKey?: string
   AND?: Prisma.MatchmakingQueueEntryWhereInput | Prisma.MatchmakingQueueEntryWhereInput[]
   OR?: Prisma.MatchmakingQueueEntryWhereInput[]
   NOT?: Prisma.MatchmakingQueueEntryWhereInput | Prisma.MatchmakingQueueEntryWhereInput[]
@@ -311,11 +321,12 @@ export type MatchmakingQueueEntryWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"MatchmakingQueueEntry"> | Date | string
   player?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
   challenge?: Prisma.XOR<Prisma.ChallengeNullableScalarRelationFilter, Prisma.ChallengeWhereInput> | null
-}, "id">
+}, "id" | "activeKey">
 
 export type MatchmakingQueueEntryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  activeKey?: Prisma.SortOrderInput | Prisma.SortOrder
   mode?: Prisma.SortOrder
   stake?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -339,6 +350,7 @@ export type MatchmakingQueueEntryScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MatchmakingQueueEntryScalarWhereWithAggregatesInput | Prisma.MatchmakingQueueEntryScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"MatchmakingQueueEntry"> | string
   playerId?: Prisma.StringWithAggregatesFilter<"MatchmakingQueueEntry"> | string
+  activeKey?: Prisma.StringNullableWithAggregatesFilter<"MatchmakingQueueEntry"> | string | null
   mode?: Prisma.EnumMatchModeWithAggregatesFilter<"MatchmakingQueueEntry"> | $Enums.MatchMode
   stake?: Prisma.IntWithAggregatesFilter<"MatchmakingQueueEntry"> | number
   status?: Prisma.EnumMatchmakingQueueStatusWithAggregatesFilter<"MatchmakingQueueEntry"> | $Enums.MatchmakingQueueStatus
@@ -353,6 +365,7 @@ export type MatchmakingQueueEntryScalarWhereWithAggregatesInput = {
 
 export type MatchmakingQueueEntryCreateInput = {
   id?: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -369,6 +382,7 @@ export type MatchmakingQueueEntryCreateInput = {
 export type MatchmakingQueueEntryUncheckedCreateInput = {
   id?: string
   playerId: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -383,6 +397,7 @@ export type MatchmakingQueueEntryUncheckedCreateInput = {
 
 export type MatchmakingQueueEntryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -399,6 +414,7 @@ export type MatchmakingQueueEntryUpdateInput = {
 export type MatchmakingQueueEntryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -414,6 +430,7 @@ export type MatchmakingQueueEntryUncheckedUpdateInput = {
 export type MatchmakingQueueEntryCreateManyInput = {
   id?: string
   playerId: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -428,6 +445,7 @@ export type MatchmakingQueueEntryCreateManyInput = {
 
 export type MatchmakingQueueEntryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -442,6 +460,7 @@ export type MatchmakingQueueEntryUpdateManyMutationInput = {
 export type MatchmakingQueueEntryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -467,6 +486,7 @@ export type MatchmakingQueueEntryOrderByRelationAggregateInput = {
 export type MatchmakingQueueEntryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  activeKey?: Prisma.SortOrder
   mode?: Prisma.SortOrder
   stake?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -486,6 +506,7 @@ export type MatchmakingQueueEntryAvgOrderByAggregateInput = {
 export type MatchmakingQueueEntryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  activeKey?: Prisma.SortOrder
   mode?: Prisma.SortOrder
   stake?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -501,6 +522,7 @@ export type MatchmakingQueueEntryMaxOrderByAggregateInput = {
 export type MatchmakingQueueEntryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  activeKey?: Prisma.SortOrder
   mode?: Prisma.SortOrder
   stake?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -607,6 +629,7 @@ export type EnumMatchmakingQueueStatusFieldUpdateOperationsInput = {
 
 export type MatchmakingQueueEntryCreateWithoutPlayerInput = {
   id?: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -621,6 +644,7 @@ export type MatchmakingQueueEntryCreateWithoutPlayerInput = {
 
 export type MatchmakingQueueEntryUncheckedCreateWithoutPlayerInput = {
   id?: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -665,6 +689,7 @@ export type MatchmakingQueueEntryScalarWhereInput = {
   NOT?: Prisma.MatchmakingQueueEntryScalarWhereInput | Prisma.MatchmakingQueueEntryScalarWhereInput[]
   id?: Prisma.StringFilter<"MatchmakingQueueEntry"> | string
   playerId?: Prisma.StringFilter<"MatchmakingQueueEntry"> | string
+  activeKey?: Prisma.StringNullableFilter<"MatchmakingQueueEntry"> | string | null
   mode?: Prisma.EnumMatchModeFilter<"MatchmakingQueueEntry"> | $Enums.MatchMode
   stake?: Prisma.IntFilter<"MatchmakingQueueEntry"> | number
   status?: Prisma.EnumMatchmakingQueueStatusFilter<"MatchmakingQueueEntry"> | $Enums.MatchmakingQueueStatus
@@ -679,6 +704,7 @@ export type MatchmakingQueueEntryScalarWhereInput = {
 
 export type MatchmakingQueueEntryCreateWithoutChallengeInput = {
   id?: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -694,6 +720,7 @@ export type MatchmakingQueueEntryCreateWithoutChallengeInput = {
 export type MatchmakingQueueEntryUncheckedCreateWithoutChallengeInput = {
   id?: string
   playerId: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -733,6 +760,7 @@ export type MatchmakingQueueEntryUpdateManyWithWhereWithoutChallengeInput = {
 
 export type MatchmakingQueueEntryCreateManyPlayerInput = {
   id?: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -747,6 +775,7 @@ export type MatchmakingQueueEntryCreateManyPlayerInput = {
 
 export type MatchmakingQueueEntryUpdateWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -761,6 +790,7 @@ export type MatchmakingQueueEntryUpdateWithoutPlayerInput = {
 
 export type MatchmakingQueueEntryUncheckedUpdateWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -775,6 +805,7 @@ export type MatchmakingQueueEntryUncheckedUpdateWithoutPlayerInput = {
 
 export type MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -790,6 +821,7 @@ export type MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerInput = {
 export type MatchmakingQueueEntryCreateManyChallengeInput = {
   id?: string
   playerId: string
+  activeKey?: string | null
   mode: $Enums.MatchMode
   stake: number
   status?: $Enums.MatchmakingQueueStatus
@@ -803,6 +835,7 @@ export type MatchmakingQueueEntryCreateManyChallengeInput = {
 
 export type MatchmakingQueueEntryUpdateWithoutChallengeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -818,6 +851,7 @@ export type MatchmakingQueueEntryUpdateWithoutChallengeInput = {
 export type MatchmakingQueueEntryUncheckedUpdateWithoutChallengeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -832,6 +866,7 @@ export type MatchmakingQueueEntryUncheckedUpdateWithoutChallengeInput = {
 export type MatchmakingQueueEntryUncheckedUpdateManyWithoutChallengeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
+  activeKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
   stake?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumMatchmakingQueueStatusFieldUpdateOperationsInput | $Enums.MatchmakingQueueStatus
@@ -848,6 +883,7 @@ export type MatchmakingQueueEntryUncheckedUpdateManyWithoutChallengeInput = {
 export type MatchmakingQueueEntrySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   playerId?: boolean
+  activeKey?: boolean
   mode?: boolean
   stake?: boolean
   status?: boolean
@@ -865,6 +901,7 @@ export type MatchmakingQueueEntrySelect<ExtArgs extends runtime.Types.Extensions
 export type MatchmakingQueueEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   playerId?: boolean
+  activeKey?: boolean
   mode?: boolean
   stake?: boolean
   status?: boolean
@@ -882,6 +919,7 @@ export type MatchmakingQueueEntrySelectCreateManyAndReturn<ExtArgs extends runti
 export type MatchmakingQueueEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   playerId?: boolean
+  activeKey?: boolean
   mode?: boolean
   stake?: boolean
   status?: boolean
@@ -899,6 +937,7 @@ export type MatchmakingQueueEntrySelectUpdateManyAndReturn<ExtArgs extends runti
 export type MatchmakingQueueEntrySelectScalar = {
   id?: boolean
   playerId?: boolean
+  activeKey?: boolean
   mode?: boolean
   stake?: boolean
   status?: boolean
@@ -911,7 +950,7 @@ export type MatchmakingQueueEntrySelectScalar = {
   updatedAt?: boolean
 }
 
-export type MatchmakingQueueEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "playerId" | "mode" | "stake" | "status" | "sourceChannel" | "sourceSessionId" | "challengeId" | "createdAt" | "matchedAt" | "cancelledAt" | "updatedAt", ExtArgs["result"]["matchmakingQueueEntry"]>
+export type MatchmakingQueueEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "playerId" | "activeKey" | "mode" | "stake" | "status" | "sourceChannel" | "sourceSessionId" | "challengeId" | "createdAt" | "matchedAt" | "cancelledAt" | "updatedAt", ExtArgs["result"]["matchmakingQueueEntry"]>
 export type MatchmakingQueueEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   challenge?: boolean | Prisma.MatchmakingQueueEntry$challengeArgs<ExtArgs>
@@ -934,6 +973,7 @@ export type $MatchmakingQueueEntryPayload<ExtArgs extends runtime.Types.Extensio
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     playerId: string
+    activeKey: string | null
     mode: $Enums.MatchMode
     stake: number
     status: $Enums.MatchmakingQueueStatus
@@ -1371,6 +1411,7 @@ export interface Prisma__MatchmakingQueueEntryClient<T, Null = never, ExtArgs ex
 export interface MatchmakingQueueEntryFieldRefs {
   readonly id: Prisma.FieldRef<"MatchmakingQueueEntry", 'String'>
   readonly playerId: Prisma.FieldRef<"MatchmakingQueueEntry", 'String'>
+  readonly activeKey: Prisma.FieldRef<"MatchmakingQueueEntry", 'String'>
   readonly mode: Prisma.FieldRef<"MatchmakingQueueEntry", 'MatchMode'>
   readonly stake: Prisma.FieldRef<"MatchmakingQueueEntry", 'Int'>
   readonly status: Prisma.FieldRef<"MatchmakingQueueEntry", 'MatchmakingQueueStatus'>

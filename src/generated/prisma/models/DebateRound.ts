@@ -245,6 +245,7 @@ export type DebateRoundWhereInput = {
   wordCount?: Prisma.IntFilter<"DebateRound"> | number
   createdAt?: Prisma.DateTimeFilter<"DebateRound"> | Date | string
   debate?: Prisma.XOR<Prisma.DebateScalarRelationFilter, Prisma.DebateWhereInput>
+  player?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
 }
 
 export type DebateRoundOrderByWithRelationInput = {
@@ -257,6 +258,7 @@ export type DebateRoundOrderByWithRelationInput = {
   wordCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   debate?: Prisma.DebateOrderByWithRelationInput
+  player?: Prisma.PlayerOrderByWithRelationInput
 }
 
 export type DebateRoundWhereUniqueInput = Prisma.AtLeast<{
@@ -273,6 +275,7 @@ export type DebateRoundWhereUniqueInput = Prisma.AtLeast<{
   wordCount?: Prisma.IntFilter<"DebateRound"> | number
   createdAt?: Prisma.DateTimeFilter<"DebateRound"> | Date | string
   debate?: Prisma.XOR<Prisma.DebateScalarRelationFilter, Prisma.DebateWhereInput>
+  player?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
 }, "id" | "debateId_roundNumber_side">
 
 export type DebateRoundOrderByWithAggregationInput = {
@@ -309,11 +312,11 @@ export type DebateRoundCreateInput = {
   id?: string
   roundNumber: number
   side: $Enums.DebateSide
-  playerId: string
   argument: string
   wordCount?: number
   createdAt?: Date | string
   debate: Prisma.DebateCreateNestedOneWithoutRoundsInput
+  player: Prisma.PlayerCreateNestedOneWithoutDebateRoundsInput
 }
 
 export type DebateRoundUncheckedCreateInput = {
@@ -331,11 +334,11 @@ export type DebateRoundUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   side?: Prisma.EnumDebateSideFieldUpdateOperationsInput | $Enums.DebateSide
-  playerId?: Prisma.StringFieldUpdateOperationsInput | string
   argument?: Prisma.StringFieldUpdateOperationsInput | string
   wordCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   debate?: Prisma.DebateUpdateOneRequiredWithoutRoundsNestedInput
+  player?: Prisma.PlayerUpdateOneRequiredWithoutDebateRoundsNestedInput
 }
 
 export type DebateRoundUncheckedUpdateInput = {
@@ -364,7 +367,6 @@ export type DebateRoundUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   side?: Prisma.EnumDebateSideFieldUpdateOperationsInput | $Enums.DebateSide
-  playerId?: Prisma.StringFieldUpdateOperationsInput | string
   argument?: Prisma.StringFieldUpdateOperationsInput | string
   wordCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -440,6 +442,48 @@ export type DebateRoundSumOrderByAggregateInput = {
   wordCount?: Prisma.SortOrder
 }
 
+export type DebateRoundCreateNestedManyWithoutPlayerInput = {
+  create?: Prisma.XOR<Prisma.DebateRoundCreateWithoutPlayerInput, Prisma.DebateRoundUncheckedCreateWithoutPlayerInput> | Prisma.DebateRoundCreateWithoutPlayerInput[] | Prisma.DebateRoundUncheckedCreateWithoutPlayerInput[]
+  connectOrCreate?: Prisma.DebateRoundCreateOrConnectWithoutPlayerInput | Prisma.DebateRoundCreateOrConnectWithoutPlayerInput[]
+  createMany?: Prisma.DebateRoundCreateManyPlayerInputEnvelope
+  connect?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+}
+
+export type DebateRoundUncheckedCreateNestedManyWithoutPlayerInput = {
+  create?: Prisma.XOR<Prisma.DebateRoundCreateWithoutPlayerInput, Prisma.DebateRoundUncheckedCreateWithoutPlayerInput> | Prisma.DebateRoundCreateWithoutPlayerInput[] | Prisma.DebateRoundUncheckedCreateWithoutPlayerInput[]
+  connectOrCreate?: Prisma.DebateRoundCreateOrConnectWithoutPlayerInput | Prisma.DebateRoundCreateOrConnectWithoutPlayerInput[]
+  createMany?: Prisma.DebateRoundCreateManyPlayerInputEnvelope
+  connect?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+}
+
+export type DebateRoundUpdateManyWithoutPlayerNestedInput = {
+  create?: Prisma.XOR<Prisma.DebateRoundCreateWithoutPlayerInput, Prisma.DebateRoundUncheckedCreateWithoutPlayerInput> | Prisma.DebateRoundCreateWithoutPlayerInput[] | Prisma.DebateRoundUncheckedCreateWithoutPlayerInput[]
+  connectOrCreate?: Prisma.DebateRoundCreateOrConnectWithoutPlayerInput | Prisma.DebateRoundCreateOrConnectWithoutPlayerInput[]
+  upsert?: Prisma.DebateRoundUpsertWithWhereUniqueWithoutPlayerInput | Prisma.DebateRoundUpsertWithWhereUniqueWithoutPlayerInput[]
+  createMany?: Prisma.DebateRoundCreateManyPlayerInputEnvelope
+  set?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+  disconnect?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+  delete?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+  connect?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+  update?: Prisma.DebateRoundUpdateWithWhereUniqueWithoutPlayerInput | Prisma.DebateRoundUpdateWithWhereUniqueWithoutPlayerInput[]
+  updateMany?: Prisma.DebateRoundUpdateManyWithWhereWithoutPlayerInput | Prisma.DebateRoundUpdateManyWithWhereWithoutPlayerInput[]
+  deleteMany?: Prisma.DebateRoundScalarWhereInput | Prisma.DebateRoundScalarWhereInput[]
+}
+
+export type DebateRoundUncheckedUpdateManyWithoutPlayerNestedInput = {
+  create?: Prisma.XOR<Prisma.DebateRoundCreateWithoutPlayerInput, Prisma.DebateRoundUncheckedCreateWithoutPlayerInput> | Prisma.DebateRoundCreateWithoutPlayerInput[] | Prisma.DebateRoundUncheckedCreateWithoutPlayerInput[]
+  connectOrCreate?: Prisma.DebateRoundCreateOrConnectWithoutPlayerInput | Prisma.DebateRoundCreateOrConnectWithoutPlayerInput[]
+  upsert?: Prisma.DebateRoundUpsertWithWhereUniqueWithoutPlayerInput | Prisma.DebateRoundUpsertWithWhereUniqueWithoutPlayerInput[]
+  createMany?: Prisma.DebateRoundCreateManyPlayerInputEnvelope
+  set?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+  disconnect?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+  delete?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+  connect?: Prisma.DebateRoundWhereUniqueInput | Prisma.DebateRoundWhereUniqueInput[]
+  update?: Prisma.DebateRoundUpdateWithWhereUniqueWithoutPlayerInput | Prisma.DebateRoundUpdateWithWhereUniqueWithoutPlayerInput[]
+  updateMany?: Prisma.DebateRoundUpdateManyWithWhereWithoutPlayerInput | Prisma.DebateRoundUpdateManyWithWhereWithoutPlayerInput[]
+  deleteMany?: Prisma.DebateRoundScalarWhereInput | Prisma.DebateRoundScalarWhereInput[]
+}
+
 export type DebateRoundCreateNestedManyWithoutDebateInput = {
   create?: Prisma.XOR<Prisma.DebateRoundCreateWithoutDebateInput, Prisma.DebateRoundUncheckedCreateWithoutDebateInput> | Prisma.DebateRoundCreateWithoutDebateInput[] | Prisma.DebateRoundUncheckedCreateWithoutDebateInput[]
   connectOrCreate?: Prisma.DebateRoundCreateOrConnectWithoutDebateInput | Prisma.DebateRoundCreateOrConnectWithoutDebateInput[]
@@ -482,14 +526,74 @@ export type DebateRoundUncheckedUpdateManyWithoutDebateNestedInput = {
   deleteMany?: Prisma.DebateRoundScalarWhereInput | Prisma.DebateRoundScalarWhereInput[]
 }
 
+export type DebateRoundCreateWithoutPlayerInput = {
+  id?: string
+  roundNumber: number
+  side: $Enums.DebateSide
+  argument: string
+  wordCount?: number
+  createdAt?: Date | string
+  debate: Prisma.DebateCreateNestedOneWithoutRoundsInput
+}
+
+export type DebateRoundUncheckedCreateWithoutPlayerInput = {
+  id?: string
+  debateId: string
+  roundNumber: number
+  side: $Enums.DebateSide
+  argument: string
+  wordCount?: number
+  createdAt?: Date | string
+}
+
+export type DebateRoundCreateOrConnectWithoutPlayerInput = {
+  where: Prisma.DebateRoundWhereUniqueInput
+  create: Prisma.XOR<Prisma.DebateRoundCreateWithoutPlayerInput, Prisma.DebateRoundUncheckedCreateWithoutPlayerInput>
+}
+
+export type DebateRoundCreateManyPlayerInputEnvelope = {
+  data: Prisma.DebateRoundCreateManyPlayerInput | Prisma.DebateRoundCreateManyPlayerInput[]
+  skipDuplicates?: boolean
+}
+
+export type DebateRoundUpsertWithWhereUniqueWithoutPlayerInput = {
+  where: Prisma.DebateRoundWhereUniqueInput
+  update: Prisma.XOR<Prisma.DebateRoundUpdateWithoutPlayerInput, Prisma.DebateRoundUncheckedUpdateWithoutPlayerInput>
+  create: Prisma.XOR<Prisma.DebateRoundCreateWithoutPlayerInput, Prisma.DebateRoundUncheckedCreateWithoutPlayerInput>
+}
+
+export type DebateRoundUpdateWithWhereUniqueWithoutPlayerInput = {
+  where: Prisma.DebateRoundWhereUniqueInput
+  data: Prisma.XOR<Prisma.DebateRoundUpdateWithoutPlayerInput, Prisma.DebateRoundUncheckedUpdateWithoutPlayerInput>
+}
+
+export type DebateRoundUpdateManyWithWhereWithoutPlayerInput = {
+  where: Prisma.DebateRoundScalarWhereInput
+  data: Prisma.XOR<Prisma.DebateRoundUpdateManyMutationInput, Prisma.DebateRoundUncheckedUpdateManyWithoutPlayerInput>
+}
+
+export type DebateRoundScalarWhereInput = {
+  AND?: Prisma.DebateRoundScalarWhereInput | Prisma.DebateRoundScalarWhereInput[]
+  OR?: Prisma.DebateRoundScalarWhereInput[]
+  NOT?: Prisma.DebateRoundScalarWhereInput | Prisma.DebateRoundScalarWhereInput[]
+  id?: Prisma.StringFilter<"DebateRound"> | string
+  debateId?: Prisma.StringFilter<"DebateRound"> | string
+  roundNumber?: Prisma.IntFilter<"DebateRound"> | number
+  side?: Prisma.EnumDebateSideFilter<"DebateRound"> | $Enums.DebateSide
+  playerId?: Prisma.StringFilter<"DebateRound"> | string
+  argument?: Prisma.StringFilter<"DebateRound"> | string
+  wordCount?: Prisma.IntFilter<"DebateRound"> | number
+  createdAt?: Prisma.DateTimeFilter<"DebateRound"> | Date | string
+}
+
 export type DebateRoundCreateWithoutDebateInput = {
   id?: string
   roundNumber: number
   side: $Enums.DebateSide
-  playerId: string
   argument: string
   wordCount?: number
   createdAt?: Date | string
+  player: Prisma.PlayerCreateNestedOneWithoutDebateRoundsInput
 }
 
 export type DebateRoundUncheckedCreateWithoutDebateInput = {
@@ -528,18 +632,44 @@ export type DebateRoundUpdateManyWithWhereWithoutDebateInput = {
   data: Prisma.XOR<Prisma.DebateRoundUpdateManyMutationInput, Prisma.DebateRoundUncheckedUpdateManyWithoutDebateInput>
 }
 
-export type DebateRoundScalarWhereInput = {
-  AND?: Prisma.DebateRoundScalarWhereInput | Prisma.DebateRoundScalarWhereInput[]
-  OR?: Prisma.DebateRoundScalarWhereInput[]
-  NOT?: Prisma.DebateRoundScalarWhereInput | Prisma.DebateRoundScalarWhereInput[]
-  id?: Prisma.StringFilter<"DebateRound"> | string
-  debateId?: Prisma.StringFilter<"DebateRound"> | string
-  roundNumber?: Prisma.IntFilter<"DebateRound"> | number
-  side?: Prisma.EnumDebateSideFilter<"DebateRound"> | $Enums.DebateSide
-  playerId?: Prisma.StringFilter<"DebateRound"> | string
-  argument?: Prisma.StringFilter<"DebateRound"> | string
-  wordCount?: Prisma.IntFilter<"DebateRound"> | number
-  createdAt?: Prisma.DateTimeFilter<"DebateRound"> | Date | string
+export type DebateRoundCreateManyPlayerInput = {
+  id?: string
+  debateId: string
+  roundNumber: number
+  side: $Enums.DebateSide
+  argument: string
+  wordCount?: number
+  createdAt?: Date | string
+}
+
+export type DebateRoundUpdateWithoutPlayerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  side?: Prisma.EnumDebateSideFieldUpdateOperationsInput | $Enums.DebateSide
+  argument?: Prisma.StringFieldUpdateOperationsInput | string
+  wordCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  debate?: Prisma.DebateUpdateOneRequiredWithoutRoundsNestedInput
+}
+
+export type DebateRoundUncheckedUpdateWithoutPlayerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  debateId?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  side?: Prisma.EnumDebateSideFieldUpdateOperationsInput | $Enums.DebateSide
+  argument?: Prisma.StringFieldUpdateOperationsInput | string
+  wordCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type DebateRoundUncheckedUpdateManyWithoutPlayerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  debateId?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  side?: Prisma.EnumDebateSideFieldUpdateOperationsInput | $Enums.DebateSide
+  argument?: Prisma.StringFieldUpdateOperationsInput | string
+  wordCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DebateRoundCreateManyDebateInput = {
@@ -556,10 +686,10 @@ export type DebateRoundUpdateWithoutDebateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   side?: Prisma.EnumDebateSideFieldUpdateOperationsInput | $Enums.DebateSide
-  playerId?: Prisma.StringFieldUpdateOperationsInput | string
   argument?: Prisma.StringFieldUpdateOperationsInput | string
   wordCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  player?: Prisma.PlayerUpdateOneRequiredWithoutDebateRoundsNestedInput
 }
 
 export type DebateRoundUncheckedUpdateWithoutDebateInput = {
@@ -594,6 +724,7 @@ export type DebateRoundSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   wordCount?: boolean
   createdAt?: boolean
   debate?: boolean | Prisma.DebateDefaultArgs<ExtArgs>
+  player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["debateRound"]>
 
 export type DebateRoundSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -606,6 +737,7 @@ export type DebateRoundSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   wordCount?: boolean
   createdAt?: boolean
   debate?: boolean | Prisma.DebateDefaultArgs<ExtArgs>
+  player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["debateRound"]>
 
 export type DebateRoundSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -618,6 +750,7 @@ export type DebateRoundSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   wordCount?: boolean
   createdAt?: boolean
   debate?: boolean | Prisma.DebateDefaultArgs<ExtArgs>
+  player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["debateRound"]>
 
 export type DebateRoundSelectScalar = {
@@ -634,18 +767,22 @@ export type DebateRoundSelectScalar = {
 export type DebateRoundOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "debateId" | "roundNumber" | "side" | "playerId" | "argument" | "wordCount" | "createdAt", ExtArgs["result"]["debateRound"]>
 export type DebateRoundInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   debate?: boolean | Prisma.DebateDefaultArgs<ExtArgs>
+  player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
 }
 export type DebateRoundIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   debate?: boolean | Prisma.DebateDefaultArgs<ExtArgs>
+  player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
 }
 export type DebateRoundIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   debate?: boolean | Prisma.DebateDefaultArgs<ExtArgs>
+  player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
 }
 
 export type $DebateRoundPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "DebateRound"
   objects: {
     debate: Prisma.$DebatePayload<ExtArgs>
+    player: Prisma.$PlayerPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1051,6 +1188,7 @@ readonly fields: DebateRoundFieldRefs;
 export interface Prisma__DebateRoundClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   debate<T extends Prisma.DebateDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DebateDefaultArgs<ExtArgs>>): Prisma.Prisma__DebateClient<runtime.Types.Result.GetResult<Prisma.$DebatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  player<T extends Prisma.PlayerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlayerDefaultArgs<ExtArgs>>): Prisma.Prisma__PlayerClient<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

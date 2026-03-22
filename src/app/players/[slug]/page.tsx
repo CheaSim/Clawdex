@@ -15,9 +15,9 @@ type PlayerProfilePageProps = {
 };
 
 const resultMeta = {
-  win: { label: "胜", tone: "text-accentSecondary" },
-  loss: { label: "负", tone: "text-danger" },
-  "in-progress": { label: "进行中", tone: "text-accent" },
+  win: { label: "胜", tone: "text-[#f6bd4b]" },
+  loss: { label: "负", tone: "text-[#ff8b79]" },
+  "in-progress": { label: "进行中", tone: "text-sky-300" },
 } as const;
 
 export default async function PlayerProfilePage({ params }: PlayerProfilePageProps) {
@@ -35,117 +35,115 @@ export default async function PlayerProfilePage({ params }: PlayerProfilePagePro
     <SiteShell>
       <div className="section-grid">
         <PageHero
-          eyebrow={player.title}
-          title={`${player.name} · ${player.bio}`}
-          description={`偏好模式：${getModeLabel(player.preferredMode)} · 当前 Elo ${player.elo} · Fame ${player.fame.toLocaleString()} · 胜率 ${player.winRate}`}
+          eyebrow="球员档案"
+          title={`${player.name} · ${player.title}`}
+          description={`${player.bio} · 当前 Elo ${player.elo} · Fame ${player.fame.toLocaleString()} · 胜率 ${player.winRate}`}
           actions={
             <>
               <Link href="/challenge/new" className="btn-primary">
                 向 Ta 发起挑战
               </Link>
-              <Link href={`/openclaw?player=${player.slug}`} className="btn-secondary">
-                管理 OpenClaw 接入
-              </Link>
               <Link href="/watch" className="btn-secondary">
-                查看相关观战
+                返回直播频道
               </Link>
             </>
           }
           aside={
-            <SurfaceCard className="h-full bg-slate-950/45 p-5">
+            <SurfaceCard className="editorial-surface rounded-[1.9rem] p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-20 w-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-accent/30 to-accentSecondary/20 text-2xl font-semibold text-slate-950">
+                <div className="flex h-24 w-24 items-center justify-center rounded-[1.6rem] bg-[linear-gradient(135deg,rgba(240,75,55,0.25),rgba(246,189,75,0.18))] font-[var(--headline-font)] text-4xl uppercase text-[#fff3ec]">
                   {player.avatar}
                 </div>
                 <div>
-                  <p className="text-sm text-muted">当前连胜</p>
-                  <p className="mt-1 text-3xl font-semibold">{player.streak}</p>
+                  <p className="media-kicker">Current Streak</p>
+                  <p className="mt-2 font-[var(--headline-font)] text-5xl uppercase">{player.streak}</p>
                 </div>
               </div>
-              <div className="mt-5 rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-xs text-muted">可用钱包</p>
-                <p className="mt-2 text-2xl font-semibold text-accentSecondary">{player.clawPoints} Claw Points</p>
-                <p className="mt-2 text-sm text-muted">
-                  创建挑战时会先冻结发起方 stake，等对手接战后奖池才会翻倍锁定。
-                </p>
-              </div>
-              <div className="mt-5 rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-xs text-muted">OpenClaw 状态</p>
-                <p className={`mt-2 text-2xl font-semibold ${openClawStatusMeta[player.openClaw.status].tone}`}>
-                  {openClawStatusMeta[player.openClaw.status].label}
-                </p>
-                <p className="mt-2 text-sm text-muted">
-                  {player.openClaw.channel} · {player.openClaw.region} · {player.openClaw.accountId}
-                </p>
-                <p className="mt-2 text-sm text-muted">{openClawStatusMeta[player.openClaw.status].description}</p>
-              </div>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {player.tags.map((tag) => (
-                  <span key={tag} className="pill-muted text-sm text-slate-200">
-                    #{tag}
-                  </span>
-                ))}
+              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-1">
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="media-kicker">Wallet</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{player.clawPoints}</p>
+                </div>
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="media-kicker">OpenClaw</p>
+                  <p className={`mt-3 text-lg font-semibold ${openClawStatusMeta[player.openClaw.status].tone}`}>
+                    {openClawStatusMeta[player.openClaw.status].label}
+                  </p>
+                </div>
               </div>
             </SurfaceCard>
           }
         />
 
-        <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <SurfaceCard className="bg-slate-950/70 p-6">
-            <p className="text-sm text-accent">OpenClaw 接入档案</p>
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-xs text-muted">通道</p>
-                <p className="mt-2 text-lg font-semibold">{player.openClaw.channel}</p>
+        <section className="channel-shell lg:grid-cols-[0.95fr_1.05fr] lg:grid">
+          <SurfaceCard className="rounded-[2rem] p-6">
+            <div className="section-divider">
+              <span className="media-eyebrow">Player Card</span>
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="media-kicker">Preferred Mode</p>
+                <p className="mt-3 text-sm text-slate-200">{getModeLabel(player.preferredMode)}</p>
               </div>
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-xs text-muted">客户端版本</p>
-                <p className="mt-2 text-lg font-semibold">{player.openClaw.clientVersion}</p>
+              <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="media-kicker">Tags</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {player.tags.map((tag) => (
+                    <span key={tag} className="pill-muted text-xs text-slate-200">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-xs text-muted">配置时间</p>
-                <p className="mt-2 text-sm text-slate-200">
-                  {player.openClaw.configuredAt ? new Date(player.openClaw.configuredAt).toLocaleString("zh-CN") : "尚未配置"}
+              <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="media-kicker">OpenClaw Channel</p>
+                <p className="mt-3 text-sm text-slate-200">{player.openClaw.channel}</p>
+                <p className="mt-2 text-xs text-slate-400">
+                  {player.openClaw.region} · {player.openClaw.accountId}
                 </p>
               </div>
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-xs text-muted">最近校验</p>
-                <p className="mt-2 text-sm text-slate-200">
+              <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="media-kicker">Verification</p>
+                <p className="mt-3 text-sm text-slate-200">
                   {player.openClaw.lastVerifiedAt ? new Date(player.openClaw.lastVerifiedAt).toLocaleString("zh-CN") : "等待首次校验"}
                 </p>
               </div>
             </div>
             {player.openClaw.notes ? (
-              <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm leading-6 text-slate-200">
+              <div className="mt-4 rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-slate-300">
                 {player.openClaw.notes}
               </div>
             ) : null}
           </SurfaceCard>
 
-          <SurfaceCard className="bg-slate-950/70 p-6">
-            <p className="text-sm text-accent">近期高光</p>
+          <SurfaceCard className="rounded-[2rem] p-6">
+            <div className="section-divider">
+              <span className="media-eyebrow">Recent Moments</span>
+            </div>
             <div className="mt-5 space-y-3">
               {player.recentMoments.map((moment) => (
-                <div key={moment} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm leading-6 text-slate-200">
+                <div key={moment} className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-slate-300">
                   {moment}
                 </div>
               ))}
             </div>
           </SurfaceCard>
+        </section>
 
-          <SurfaceCard className="p-6 lg:col-span-2">
+        <section>
+          <div className="section-divider">
+            <span className="media-eyebrow">Career Archive</span>
+          </div>
+          <SurfaceCard className="mt-5 rounded-[2rem] p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-sm text-accent">历史战绩</p>
-                <h2 className="mt-2 text-2xl font-semibold">回放、结果、奖池都会在这里沉淀成完整记录</h2>
-              </div>
+              <h2 className="headline-card text-[#f7f4ed]">历史战绩与回放入口</h2>
               <span className="pill-muted text-sm text-slate-200">{battleHistory.length} 场对战记录</span>
             </div>
 
             <div className="mt-5 space-y-3">
               {battleHistory.length === 0 ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-muted">
-                  这位选手还没有历史对战记录。等第一场开打之后，这里就会开始积累战绩与回放。
+                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-500">
+                  这位选手还没有历史对战记录。
                 </div>
               ) : null}
 
@@ -157,35 +155,35 @@ export default async function PlayerProfilePage({ params }: PlayerProfilePagePro
                   <Link
                     key={entry.challenge.id}
                     href={`/replay/${entry.challenge.id}`}
-                    className="block rounded-[24px] border border-white/10 bg-slate-950/55 p-4 transition hover:border-accent/30 hover:bg-white/[0.06]"
+                    className="block rounded-[1.6rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-[rgba(240,75,55,0.28)] hover:bg-white/[0.05]"
                   >
-                    <div className="grid gap-4 lg:grid-cols-[1.25fr_0.9fr_0.75fr_0.7fr_1fr_auto] lg:items-center">
+                    <div className="grid gap-4 xl:grid-cols-[1.2fr_0.85fr_0.8fr_0.8fr_1fr_auto] xl:items-center">
                       <div>
-                        <p className="text-xs text-muted">对手</p>
-                        <h3 className="mt-2 text-lg font-semibold">{opponent?.name ?? entry.opponentSlug}</h3>
-                        <p className="mt-1 text-sm text-muted">{opponent?.title ?? "Clawdex Player"}</p>
+                        <p className="media-kicker">Opponent</p>
+                        <h3 className="mt-2 text-lg font-semibold text-[#f7f4ed]">{opponent?.name ?? entry.opponentSlug}</h3>
+                        <p className="text-xs uppercase tracking-[0.12em] text-slate-400">{opponent?.title ?? "Player"}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted">模式</p>
-                        <p className="mt-2 text-sm text-slate-100">{getModeLabel(entry.challenge.mode)}</p>
+                        <p className="media-kicker">Mode</p>
+                        <p className="mt-2 text-sm text-slate-200">{getModeLabel(entry.challenge.mode)}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted">结果</p>
+                        <p className="media-kicker">Result</p>
                         <p className={`mt-2 text-sm font-semibold ${result.tone}`}>{result.label}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted">奖池</p>
-                        <p className="mt-2 text-sm text-slate-100">{entry.challenge.rewardPool} CP</p>
+                        <p className="media-kicker">Pool</p>
+                        <p className="mt-2 text-sm text-slate-200">{entry.challenge.rewardPool} CP</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted">日期</p>
-                        <p className="mt-2 text-sm text-slate-100">{new Date(entry.activityAt).toLocaleString("zh-CN")}</p>
+                        <p className="media-kicker">Date</p>
+                        <p className="mt-2 text-sm text-slate-200">{new Date(entry.activityAt).toLocaleString("zh-CN")}</p>
                       </div>
-                      <div className="flex items-center justify-between gap-3 lg:justify-end">
+                      <div className="flex items-center justify-between gap-3 xl:justify-end">
                         <span className={`text-xs ${challengeStatusMeta[entry.challenge.status].tone}`}>
                           {challengeStatusMeta[entry.challenge.status].label}
                         </span>
-                        <span className="text-sm text-accentSecondary">查看回放 →</span>
+                        <span className="text-sm font-semibold text-[#ffb9a9]">查看回放 →</span>
                       </div>
                     </div>
                   </Link>

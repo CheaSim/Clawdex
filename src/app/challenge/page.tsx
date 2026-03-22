@@ -12,115 +12,141 @@ export const dynamic = "force-dynamic";
 export default async function ChallengePage() {
   const [challengeRecords, playerRecords] = await Promise.all([listChallenges(), listPlayers()]);
   const playerMap = Object.fromEntries(playerRecords.map((player) => [player.slug, player]));
-  const spotlightChallenges = challengeRecords.slice(0, 6);
-
+  const fixtureCards = challengeRecords.slice(0, 8);
   const activeBattles = challengeRecords.filter((c) => ["accepted", "live"].includes(c.status)).length;
-  const dailyPool = challengeRecords
-    .filter((c) => c.status !== "settlement")
-    .reduce((sum, c) => sum + c.rewardPool, 0);
+  const pendingBattles = challengeRecords.filter((c) => c.status === "pending").length;
+  const dailyPool = challengeRecords.filter((c) => c.status !== "settlement").reduce((sum, c) => sum + c.rewardPool, 0);
 
   return (
     <SiteShell>
       <div className="section-grid">
         <PageHero
-          eyebrow="挑战擂台"
-          title="守擂、复仇、爆冷，才是最容易出圈的 1v1。"
-          description="这里不是房间列表，而是剧情化的对战入口。每场挑战都牵动奖池、榜单、连胜纪录和观众站队。"
+          eyebrow="今日赛程"
+          title="这里不是随机匹配列表，而是整站的对阵版与赛程页。"
+          description="所有挑战会以赛程、焦点战、模式分区和赛后结算的形式出现。功能入口还在，但不再占据第一视觉。"
           actions={
-            <Link href="/challenge/new" className="btn-primary">
-              创建挑战
-            </Link>
+            <>
+              <Link href="/challenge/new" className="btn-primary">
+                提交一场新对决
+              </Link>
+              <Link href="/watch" className="btn-secondary">
+                返回直播频道
+              </Link>
+            </>
           }
           aside={
-            <SurfaceCard className="h-full bg-slate-950/45 p-5">
-              <p className="text-sm text-accent">今日擂台状态</p>
-              <div className="mt-4 space-y-3">
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs text-muted">进行中对战</p>
-                  <p className="mt-2 text-2xl font-semibold">{activeBattles} 场</p>
+            <SurfaceCard className="score-surface rounded-[1.9rem] p-5">
+              <p className="media-kicker">Match Desk</p>
+              <div className="mt-5 grid gap-3">
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">直播 / 锁池</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{activeBattles}</p>
                 </div>
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs text-muted">当前锁池总量</p>
-                  <p className="mt-2 text-2xl font-semibold text-accentSecondary">{dailyPool.toLocaleString()} Claw Points</p>
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">待接战</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{pendingBattles}</p>
+                </div>
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">锁池总量</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{dailyPool}</p>
                 </div>
               </div>
             </SurfaceCard>
           }
         />
 
-        <section className="mt-8 grid gap-4 md:grid-cols-3">
-          <SurfaceCard className="bg-slate-950/70 p-6">
-            <p className="text-sm text-muted">模式</p>
-            <h2 className="mt-3 text-2xl font-semibold">公开擂台</h2>
-            <p className="mt-3 leading-7 text-muted">最适合做爆点内容，天然适配观众投票、赛后评分和首页推荐。</p>
-          </SurfaceCard>
-          <SurfaceCard className="bg-slate-950/70 p-6">
-            <p className="text-sm text-muted">模式</p>
-            <h2 className="mt-3 text-2xl font-semibold">宿敌对决</h2>
-            <p className="mt-3 leading-7 text-muted">持续沉淀人物关系，让用户回访是为了追角色，而不是追房间号。</p>
-          </SurfaceCard>
-          <SurfaceCard className="bg-slate-950/70 p-6">
-            <p className="text-sm text-muted">模式</p>
-            <h2 className="mt-3 text-2xl font-semibold">排位冲榜</h2>
-            <p className="mt-3 leading-7 text-muted">给高水平玩家明确的荣誉路径，也给观众稳定的关注对象。</p>
-          </SurfaceCard>
-        </section>
-
-        <SurfaceCard className="p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">当前挑战列表</h2>
-            <Link href="/challenge/new" className="btn-primary px-4 py-2 text-sm">
-              创建挑战
-            </Link>
+        <section>
+          <div className="section-divider">
+            <span className="media-eyebrow">Fixtures</span>
           </div>
-          <div className="mt-6 space-y-4">
-            {spotlightChallenges.map((match) => {
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            {fixtureCards.map((match) => {
               const challenger = playerMap[match.challengerSlug];
               const defender = playerMap[match.defenderSlug];
               const statusMeta = challengeStatusMeta[match.status];
 
               return (
-                <div key={match.id} className="rounded-[28px] border border-white/10 bg-white/5 p-5 md:flex md:items-center md:justify-between">
-                  <div>
-                    <p className={`text-sm ${statusMeta.tone}`}>{statusMeta.label}</p>
-                    <h3 className="mt-2 text-xl font-semibold">
-                      {challenger?.name ?? match.challengerSlug} vs {defender?.name ?? match.defenderSlug}
-                    </h3>
-                    <p className="mt-2 text-sm text-slate-300">{getModeLabel(match.mode)} · {match.scheduledFor} · 奖池 {match.rewardPool} Claw Points</p>
-                    <p className="mt-2 text-sm leading-6 text-muted">{match.storyline}</p>
-                  </div>
-                  <div className="mt-4 flex gap-3 md:mt-0">
-                    <Link href={`/challenge/${match.id}`} className="rounded-full border border-white/10 px-4 py-2 text-sm">查看详情</Link>
-                    <Link href="/challenge/new" className="rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm text-accent">发起挑战</Link>
-                  </div>
-                </div>
+                <Link key={match.id} href={`/challenge/${match.id}`}>
+                  <SurfaceCard className="editorial-surface rounded-[1.9rem] p-5 transition hover:-translate-y-1 hover:border-[rgba(240,75,55,0.28)]">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className={`text-sm font-semibold ${statusMeta.tone}`}>{statusMeta.label}</p>
+                      <span className="hud-chip">{getModeLabel(match.mode)}</span>
+                    </div>
+
+                    <div className="mt-5 flex items-center gap-4">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 font-[var(--headline-font)] text-xl text-[#f7f4ed]">
+                          {challenger?.avatar ?? "?"}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-lg font-semibold text-[#f7f4ed]">{challenger?.name ?? match.challengerSlug}</p>
+                          <p className="text-xs uppercase tracking-[0.12em] text-slate-400">{challenger?.title ?? "Player"}</p>
+                        </div>
+                      </div>
+
+                      <div className="px-2 font-[var(--headline-font)] text-3xl uppercase text-slate-500">VS</div>
+
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 font-[var(--headline-font)] text-xl text-[#f7f4ed]">
+                          {defender?.avatar ?? "?"}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-lg font-semibold text-[#f7f4ed]">{defender?.name ?? match.defenderSlug}</p>
+                          <p className="text-xs uppercase tracking-[0.12em] text-slate-400">{defender?.title ?? "Player"}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 grid gap-3 md:grid-cols-3">
+                      <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-3">
+                        <p className="media-kicker">Time</p>
+                        <p className="mt-2 text-sm text-slate-200">{match.scheduledFor}</p>
+                      </div>
+                      <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-3">
+                        <p className="media-kicker">Pool</p>
+                        <p className="mt-2 font-[var(--headline-font)] text-3xl uppercase">{match.rewardPool}</p>
+                      </div>
+                      <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-3">
+                        <p className="media-kicker">Entry</p>
+                        <p className="mt-2 text-sm text-slate-200">查看对阵详情</p>
+                      </div>
+                    </div>
+
+                    <p className="mt-5 text-sm leading-7 text-slate-400">{match.storyline}</p>
+                  </SurfaceCard>
+                </Link>
               );
             })}
           </div>
-        </SurfaceCard>
+        </section>
 
-        <section className="mt-8 grid gap-6 xl:grid-cols-[1fr_1fr]">
-          <SurfaceCard className="bg-slate-950/70 p-6">
-            <p className="text-sm text-accent">赛后结算说明</p>
-            <div className="mt-5 space-y-4">
+        <section className="channel-shell lg:grid-cols-[1fr_1fr] lg:grid">
+          <SurfaceCard className="rounded-[2rem] p-6">
+            <div className="section-divider">
+              <span className="media-eyebrow">Settlement Notes</span>
+            </div>
+            <div className="mt-5 space-y-3">
               {settlementRules.map((rule) => (
-                <article key={rule.title} className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                  <h3 className="text-xl font-semibold">{rule.title}</h3>
-                  <p className="mt-3 text-sm text-accentSecondary">{rule.reward}</p>
-                  <p className="mt-2 text-sm text-danger">{rule.penalty}</p>
-                  <p className="mt-2 text-sm leading-6 text-muted">{rule.detail}</p>
+                <article key={rule.title} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                  <h2 className="headline-card text-[#f7f4ed]">{rule.title}</h2>
+                  <p className="mt-3 text-sm font-semibold text-[#f6bd4b]">{rule.reward}</p>
+                  <p className="mt-2 text-sm font-semibold text-[#ff8b79]">{rule.penalty}</p>
+                  <p className="mt-3 text-sm leading-7 text-slate-400">{rule.detail}</p>
                 </article>
               ))}
             </div>
           </SurfaceCard>
-          <SurfaceCard className="p-6">
-            <p className="text-sm text-accent">公平竞技</p>
-            <div className="mt-5 space-y-4">
+
+          <SurfaceCard className="rounded-[2rem] p-6">
+            <div className="section-divider">
+              <span className="media-eyebrow">Discipline Desk</span>
+            </div>
+            <div className="mt-5 space-y-3">
               {fairPlayRules.map((rule) => (
-                <article key={rule.title} className="rounded-[24px] border border-white/10 bg-slate-950/55 p-4">
-                  <h3 className="text-xl font-semibold">{rule.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-muted">{rule.description}</p>
-                  <p className="mt-3 text-sm text-danger">{rule.consequence}</p>
+                <article key={rule.title} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                  <h2 className="headline-card text-[#f7f4ed]">{rule.title}</h2>
+                  <p className="mt-3 text-sm leading-7 text-slate-400">{rule.description}</p>
+                  <p className="mt-3 text-sm font-semibold text-[#ff8b79]">{rule.consequence}</p>
                 </article>
               ))}
             </div>

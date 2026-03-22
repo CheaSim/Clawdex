@@ -26,10 +26,10 @@ const debateStatusLabels: Record<string, string> = {
 };
 
 const filterOptions = [
-  { key: "all", label: "全部" },
+  { key: "all", label: "全部战报" },
   { key: "settled", label: "已结算" },
-  { key: "live", label: "进行中" },
-  { key: "debate", label: "含辩论" },
+  { key: "live", label: "直播中" },
+  { key: "debate", label: "辩论专题" },
 ] as const;
 
 type ReplayPageProps = {
@@ -80,24 +80,24 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
     <SiteShell>
       <div className="section-grid">
         <PageHero
-          eyebrow="Replay 战绩回看"
-          title="每一场对战，都会沉淀成一个可以继续传播的内容页。"
-          description="这里汇总所有挑战与辩论记录。观众可以复盘高光，选手可以回看自己的历史战绩，插件也能把结果回链到这里。"
+          eyebrow="战报归档"
+          title="每一场比赛都该沉淀成可再次阅读、再次传播的档案页。"
+          description="回放页现在按战报归档逻辑组织，已结算、直播中和辩论专题分开编排，避免继续像普通列表页。"
           aside={
-            <SurfaceCard className="h-full bg-slate-950/45 p-5">
-              <p className="text-sm text-accent">历史统计</p>
-              <div className="mt-4 space-y-3">
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs text-muted">已结算对战</p>
-                  <p className="mt-2 text-2xl font-semibold">{totalSettled} 场</p>
+            <SurfaceCard className="score-surface rounded-[1.9rem] p-5">
+              <p className="media-kicker">Archive Desk</p>
+              <div className="mt-5 grid gap-3">
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">已结算</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{totalSettled}</p>
                 </div>
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs text-muted">累计辩论发言</p>
-                  <p className="mt-2 text-2xl font-semibold">{totalDebateRounds} 条</p>
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">辩论发言</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{totalDebateRounds}</p>
                 </div>
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs text-muted">累计结算奖池</p>
-                  <p className="mt-2 text-2xl font-semibold text-accentSecondary">{totalRewardPool.toLocaleString()} CP</p>
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">累计奖池</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{totalRewardPool}</p>
                 </div>
               </div>
             </SurfaceCard>
@@ -112,10 +112,10 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
               <Link
                 key={option.key}
                 href={option.key === "all" ? "/replay" : `/replay?filter=${option.key}`}
-                className={`rounded-full px-4 py-1.5 text-sm transition ${
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
                   active
-                    ? "border border-accent/40 bg-accent/10 text-accent"
-                    : "border border-white/10 text-muted hover:border-accent/20 hover:text-slate-200"
+                    ? "border border-[rgba(240,75,55,0.4)] bg-[rgba(240,75,55,0.1)] text-[#ffb9a9]"
+                    : "border border-white/10 text-slate-400 hover:border-[rgba(240,75,55,0.24)] hover:text-slate-100"
                 }`}
               >
                 {option.label} ({filterCounts[option.key]})
@@ -125,186 +125,69 @@ export default async function ReplayPage({ searchParams }: ReplayPageProps) {
         </div>
 
         {filteredMatches.length === 0 ? (
-          <SurfaceCard>
-            <p className="py-12 text-center text-muted">
-              当前筛选下还没有回放记录。去{" "}
-              <Link href="/challenge/new" className="text-accent hover:underline">
-                创建第一场挑战
-              </Link>
-              。
-            </p>
+          <SurfaceCard className="rounded-[2rem] p-8 text-center text-slate-400">
+            当前筛选下还没有战报记录。去{" "}
+            <Link href="/challenge/new" className="font-semibold text-[#ffb9a9]">
+              创建第一场挑战
+            </Link>
+            。
           </SurfaceCard>
         ) : (
-          <div className="relative space-y-0">
-            <div className="absolute left-5 top-0 hidden h-full w-px bg-white/10 md:block" />
-
+          <div className="space-y-4">
             {filteredMatches.map((match) => {
               const challenger = playerMap[match.challengerSlug];
               const defender = playerMap[match.defenderSlug];
               const winner = match.winnerSlug ? playerMap[match.winnerSlug] : null;
               const statusMeta = challengeStatusMeta[match.status];
               const debate = debateMap[match.id];
-              const isSettled = match.status === "settlement";
 
               return (
-                <div key={match.id} className="relative md:pl-14">
-                  <div
-                    className={`absolute left-3.5 top-6 hidden h-3 w-3 rounded-full md:block ${
-                      isSettled ? "bg-accentSecondary" : match.status === "live" ? "animate-pulse bg-danger" : "bg-white/30"
-                    }`}
-                  />
+                <Link key={match.id} href={`/replay/${match.id}`}>
+                  <SurfaceCard className="editorial-surface rounded-[2rem] p-6 transition hover:-translate-y-1 hover:border-[rgba(240,75,55,0.28)]">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className={`text-sm font-semibold ${statusMeta.tone}`}>{statusMeta.label}</span>
+                        <span className="hud-chip">{getModeLabel(match.mode)}</span>
+                        {debate ? <span className="pill-muted text-xs text-[#f6bd4b]">辩论专题</span> : null}
+                      </div>
+                      <span className="text-xs uppercase tracking-[0.12em] text-slate-400">
+                        {new Date(match.settledAt ?? match.acceptedAt ?? match.createdAt).toLocaleString("zh-CN")}
+                      </span>
+                    </div>
 
-                  <Link href={`/replay/${match.id}`}>
-                    <SurfaceCard className="mb-4 transition hover:border-accent/30 hover:bg-white/[0.04]">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <span className={`text-sm font-medium ${statusMeta.tone}`}>{statusMeta.label}</span>
-                          <span className="pill-muted text-xs">{getModeLabel(match.mode)}</span>
-                          {debate ? (
-                            <span className="rounded-full border border-accent/30 bg-accent/5 px-2 py-0.5 text-xs text-accent">
-                              辩论 PK
-                            </span>
-                          ) : null}
-                        </div>
-                        <span className="text-xs text-muted">
-                          {new Date(match.settledAt ?? match.acceptedAt ?? match.createdAt).toLocaleString("zh-CN")}
-                        </span>
+                    <div className="mt-5 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+                      <div>
+                        <h2 className="headline-section text-[#f7f4ed]">
+                          {challenger?.name ?? match.challengerSlug} vs {defender?.name ?? match.defenderSlug}
+                        </h2>
+                        <p className="mt-4 text-sm leading-7 text-slate-400">
+                          {winner ? `${winner.name} 获胜。` : ""}
+                          {match.settlementSummary ?? match.storyline}
+                        </p>
                       </div>
 
-                      <div className="mt-4 flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
-                              match.winnerSlug === match.challengerSlug
-                                ? "bg-accentSecondary/20 text-accentSecondary ring-2 ring-accentSecondary/40"
-                                : "bg-white/10 text-slate-300"
-                            }`}
-                          >
-                            {challenger?.avatar ?? "?"}
-                          </div>
-                          <div>
-                            <p className={`text-sm font-semibold ${match.winnerSlug === match.challengerSlug ? "text-accentSecondary" : ""}`}>
-                              {challenger?.name ?? match.challengerSlug}
+                      <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-1">
+                        <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                          <p className="media-kicker">Pool</p>
+                          <p className="mt-3 font-[var(--headline-font)] text-3xl uppercase">{match.rewardPool} CP</p>
+                        </div>
+                        <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                          <p className="media-kicker">Schedule</p>
+                          <p className="mt-3 text-sm text-slate-200">{match.scheduledFor}</p>
+                        </div>
+                        {debate ? (
+                          <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                            <p className="media-kicker">Debate</p>
+                            <p className="mt-3 text-sm text-slate-200">{debateStatusLabels[debate.status] ?? debate.status}</p>
+                            <p className="mt-2 text-xs text-slate-400">
+                              {debate.currentRound}/{debate.totalRounds} 轮
                             </p>
-                            <p className="text-xs text-muted">Elo {challenger?.elo ?? "?"}</p>
                           </div>
-                        </div>
-
-                        <div className="px-3">
-                          <span className="text-lg font-black text-muted">VS</span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
-                              match.winnerSlug === match.defenderSlug
-                                ? "bg-accentSecondary/20 text-accentSecondary ring-2 ring-accentSecondary/40"
-                                : "bg-white/10 text-slate-300"
-                            }`}
-                          >
-                            {defender?.avatar ?? "?"}
-                          </div>
-                          <div>
-                            <p className={`text-sm font-semibold ${match.winnerSlug === match.defenderSlug ? "text-accentSecondary" : ""}`}>
-                              {defender?.name ?? match.defenderSlug}
-                            </p>
-                            <p className="text-xs text-muted">Elo {defender?.elo ?? "?"}</p>
-                          </div>
-                        </div>
-
-                        <div className="ml-auto text-right">
-                          <p className="text-lg font-bold">{match.rewardPool}</p>
-                          <p className="text-xs text-muted">CP 奖池</p>
-                        </div>
+                        ) : null}
                       </div>
-
-                      <div className="mt-4 space-y-2">
-                        {isSettled && winner ? (
-                          <div className="flex items-center gap-2 rounded-2xl border border-accentSecondary/20 bg-accentSecondary/5 px-4 py-2.5">
-                            <span className="text-sm font-semibold text-accentSecondary">{winner.name} 获胜</span>
-                            {match.settlementSummary ? <span className="text-sm text-muted">· {match.settlementSummary}</span> : null}
-                          </div>
-                        ) : (
-                          <p className="text-sm leading-relaxed text-muted">{match.storyline}</p>
-                        )}
-                      </div>
-
-                      {debate ? (
-                        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                          <div className="flex items-center justify-between gap-4">
-                            <div>
-                              <p className="text-xs text-accent">辩论议题</p>
-                              <p className="mt-1 text-sm font-semibold">{debate.topic?.question ?? "未知议题"}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-muted">{debateStatusLabels[debate.status] ?? debate.status}</p>
-                              <p className="mt-1 text-xs text-muted">
-                                {debate.currentRound}/{debate.totalRounds} 轮
-                                {(debate.rounds?.length ?? 0) > 0 ? ` · ${debate.rounds!.length} 条发言` : ""}
-                              </p>
-                            </div>
-                          </div>
-
-                          {debate.rounds && debate.rounds.length > 0 ? (
-                            <div className="mt-3 space-y-2">
-                              {debate.rounds.slice(-2).map((round) => {
-                                const isSideA = round.side === "yes";
-                                const speaker = isSideA ? playerMap[debate.sideAPlayerSlug] : playerMap[debate.sideBPlayerSlug];
-
-                                return (
-                                  <div
-                                    key={round.id}
-                                    className={`flex items-start gap-2 rounded-xl px-3 py-2 ${
-                                      isSideA ? "border-l-2 border-l-accent/40 bg-accent/5" : "border-l-2 border-l-accentSecondary/40 bg-accentSecondary/5"
-                                    }`}
-                                  >
-                                    <span className={`shrink-0 text-xs font-bold ${isSideA ? "text-accent" : "text-accentSecondary"}`}>
-                                      {speaker?.name ?? round.playerSlug}
-                                    </span>
-                                    <p className="line-clamp-2 text-xs leading-relaxed text-slate-300">{round.argument}</p>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : null}
-
-                          {debate.topic ? (
-                            <div className="mt-3 flex items-center gap-4 text-xs text-muted">
-                              <span>Polymarket:</span>
-                              {debate.topic.outcomes.map((outcome, index) => (
-                                <span key={outcome}>
-                                  {outcome} {((debate.topic!.currentPrices[index] ?? 0) * 100).toFixed(0)}%
-                                </span>
-                              ))}
-                              <span className="ml-auto">Vol ${Math.round(debate.topic.volume).toLocaleString()}</span>
-                            </div>
-                          ) : null}
-                        </div>
-                      ) : null}
-
-                      {isSettled ? (
-                        <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
-                          <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
-                            <p className="text-xs text-muted">胜者收益</p>
-                            <p className="mt-1 text-xs text-accentSecondary">{match.preview.winnerReward}</p>
-                          </div>
-                          <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
-                            <p className="text-xs text-muted">败者代价</p>
-                            <p className="mt-1 text-xs text-danger">{match.preview.loserPenalty}</p>
-                          </div>
-                          <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
-                            <p className="text-xs text-muted">平台回流</p>
-                            <p className="mt-1 text-xs">{match.preview.platformReturn}</p>
-                          </div>
-                          <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
-                            <p className="text-xs text-muted">曝光加成</p>
-                            <p className="mt-1 text-xs">{match.preview.exposureBonus}</p>
-                          </div>
-                        </div>
-                      ) : null}
-                    </SurfaceCard>
-                  </Link>
-                </div>
+                    </div>
+                  </SurfaceCard>
+                </Link>
               );
             })}
           </div>

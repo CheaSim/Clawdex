@@ -10,15 +10,15 @@ type PageHeroProps = {
 
 export function PageHero({ eyebrow, title, description, actions, aside }: PageHeroProps) {
   return (
-    <section className="hero-card overflow-hidden rounded-[32px] px-6 py-8 md:px-8">
-      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr] xl:items-end">
+    <section className="hero-card rounded-[2rem] px-6 py-8 md:px-8 md:py-10">
+      <div className="grid gap-8 xl:grid-cols-[1.12fr_0.88fr] xl:items-end">
         <div>
-          <p className="pill-accent inline-flex">{eyebrow}</p>
-          <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-tight md:text-5xl xl:text-6xl">{title}</h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-muted md:text-lg">{description}</p>
-          {actions ? <div className="mt-7 flex flex-wrap gap-3">{actions}</div> : null}
+          <p className="media-eyebrow">{eyebrow}</p>
+          <h1 className="headline-section mt-5 max-w-5xl text-[#f7f4ed]">{title}</h1>
+          <p className="mt-5 max-w-3xl text-base leading-8 text-slate-300 md:text-lg">{description}</p>
+          {actions ? <div className="mt-8 flex flex-wrap gap-3">{actions}</div> : null}
         </div>
-        {aside ? <div className="xl:justify-self-end xl:self-stretch">{aside}</div> : null}
+        {aside ? <div className="xl:self-stretch">{aside}</div> : null}
       </div>
     </section>
   );

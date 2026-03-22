@@ -9,7 +9,7 @@ import { listChallenges, listPlayers } from "@/lib/mock-db";
 
 export const dynamic = "force-dynamic";
 
-const categoryLabels = ["综合 Elo", "内容热度", "观众支持率"];
+const categoryLabels = ["综合 Elo", "内容热度", "胜率"];
 
 export default async function RankingsPage() {
   const [players, challenges] = await Promise.all([listPlayers(), listChallenges()]);
@@ -17,7 +17,6 @@ export default async function RankingsPage() {
   const challengeMap = Object.fromEntries(challenges.map((challenge) => [challenge.id, challenge]));
   const latestBattleMap = getPlayerLatestBattleMap(challenges);
   const sortedPlayers = [...players].sort((left, right) => right.elo - left.elo);
-
   const rankingLeaders = [
     [...players].sort((left, right) => right.elo - left.elo)[0],
     [...players].sort((left, right) => right.fame - left.fame)[0],
@@ -28,107 +27,105 @@ export default async function RankingsPage() {
     <SiteShell>
       <div className="section-grid">
         <PageHero
-          eyebrow="排行榜"
-          title="竞技强度和内容热度一起算，才更像一个会持续增长的社区。"
-          description="这里既看 Elo，也看 Fame 和胜率。更重要的是，每位选手最近一场对战都可以直接点进回放继续追剧情。"
+          eyebrow="联赛榜"
+          title="这里不是资料表，而是整个战报站的人物主线。"
+          description="排行榜按联赛榜的方式组织：领跑者、完整排名、最近对战和人物页入口都在同一个内容流里。"
         />
 
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {rankingLeaders.map((entry, index) => (
-            <Link key={entry.slug} href={`/players/${entry.slug}`}>
-              <SurfaceCard className="relative overflow-hidden bg-slate-950/70 p-6 transition hover:-translate-y-1">
-                <div className="absolute right-[-1rem] top-[-1rem] h-24 w-24 rounded-full bg-accent/10 blur-2xl" />
-                <p className="text-sm text-muted">{categoryLabels[index]}</p>
-                <div className="mt-5 flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 text-xl font-semibold text-accent">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-semibold">{entry.name}</h2>
-                    <p className="text-sm text-muted">{entry.title}</p>
-                  </div>
-                </div>
-                <p className="mt-6 text-3xl font-semibold text-accentSecondary">
-                  {index === 0 ? `${entry.elo} Elo` : index === 1 ? `${entry.fame.toLocaleString()} Fame` : entry.winRate}
-                </p>
-              </SurfaceCard>
-            </Link>
-          ))}
-        </div>
-
-        <SurfaceCard className="bg-slate-950/70 p-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-sm text-accent">完整榜单</p>
-              <h2 className="mt-2 text-2xl font-semibold">每位选手最近一场对战都会在这里继续带出回放流量</h2>
-            </div>
-            <span className="pill-muted text-sm text-slate-200">{sortedPlayers.length} 位选手</span>
+        <section>
+          <div className="section-divider">
+            <span className="media-eyebrow">Leaders</span>
           </div>
-
-          <div className="mt-6 space-y-3">
-            {sortedPlayers.map((player, index) => {
-              const latestBattle = latestBattleMap[player.slug];
-              const opponent = latestBattle ? playerMap[latestBattle.opponentSlug] : null;
-              const latestBattleStatus = latestBattle ? challengeStatusMeta[latestBattle.status] : null;
-
-              return (
-                <div
-                  key={player.slug}
-                  className="grid gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 lg:grid-cols-[0.4fr_1.2fr_0.7fr_0.7fr_0.8fr_1.6fr] lg:items-center"
-                >
-                  <div className="text-sm font-semibold text-accentSecondary">#{index + 1}</div>
-
-                  <Link href={`/players/${player.slug}`} className="min-w-0 transition hover:text-accent">
-                    <p className="truncate text-lg font-semibold">{player.name}</p>
-                    <p className="truncate text-sm text-muted">{player.title}</p>
-                  </Link>
-
-                  <div>
-                    <p className="text-xs text-muted">Elo</p>
-                    <p className="mt-1 text-sm font-semibold">{player.elo}</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {rankingLeaders.map((entry, index) => (
+              <Link key={entry.slug} href={`/players/${entry.slug}`}>
+                <SurfaceCard className="editorial-surface rounded-[1.9rem] p-6 transition hover:-translate-y-1 hover:border-[rgba(240,75,55,0.28)]">
+                  <p className="media-kicker">{categoryLabels[index]}</p>
+                  <div className="mt-5 flex items-center justify-between gap-4">
+                    <div>
+                      <h2 className="headline-card text-[#f7f4ed]">{entry.name}</h2>
+                      <p className="mt-2 text-xs uppercase tracking-[0.12em] text-slate-400">{entry.title}</p>
+                    </div>
+                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(240,75,55,0.12)] font-[var(--headline-font)] text-3xl uppercase text-[#ffb9a9]">
+                      {index + 1}
+                    </span>
                   </div>
+                  <p className="mt-6 font-[var(--headline-font)] text-5xl uppercase text-[#f6bd4b]">
+                    {index === 0 ? entry.elo : index === 1 ? entry.fame.toLocaleString() : entry.winRate}
+                  </p>
+                </SurfaceCard>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-                  <div>
-                    <p className="text-xs text-muted">Fame</p>
-                    <p className="mt-1 text-sm font-semibold">{player.fame.toLocaleString()}</p>
-                  </div>
+        <section>
+          <div className="section-divider">
+            <span className="media-eyebrow">League Table</span>
+          </div>
+          <SurfaceCard className="mt-5 rounded-[2rem] p-6">
+            <div className="grid gap-3">
+              {sortedPlayers.map((player, index) => {
+                const latestBattle = latestBattleMap[player.slug];
+                const opponent = latestBattle ? playerMap[latestBattle.opponentSlug] : null;
+                const latestBattleStatus = latestBattle ? challengeStatusMeta[latestBattle.status] : null;
 
-                  <div>
-                    <p className="text-xs text-muted">胜率</p>
-                    <p className="mt-1 text-sm font-semibold">{player.winRate}</p>
-                  </div>
+                return (
+                  <div
+                    key={player.slug}
+                    className="grid gap-4 rounded-[1.6rem] border border-white/10 bg-white/[0.03] p-4 xl:grid-cols-[0.35fr_1.2fr_0.8fr_0.8fr_0.8fr_1.7fr] xl:items-center"
+                  >
+                    <div className="font-[var(--headline-font)] text-3xl uppercase text-[#ffb9a9]">#{index + 1}</div>
 
-                  <div className="min-w-0">
-                    {latestBattle ? (
-                      <Link
-                        href={`/replay/${latestBattle.challengeId}`}
-                        className="block rounded-[18px] border border-white/10 bg-slate-950/55 p-3 transition hover:border-accent/30 hover:bg-white/[0.06]"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="truncate text-sm font-semibold">{opponent?.name ?? latestBattle.opponentSlug}</p>
-                          {latestBattleStatus ? (
-                            <span className={`text-xs ${latestBattleStatus.tone}`}>{latestBattleStatus.label}</span>
-                          ) : null}
+                    <Link href={`/players/${player.slug}`} className="min-w-0 transition hover:text-[#ffd8c9]">
+                      <p className="truncate text-lg font-semibold text-[#f7f4ed]">{player.name}</p>
+                      <p className="truncate text-xs uppercase tracking-[0.12em] text-slate-400">{player.title}</p>
+                    </Link>
+
+                    <div>
+                      <p className="media-kicker">Elo</p>
+                      <p className="mt-2 text-sm text-slate-200">{player.elo}</p>
+                    </div>
+
+                    <div>
+                      <p className="media-kicker">Fame</p>
+                      <p className="mt-2 text-sm text-slate-200">{player.fame.toLocaleString()}</p>
+                    </div>
+
+                    <div>
+                      <p className="media-kicker">Win Rate</p>
+                      <p className="mt-2 text-sm text-slate-200">{player.winRate}</p>
+                    </div>
+
+                    <div className="min-w-0">
+                      {latestBattle ? (
+                        <Link
+                          href={`/replay/${latestBattle.challengeId}`}
+                          className="block rounded-[1.25rem] border border-white/10 bg-[rgba(255,255,255,0.03)] p-3 transition hover:border-[rgba(240,75,55,0.28)]"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="truncate text-sm font-semibold text-[#f7f4ed]">{opponent?.name ?? latestBattle.opponentSlug}</p>
+                            {latestBattleStatus ? (
+                              <span className={`text-xs ${latestBattleStatus.tone}`}>{latestBattleStatus.label}</span>
+                            ) : null}
+                          </div>
+                          <p className="mt-2 text-xs text-slate-400">
+                            {getModeLabel(challengeMap[latestBattle.challengeId]?.mode ?? "public-arena")} · 最近结果{" "}
+                            {latestBattle.result === "win" ? "胜" : latestBattle.result === "loss" ? "负" : "进行中"}
+                          </p>
+                        </Link>
+                      ) : (
+                        <div className="rounded-[1.25rem] border border-white/10 bg-[rgba(255,255,255,0.03)] p-3 text-sm text-slate-500">
+                          暂无最近对战
                         </div>
-                        <p className="mt-2 text-xs text-muted">
-                          {getModeLabel(
-                            challengeMap[latestBattle.challengeId]?.mode ?? "public-arena",
-                          )}{" "}
-                          · 结果 {latestBattle.result === "win" ? "胜" : latestBattle.result === "loss" ? "负" : "进行中"}
-                        </p>
-                        <p className="mt-2 text-xs text-accentSecondary">查看最近对战回放 →</p>
-                      </Link>
-                    ) : (
-                      <div className="rounded-[18px] border border-white/10 bg-slate-950/55 p-3 text-sm text-muted">
-                        暂无最近对战
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </SurfaceCard>
+                );
+              })}
+            </div>
+          </SurfaceCard>
+        </section>
       </div>
     </SiteShell>
   );

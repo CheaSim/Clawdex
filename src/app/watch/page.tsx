@@ -14,46 +14,80 @@ export default async function WatchPage() {
   const [challenges, players] = await Promise.all([listChallenges(), listPlayers()]);
   const playerMap = Object.fromEntries(players.map((player) => [player.slug, player]));
   const { primaryMatches, recentSettled } = getWatchFeedSections(challenges);
+  const leadMatch = primaryMatches[0] ?? recentSettled[0] ?? null;
 
   return (
     <SiteShell>
       <div className="section-grid">
         <PageHero
-          eyebrow="观战中心"
-          title="先看高光，再站队，再给出你的裁决。"
-          description="这里收拢正在进行的对战、刚刚结算的回放、观众投票和公平规则。对观众来说，这是最容易持续刷内容的入口。"
+          eyebrow="直播频道"
+          title="所有正在发生的比赛和刚刚发生过的高光，都应该先被看见。"
+          description="观战中心现在按体育媒体频道组织，直播桌、赛后高光、裁判规则和导流入口分开呈现，不再只是普通卡片流。"
           aside={
-            <SurfaceCard className="h-full bg-slate-950/45 p-5">
-              <p className="text-sm text-accent">实时状态</p>
-              <div className="mt-4 space-y-3">
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs text-muted">正在观战</p>
-                  <p className="mt-2 text-2xl font-semibold">{primaryMatches.length} 场</p>
+            <SurfaceCard className="score-surface rounded-[1.9rem] p-5">
+              <p className="media-kicker">Live Desk</p>
+              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-1">
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">直播中</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{primaryMatches.length}</p>
                 </div>
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs text-muted">近期结算</p>
-                  <p className="mt-2 text-2xl font-semibold">{recentSettled.length} 场</p>
+                <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">最新结算</p>
+                  <p className="mt-3 font-[var(--headline-font)] text-4xl uppercase">{recentSettled.length}</p>
                 </div>
               </div>
             </SurfaceCard>
           }
         />
 
-        <div className="mt-8 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-          <SurfaceCard className="bg-slate-950/70 p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-semibold">直播与进行中</h2>
-              <span className="rounded-full bg-danger/10 px-3 py-1 text-xs text-danger">实时刷新</span>
+        {leadMatch ? (
+          <Link href={leadMatch.status === "settlement" ? `/replay/${leadMatch.id}` : `/challenge/${leadMatch.id}`}>
+            <SurfaceCard className="hero-card rounded-[2rem] p-6 transition hover:border-[rgba(240,75,55,0.28)]">
+              <div className="section-divider">
+                <span className="media-eyebrow">Featured Broadcast</span>
+              </div>
+              <div className="mt-6 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
+                <div>
+                  <p className={`text-sm font-semibold ${challengeStatusMeta[leadMatch.status].tone}`}>
+                    {challengeStatusMeta[leadMatch.status].label} · {getModeLabel(leadMatch.mode)}
+                  </p>
+                  <h2 className="headline-section mt-4 text-[#f7f4ed]">
+                    {playerMap[leadMatch.challengerSlug]?.name ?? leadMatch.challengerSlug} vs{" "}
+                    {playerMap[leadMatch.defenderSlug]?.name ?? leadMatch.defenderSlug}
+                  </h2>
+                  <p className="mt-4 text-base leading-8 text-slate-300">
+                    {leadMatch.settlementSummary ?? leadMatch.storyline}
+                  </p>
+                </div>
+                <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-1">
+                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                    <p className="media-kicker">Schedule</p>
+                    <p className="mt-3 text-sm text-slate-200">{leadMatch.scheduledFor}</p>
+                  </div>
+                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                    <p className="media-kicker">Pool</p>
+                    <p className="mt-3 font-[var(--headline-font)] text-3xl uppercase">{leadMatch.rewardPool} CP</p>
+                  </div>
+                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                    <p className="media-kicker">Destination</p>
+                    <p className="mt-3 text-sm text-slate-200">{leadMatch.status === "settlement" ? "完整回放" : "比赛详情"}</p>
+                  </div>
+                </div>
+              </div>
+            </SurfaceCard>
+          </Link>
+        ) : null}
+
+        <section className="channel-shell lg:grid-cols-[1.08fr_0.92fr] lg:grid">
+          <div className="space-y-5">
+            <div className="section-divider">
+              <span className="media-eyebrow">Live Broadcasts</span>
             </div>
-            <div className="mt-6 space-y-4">
+            <div className="space-y-4">
               {primaryMatches.length === 0 ? (
-                <p className="text-sm text-muted">
-                  当前没有进行中的对战。去{" "}
-                  <Link href="/challenge/new" className="text-accent hover:underline">
-                    发起一场新的 PK
-                  </Link>
-                  。
-                </p>
+                <SurfaceCard className="rounded-[1.8rem] p-5 text-sm text-slate-400">
+                  当前没有正在直播或锁池中的对战。下一场比赛开始后，这里会成为直播桌首页。
+                </SurfaceCard>
               ) : null}
 
               {primaryMatches.map((match) => {
@@ -62,71 +96,73 @@ export default async function WatchPage() {
                 const statusMeta = challengeStatusMeta[match.status];
 
                 return (
-                  <Link
-                    key={match.id}
-                    href={`/challenge/${match.id}`}
-                    className="block rounded-[28px] border border-white/10 bg-white/5 p-5 transition hover:border-accent/30 hover:bg-white/[0.08]"
-                  >
-                    <p className={`text-sm ${statusMeta.tone}`}>
-                      {statusMeta.label} · {getModeLabel(match.mode)}
-                    </p>
-                    <h3 className="mt-2 text-xl font-semibold">
-                      {challenger?.name ?? match.challengerSlug} vs {defender?.name ?? match.defenderSlug}
-                    </h3>
-                    <p className="mt-3 text-sm leading-6 text-muted">{match.storyline}</p>
-                    <p className="mt-2 text-xs text-slate-400">
-                      {match.scheduledFor} · 奖池 {match.rewardPool} Claw Points
-                    </p>
+                  <Link key={match.id} href={`/challenge/${match.id}`}>
+                    <SurfaceCard className="editorial-surface rounded-[1.8rem] p-5 transition hover:-translate-y-1 hover:border-[rgba(240,75,55,0.28)]">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className={`text-sm font-semibold ${statusMeta.tone}`}>{statusMeta.label}</p>
+                        <span className="hud-chip">{getModeLabel(match.mode)}</span>
+                      </div>
+                      <h2 className="headline-card mt-4 text-[#f7f4ed]">
+                        {challenger?.name ?? match.challengerSlug} vs {defender?.name ?? match.defenderSlug}
+                      </h2>
+                      <p className="mt-3 text-sm text-slate-300">
+                        {match.scheduledFor} · 奖池 {match.rewardPool} Claw Points
+                      </p>
+                      <p className="mt-4 text-sm leading-7 text-slate-400">{match.storyline}</p>
+                    </SurfaceCard>
                   </Link>
                 );
               })}
             </div>
-          </SurfaceCard>
+          </div>
 
-          <SurfaceCard className="p-6">
-            <h2 className="text-2xl font-semibold">近期结算高光</h2>
-            <div className="mt-6 space-y-4">
+          <div className="space-y-5">
+            <div className="section-divider">
+              <span className="media-eyebrow">Latest Highlights</span>
+            </div>
+            <div className="space-y-4">
               {recentSettled.length === 0 ? (
-                <p className="text-sm text-muted">还没有已经结算的对战，第一场打完之后这里就会开始沉淀内容。</p>
+                <SurfaceCard className="rounded-[1.8rem] p-5 text-sm text-slate-400">
+                  还没有已经结算的高光回放，第一场打完之后这里会自动开始沉淀。
+                </SurfaceCard>
               ) : null}
 
               {recentSettled.map((match) => {
                 const winner = match.winnerSlug ? playerMap[match.winnerSlug] : null;
+                const challenger = playerMap[match.challengerSlug];
+                const defender = playerMap[match.defenderSlug];
 
                 return (
-                  <Link
-                    key={match.id}
-                    href={`/replay/${match.id}`}
-                    className="block rounded-[28px] border border-white/10 bg-white/5 p-5 transition hover:border-accent/30 hover:bg-white/[0.08]"
-                  >
-                    <p className="text-sm text-accentSecondary">{winner ? `${winner.name} 获胜` : "已结算"}</p>
-                    <h3 className="mt-2 text-xl font-semibold">
-                      {playerMap[match.challengerSlug]?.name ?? match.challengerSlug} vs{" "}
-                      {playerMap[match.defenderSlug]?.name ?? match.defenderSlug}
-                    </h3>
-                    <p className="mt-3 text-sm leading-6 text-muted">{match.settlementSummary ?? match.storyline}</p>
+                  <Link key={match.id} href={`/replay/${match.id}`}>
+                    <SurfaceCard className="rounded-[1.8rem] p-5 transition hover:-translate-y-1 hover:border-[rgba(240,75,55,0.28)]">
+                      <p className="media-kicker">Replay Highlight</p>
+                      <h2 className="headline-card mt-4 text-[#f7f4ed]">
+                        {challenger?.name ?? match.challengerSlug} vs {defender?.name ?? match.defenderSlug}
+                      </h2>
+                      <p className="mt-3 text-sm font-semibold text-[#f6bd4b]">{winner ? `${winner.name} 获胜` : "已结算"}</p>
+                      <p className="mt-4 text-sm leading-7 text-slate-400">{match.settlementSummary ?? match.storyline}</p>
+                    </SurfaceCard>
                   </Link>
                 );
               })}
             </div>
-          </SurfaceCard>
-        </div>
-
-        <SurfaceCard className="mt-2 bg-slate-950/70 p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">观战判罚面板</h2>
-            <span className="text-sm text-muted">观众和裁判共同维护对战公信力</span>
           </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+        </section>
+
+        <section>
+          <div className="section-divider">
+            <span className="media-eyebrow">Rules Desk</span>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
             {fairPlayRules.map((rule) => (
-              <article key={rule.title} className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <h3 className="text-lg font-semibold">{rule.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted">{rule.description}</p>
-                <p className="mt-3 text-sm text-danger">{rule.consequence}</p>
-              </article>
+              <SurfaceCard key={rule.title} className="rounded-[1.6rem] p-5">
+                <h2 className="headline-card text-[#f7f4ed]">{rule.title}</h2>
+                <p className="mt-4 text-sm leading-7 text-slate-400">{rule.description}</p>
+                <p className="mt-4 text-sm font-semibold text-[#ff8b79]">{rule.consequence}</p>
+              </SurfaceCard>
             ))}
           </div>
-        </SurfaceCard>
+        </section>
       </div>
     </SiteShell>
   );

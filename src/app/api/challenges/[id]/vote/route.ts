@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 
 import { getCurrentUserRecord } from "@/lib/auth-guard";
-import { getChallengeById } from "@/lib/mock-db";
+import {
+  buildJudgeRewardReason,
+  computeJudgeWalletBalanceAfter,
+  getJudgeReward,
+  isJudgeVoteType,
+  validateJudgeVoteTarget,
+} from "@/lib/challenge-vote";
 import { isPrismaBackendEnabled } from "@/lib/data-backend";
+import { getChallengeById } from "@/lib/mock-db";
 import { prisma } from "@/lib/prisma";
-
-/** Per-vote-type judge reward in Claw Points */
-const JUDGE_REWARD_MAP: Record<string, number> = {
-  MVP: 5,
-  SUPPORT: 3,
-  MOMENT: 2,
-};
 
 type VotePayload = {
   voteType: "MVP" | "MOMENT" | "SUPPORT";
@@ -44,9 +44,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ message: "投票需要 Prisma 后端。" }, { status: 400 });
   }
 
-  const voterPlayerId = currentUser.player?.id;
+  const voterPlayer = currentUser.player;
+  const voterPlayerId = voterPlayer?.id;
 
-  if (!voterPlayerId) {
+  if (!voterPlayer || !voterPlayerId) {
     return NextResponse.json({ message: "你需要先绑定选手身份才能投票。" }, { status: 403 });
   }
 
@@ -54,90 +55,87 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const challenge = await getChallengeById(id);
 
   if (!challenge) {
-    return NextResponse.json({ message: "挑战不存在" }, { status: 404 });
+    return NextResponse.json({ message: "挑战不存在。" }, { status: 404 });
   }
 
-  // Block participants from judging their own match
-  const voterSlug = currentUser.player!.slug;
-
-  if (voterSlug === challenge.challengerSlug || voterSlug === challenge.defenderSlug) {
-    return NextResponse.json({ message: "参赛选手不能为自己的比赛投票" }, { status: 403 });
+  if (voterPlayer.slug === challenge.challengerSlug || voterPlayer.slug === challenge.defenderSlug) {
+    return NextResponse.json({ message: "参赛选手不能为自己的比赛投票。" }, { status: 403 });
   }
 
   const payload = (await request.json()) as Partial<VotePayload>;
+  if (!payload.voteType || !isJudgeVoteType(payload.voteType)) {
+    return NextResponse.json({ message: "无效的投票类型。" }, { status: 400 });
+  }
 
-  if (!payload.voteType || !["MVP", "MOMENT", "SUPPORT"].includes(payload.voteType)) {
-    return NextResponse.json({ message: "无效的投票类型" }, { status: 400 });
+  const voteType = payload.voteType;
+  const targetValidationError = validateJudgeVoteTarget({
+    voteType,
+    targetPlayerSlug: payload.targetPlayerSlug,
+    challengerSlug: challenge.challengerSlug,
+    defenderSlug: challenge.defenderSlug,
+  });
+
+  if (targetValidationError) {
+    return NextResponse.json({ message: targetValidationError }, { status: 400 });
   }
 
   let targetPlayerId: string | null = null;
-
   if (payload.targetPlayerSlug) {
     const player = await prisma.player.findUnique({ where: { slug: payload.targetPlayerSlug } });
-
     if (!player) {
-      return NextResponse.json({ message: "目标玩家不存在" }, { status: 404 });
+      return NextResponse.json({ message: "目标玩家不存在。" }, { status: 404 });
     }
-
     targetPlayerId = player.id;
   }
 
-  // Duplicate check: same voter + same challenge + same voteType
   const existing = await prisma.spectatorVote.findFirst({
     where: {
       challengeId: id,
       voterId: voterPlayerId,
-      voteType: payload.voteType,
+      voteType,
     },
   });
 
   if (existing) {
-    return NextResponse.json({ message: "你已经投过这票了" }, { status: 409 });
+    return NextResponse.json({ message: "你已经投过这票了。" }, { status: 409 });
   }
 
-  const reward = JUDGE_REWARD_MAP[payload.voteType] ?? 0;
+  const reward = getJudgeReward(voteType);
 
-  // Atomic transaction: create vote + award credits
   const result = await prisma.$transaction(async (tx) => {
     const vote = await tx.spectatorVote.create({
       data: {
         challengeId: id,
         voterId: voterPlayerId,
         playerId: targetPlayerId,
-        voteType: payload.voteType!,
+        voteType,
         score: payload.score ?? null,
       },
     });
 
-    if (reward > 0) {
-      // Update player clawPoints
-      const updatedPlayer = await tx.player.update({
-        where: { id: voterPlayerId },
-        data: { clawPoints: { increment: reward } },
-      });
+    const updatedPlayer = await tx.player.update({
+      where: { id: voterPlayerId },
+      data: { clawPoints: { increment: reward } },
+    });
 
-      // Upsert wallet and create ledger entry
-      const wallet = await tx.playerWallet.upsert({
-        where: { playerId: voterPlayerId },
-        create: { playerId: voterPlayerId, availableBalance: reward },
-        update: { availableBalance: { increment: reward } },
-      });
+    const wallet = await tx.playerWallet.upsert({
+      where: { playerId: voterPlayerId },
+      create: { playerId: voterPlayerId, availableBalance: reward },
+      update: { availableBalance: { increment: reward } },
+    });
 
-      await tx.walletLedger.create({
-        data: {
-          walletId: wallet.id,
-          challengeId: id,
-          type: "JUDGE_REWARD",
-          delta: reward,
-          balanceAfter: wallet.availableBalance,
-          reason: `评委奖励：${payload.voteType} 投票`,
-        },
-      });
+    await tx.walletLedger.create({
+      data: {
+        walletId: wallet.id,
+        challengeId: id,
+        type: "JUDGE_REWARD",
+        delta: reward,
+        balanceAfter: computeJudgeWalletBalanceAfter(wallet.availableBalance, reward),
+        reason: buildJudgeRewardReason(voteType),
+      },
+    });
 
-      return { vote, reward, newBalance: updatedPlayer.clawPoints };
-    }
-
-    return { vote, reward: 0, newBalance: null };
+    return { vote, reward, newBalance: updatedPlayer.clawPoints };
   });
 
   return NextResponse.json({

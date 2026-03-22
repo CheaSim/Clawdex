@@ -12,6 +12,56 @@
 2. PM / 架构方 review 完后，更新 `TODO.md`，再回发通知
 3. 双方都可以运行轮询脚本，每分钟自动检查 `TODO.md` 和收件箱
 
+### Bash 环境
+
+本项目使用 **Git Bash** 作为默认终端环境。VS Code 已配置为默认使用 Git Bash。
+Agent 在执行命令时也应**优先使用 Git Bash / bash 语法**；只有在 bash 不可用或必须调用 PowerShell 专属能力时，才回退到 PowerShell。
+
+#### 在 VS Code 中使用 Bash
+
+- **新建终端**（`Ctrl+` `）自动进入 Git Bash
+- **手动配置**：`.vscode/settings.json` 中已设置：
+  ```json
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "terminal.integrated.profiles.windows": {
+    "Git Bash": {
+      "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+      "args": ["--login"]
+    }
+  }
+  ```
+
+#### Bash 命令速查
+
+| 任务 | PowerShell | Bash |
+|------|-----------|------|
+| 列出文件 | `Get-ChildItem` | `ls -lah` |
+| 查找文件 | `Get-ChildItem -Recurse` | `find . -name "pattern"` |
+| 搜索文本 | `Select-String "pattern"` | `grep "pattern"` |
+| 文件内容 | `Get-Content` | `cat` |
+| 前 N 行 | `Select-Object -First 10` | `head -n 10` |
+| 管道操作 | `\|` | `\|` |
+| 环境变量 | `$env:VAR_NAME` | `$VAR_NAME` |
+
+#### Bash 脚本执行
+
+直接从 bash 运行 Agent 脚本：
+
+```bash
+# 转发 PowerShell 脚本给 bash 调用
+powershell -Command ".\scripts\agent-notify.ps1" \
+  -From "impl-agent" \
+  -To "pm-agent" \
+  -Type "task_completed" \
+  -Task "P1-3" \
+  -Message "Ready for review"
+
+# 或使用 bash 原生命令
+git status
+git add .
+git commit -m "feat: update agent config"
+```
+
 ### 脚本
 
 - `scripts/agent-notify.ps1`

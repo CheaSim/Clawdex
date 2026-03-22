@@ -17,12 +17,12 @@ type ReplayDetailPageProps = {
 
 const debateStatusLabels: Record<string, { label: string; tone: string }> = {
   "topic-set": { label: "议题已设定", tone: "text-amber-300" },
-  started: { label: "辩论进行中", tone: "text-accentSecondary" },
-  "round-a": { label: "等待正方发言", tone: "text-accent" },
-  "round-b": { label: "等待反方发言", tone: "text-accentSecondary" },
+  started: { label: "辩论进行中", tone: "text-sky-300" },
+  "round-a": { label: "等待正方发言", tone: "text-sky-300" },
+  "round-b": { label: "等待反方发言", tone: "text-[#f6bd4b]" },
   closing: { label: "结辩阶段", tone: "text-amber-300" },
-  judging: { label: "评审投票中", tone: "text-danger" },
-  settled: { label: "已结算", tone: "text-muted" },
+  judging: { label: "评审中", tone: "text-[#ff8b79]" },
+  settled: { label: "已结算", tone: "text-slate-300" },
 };
 
 async function buildReplayMetadata(id: string): Promise<Metadata> {
@@ -91,9 +91,9 @@ export default async function ReplayDetailPage({ params }: ReplayDetailPageProps
   const renderAdjacentLink = (label: string, target: typeof previous) => {
     if (!target) {
       return (
-        <div className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-muted">
-          <p>{label}</p>
-          <p className="mt-2">没有更多记录了</p>
+        <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-500">
+          <p className="media-kicker">{label}</p>
+          <p className="mt-3">没有更多记录了</p>
         </div>
       );
     }
@@ -104,13 +104,13 @@ export default async function ReplayDetailPage({ params }: ReplayDetailPageProps
     return (
       <Link
         href={`/replay/${target.id}`}
-        className="block rounded-[24px] border border-white/10 bg-white/5 p-4 transition hover:border-accent/30 hover:bg-white/[0.06]"
+        className="block rounded-[1.6rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-[rgba(240,75,55,0.28)]"
       >
-        <p className="text-sm text-muted">{label}</p>
-        <p className="mt-2 text-lg font-semibold">
+        <p className="media-kicker">{label}</p>
+        <p className="mt-3 text-lg font-semibold text-[#f7f4ed]">
           {targetChallenger?.name ?? target.challengerSlug} vs {targetDefender?.name ?? target.defenderSlug}
         </p>
-        <p className="mt-2 text-sm text-slate-300">
+        <p className="mt-2 text-sm text-slate-400">
           {getModeLabel(target.mode)} · 奖池 {target.rewardPool} CP
         </p>
       </Link>
@@ -121,66 +121,65 @@ export default async function ReplayDetailPage({ params }: ReplayDetailPageProps
     <SiteShell>
       <div className="section-grid">
         <PageHero
-          eyebrow="Replay 回放"
+          eyebrow="单场战报"
           title={`${challenger.name} vs ${defender.name}`}
           description={`${getModeLabel(challenge.mode)} · 奖池 ${challenge.rewardPool} CP${isSettled && winner ? ` · ${winner.name} 获胜` : ""}`}
           actions={
             <Link href="/replay" className="btn-primary inline-flex items-center gap-2 text-sm">
-              返回对战回放
+              返回战报归档
             </Link>
           }
           aside={
-            <SurfaceCard className="h-full bg-slate-950/45 p-5">
-              <p className={`text-sm ${statusMeta.tone}`}>对战状态</p>
-              <p className="mt-3 text-3xl font-semibold">{statusMeta.label}</p>
-              <div className="mt-5 space-y-3 text-sm text-slate-200">
+            <SurfaceCard className="score-surface rounded-[1.9rem] p-5">
+              <p className={`text-sm font-semibold ${statusMeta.tone}`}>{statusMeta.label}</p>
+              <p className="mt-3 font-[var(--headline-font)] text-5xl uppercase">{challenge.rewardPool} CP</p>
+              <div className="mt-5 space-y-3 text-sm text-slate-300">
                 <p>挑战编号：{challenge.id}</p>
                 <p>创建时间：{new Date(challenge.createdAt).toLocaleString("zh-CN")}</p>
                 {challenge.acceptedAt ? <p>接战时间：{new Date(challenge.acceptedAt).toLocaleString("zh-CN")}</p> : null}
                 {challenge.settledAt ? <p>结算时间：{new Date(challenge.settledAt).toLocaleString("zh-CN")}</p> : null}
-                {debate ? <p>辩论轮次：{debate.currentRound}/{debate.totalRounds}</p> : null}
               </div>
             </SurfaceCard>
           }
         />
 
         {isSettled && winner ? (
-          <SurfaceCard className="border-accentSecondary/30 bg-accentSecondary/5 p-6">
+          <SurfaceCard className="hero-card rounded-[2rem] p-6">
             <div className="flex flex-wrap items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accentSecondary/20 text-xl font-bold text-accentSecondary ring-2 ring-accentSecondary/40">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[rgba(246,189,75,0.16)] font-[var(--headline-font)] text-3xl uppercase text-[#f6bd4b] ring-2 ring-[rgba(246,189,75,0.28)]">
                 {winner.avatar}
               </div>
               <div>
-                <p className="text-sm text-accentSecondary">胜者</p>
-                <p className="text-2xl font-semibold">{winner.name}</p>
+                <p className="media-kicker">Winner</p>
+                <p className="mt-2 text-2xl font-semibold text-[#f7f4ed]">{winner.name}</p>
               </div>
               <div className="ml-auto text-right">
-                <p className="text-sm text-muted">败者</p>
-                <p className="text-lg text-slate-300">{loser.name}</p>
+                <p className="media-kicker">Loser</p>
+                <p className="mt-2 text-lg text-slate-300">{loser.name}</p>
               </div>
             </div>
-            {challenge.settlementSummary ? <p className="mt-4 text-sm leading-7 text-slate-200">{challenge.settlementSummary}</p> : null}
+            {challenge.settlementSummary ? <p className="mt-5 text-sm leading-8 text-slate-300">{challenge.settlementSummary}</p> : null}
           </SurfaceCard>
         ) : null}
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <SurfaceCard className="p-4">
-            <p className="text-xs text-muted">赌注 / 奖池</p>
-            <p className="mt-2 text-xl font-semibold">
-              {challenge.stake} / <span className="text-accentSecondary">{challenge.rewardPool}</span> CP
+          <SurfaceCard className="rounded-[1.6rem] p-4 stagger-rise" style={{ animationDelay: "0ms" }}>
+            <p className="media-kicker">Stake / Pool</p>
+            <p className="mt-3 font-[var(--headline-font)] text-3xl uppercase text-[#f7f4ed]">
+              {challenge.stake} / {challenge.rewardPool}
             </p>
           </SurfaceCard>
-          <SurfaceCard className="p-4">
-            <p className="text-xs text-accentSecondary">胜者收益</p>
-            <p className="mt-2 text-sm leading-6">{challenge.preview.winnerReward}</p>
+          <SurfaceCard className="rounded-[1.6rem] p-4 stagger-rise" style={{ animationDelay: "60ms" }}>
+            <p className="media-kicker">Winner Reward</p>
+            <p className="mt-3 text-sm leading-7 text-slate-300">{challenge.preview.winnerReward}</p>
           </SurfaceCard>
-          <SurfaceCard className="p-4">
-            <p className="text-xs text-danger">败者代价</p>
-            <p className="mt-2 text-sm leading-6">{challenge.preview.loserPenalty}</p>
+          <SurfaceCard className="rounded-[1.6rem] p-4 stagger-rise" style={{ animationDelay: "120ms" }}>
+            <p className="media-kicker">Loser Cost</p>
+            <p className="mt-3 text-sm leading-7 text-slate-300">{challenge.preview.loserPenalty}</p>
           </SurfaceCard>
-          <SurfaceCard className="p-4">
-            <p className="text-xs text-muted">平台回流 + 曝光</p>
-            <p className="mt-2 text-sm leading-6">
+          <SurfaceCard className="rounded-[1.6rem] p-4 stagger-rise" style={{ animationDelay: "180ms" }}>
+            <p className="media-kicker">Platform Return</p>
+            <p className="mt-3 text-sm leading-7 text-slate-300">
               {challenge.preview.platformReturn}
               <br />
               {challenge.preview.exposureBonus}
@@ -188,60 +187,50 @@ export default async function ReplayDetailPage({ params }: ReplayDetailPageProps
           </SurfaceCard>
         </div>
 
-        <SurfaceCard className="p-6">
-          <p className="text-sm text-accent">剧情摘要</p>
-          <h2 className="mt-3 text-xl font-semibold">{challenge.storyline}</h2>
-          {challenge.rulesNote ? <p className="mt-3 text-sm leading-7 text-muted">{challenge.rulesNote}</p> : null}
+        <SurfaceCard className="rounded-[2rem] p-6">
+          <div className="section-divider">
+            <span className="media-eyebrow">Match Story</span>
+          </div>
+          <h2 className="headline-card mt-5 text-[#f7f4ed]">{challenge.storyline}</h2>
+          {challenge.rulesNote ? <p className="mt-4 text-sm leading-8 text-slate-400">{challenge.rulesNote}</p> : null}
         </SurfaceCard>
 
-        <section className="grid gap-6 xl:grid-cols-2">
-          {[
-            { player: challenger, role: "发起方" },
-            { player: defender, role: "应战方" },
-          ].map(({ player, role }) => {
+        <section className="channel-shell xl:grid-cols-2 xl:grid">
+          {[{ player: challenger, role: "发起方" }, { player: defender, role: "应战方" }].map(({ player, role }) => {
             const isWinner = player.slug === challenge.winnerSlug;
 
             return (
-              <SurfaceCard key={player.slug} className={`p-6 ${isWinner ? "border-accentSecondary/20" : ""}`}>
+              <SurfaceCard key={player.slug} className="rounded-[2rem] p-6">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-accent">{role}</p>
-                      {isWinner ? (
-                        <span className="rounded-full bg-accentSecondary/10 px-2 py-0.5 text-xs text-accentSecondary">胜者</span>
-                      ) : null}
-                    </div>
-                    <h3 className="mt-2 text-xl font-semibold">{player.name}</h3>
-                    <p className="mt-1 text-sm text-muted">{player.bio}</p>
+                    <p className="media-kicker">{role}</p>
+                    <h3 className="headline-card mt-3 text-[#f7f4ed]">{player.name}</h3>
+                    <p className="mt-3 text-sm leading-7 text-slate-400">{player.bio}</p>
                   </div>
-                  <div
-                    className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-gradient-to-br text-lg font-semibold ${
-                      isWinner ? "from-accentSecondary/30 to-accent/20 text-accentSecondary" : "from-accent/30 to-accentSecondary/20 text-slate-950"
-                    }`}
-                  >
+                  <div className={`flex h-16 w-16 items-center justify-center rounded-[1.2rem] font-[var(--headline-font)] text-3xl uppercase ${isWinner ? "bg-[rgba(246,189,75,0.16)] text-[#f6bd4b]" : "bg-white/10 text-slate-200"}`}>
                     {player.avatar}
                   </div>
                 </div>
-                <div className="mt-4 grid grid-cols-3 gap-3">
-                  <div className="rounded-[20px] border border-white/10 bg-white/5 p-3">
-                    <p className="text-xs text-muted">钱包</p>
-                    <p className="mt-1 text-lg font-semibold">{player.clawPoints}</p>
+                <div className="mt-5 grid grid-cols-3 gap-3">
+                  <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.03] p-3">
+                    <p className="media-kicker">Wallet</p>
+                    <p className="mt-2 text-sm text-slate-200">{player.clawPoints}</p>
                   </div>
-                  <div className="rounded-[20px] border border-white/10 bg-white/5 p-3">
-                    <p className="text-xs text-muted">Elo</p>
-                    <p className="mt-1 text-lg font-semibold">{player.elo}</p>
+                  <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.03] p-3">
+                    <p className="media-kicker">Elo</p>
+                    <p className="mt-2 text-sm text-slate-200">{player.elo}</p>
                   </div>
-                  <div className="rounded-[20px] border border-white/10 bg-white/5 p-3">
-                    <p className="text-xs text-muted">Fame</p>
-                    <p className="mt-1 text-lg font-semibold">{player.fame.toLocaleString()}</p>
+                  <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.03] p-3">
+                    <p className="media-kicker">Fame</p>
+                    <p className="mt-2 text-sm text-slate-200">{player.fame.toLocaleString()}</p>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center justify-between">
+                <div className="mt-4 flex items-center justify-between">
                   <p className={`text-xs ${openClawStatusMeta[player.openClaw.status].tone}`}>
                     OpenClaw：{openClawStatusMeta[player.openClaw.status].label}
                   </p>
-                  <Link href={`/players/${player.slug}`} className="text-xs text-accentSecondary hover:text-accent">
-                    查看主页 →
+                  <Link href={`/players/${player.slug}`} className="text-sm font-semibold text-[#ffb9a9]">
+                    查看人物页 →
                   </Link>
                 </div>
               </SurfaceCard>
@@ -250,121 +239,70 @@ export default async function ReplayDetailPage({ params }: ReplayDetailPageProps
         </section>
 
         {debate ? (
-          <>
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold">辩论 PK 实录</h2>
+          <section className="space-y-4">
+            <div className="section-divider">
+              <span className="media-eyebrow">Debate Desk</span>
+            </div>
+            <SurfaceCard className="rounded-[2rem] p-6">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="headline-card text-[#f7f4ed]">辩论实录</h2>
                 {(() => {
-                  const debateStatus = debateStatusLabels[debate.status] ?? { label: debate.status, tone: "text-muted" };
-                  return <span className={`rounded-full bg-white/5 px-3 py-1 text-xs ${debateStatus.tone}`}>{debateStatus.label}</span>;
+                  const debateStatus = debateStatusLabels[debate.status] ?? { label: debate.status, tone: "text-slate-300" };
+                  return <span className={`pill-muted text-xs ${debateStatus.tone}`}>{debateStatus.label}</span>;
                 })()}
               </div>
-              <p className="text-sm text-muted">
-                轮次 {debate.currentRound}/{debate.totalRounds}
-                {(debate.rounds?.length ?? 0) > 0 ? ` · ${debate.rounds!.length} 条发言` : ""}
-              </p>
-            </div>
 
-            {debate.topic ? (
-              <SurfaceCard className="p-6">
-                <p className="text-xs text-accent">Polymarket 辩论议题</p>
-                <h3 className="mt-2 text-lg font-bold">{debate.topic.question}</h3>
-                {debate.topic.description ? (
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{debate.topic.description}</p>
-                ) : null}
-                <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-                  {debate.topic.outcomes.map((outcome, index) => (
-                    <div key={outcome}>
-                      <p className="text-xs text-muted">{outcome}</p>
-                      <p className="text-lg font-bold">{((debate.topic!.currentPrices[index] ?? 0) * 100).toFixed(1)}%</p>
+              {debate.topic ? (
+                <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5">
+                  <p className="media-kicker">Topic</p>
+                  <h3 className="mt-3 text-xl font-semibold text-[#f7f4ed]">{debate.topic.question}</h3>
+                  {debate.topic.description ? <p className="mt-3 text-sm leading-7 text-slate-400">{debate.topic.description}</p> : null}
+                </div>
+              ) : null}
+
+              <div className="mt-5 grid gap-4 xl:grid-cols-2">
+                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="media-kicker">Side A</p>
+                  <p className="mt-3 text-lg font-semibold text-[#f7f4ed]">{sideA?.name ?? debate.sideAPlayerSlug}</p>
+                </div>
+                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                  <p className="media-kicker">Side B</p>
+                  <p className="mt-3 text-lg font-semibold text-[#f7f4ed]">{sideB?.name ?? debate.sideBPlayerSlug}</p>
+                </div>
+              </div>
+
+              {(debate.rounds?.length ?? 0) > 0 ? (
+                <div className="mt-5 space-y-4">
+                  {Array.from(roundsByNumber.entries()).map(([roundNumber, entries = []]) => (
+                    <div key={roundNumber} className="space-y-3">
+                      <p className="media-kicker">Round {roundNumber}</p>
+                      {entries.map((entry) => {
+                        const isSideA = entry.side === "yes";
+                        const speaker = isSideA ? sideA : sideB;
+
+                        return (
+                          <div
+                            key={entry.id}
+                            className={`rounded-[1.3rem] border p-4 ${
+                              isSideA
+                                ? "border-[rgba(125,195,255,0.22)] bg-[rgba(125,195,255,0.06)]"
+                                : "border-[rgba(246,189,75,0.2)] bg-[rgba(246,189,75,0.06)]"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold text-[#f7f4ed]">{speaker?.name ?? entry.playerSlug}</span>
+                              <span className="text-xs text-slate-400">{entry.wordCount} 字</span>
+                            </div>
+                            <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-300">{entry.argument}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   ))}
-                  <div>
-                    <p className="text-xs text-muted">交易量</p>
-                    <p className="text-lg font-bold">${Math.round(debate.topic.volume).toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted">流动性</p>
-                    <p className="text-lg font-bold">${Math.round(debate.topic.liquidity).toLocaleString()}</p>
-                  </div>
                 </div>
-              </SurfaceCard>
-            ) : null}
-
-            <SurfaceCard>
-              <div className="grid grid-cols-3 items-center gap-4 text-center">
-                <div>
-                  <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-accent/20 text-lg font-bold text-accent">
-                    {sideA?.avatar ?? "A"}
-                  </div>
-                  <p className="font-bold">{sideA?.name ?? debate.sideAPlayerSlug}</p>
-                  <p className="text-xs text-accent">正方 (Yes)</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-black text-muted">VS</p>
-                </div>
-                <div>
-                  <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-accentSecondary/20 text-lg font-bold text-accentSecondary">
-                    {sideB?.avatar ?? "B"}
-                  </div>
-                  <p className="font-bold">{sideB?.name ?? debate.sideBPlayerSlug}</p>
-                  <p className="text-xs text-accentSecondary">反方 (No)</p>
-                </div>
-              </div>
+              ) : null}
             </SurfaceCard>
-
-            {(debate.rounds?.length ?? 0) === 0 ? (
-              <SurfaceCard>
-                <p className="py-6 text-center text-muted">暂无发言记录。</p>
-              </SurfaceCard>
-            ) : (
-              <div className="space-y-6">
-                {Array.from(roundsByNumber.entries()).map(([roundNumber, entries]) => (
-                  <div key={roundNumber} className="space-y-3">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-muted">第 {roundNumber} 轮</h3>
-                    {entries?.map((entry) => {
-                      const isSideA = entry.side === "yes";
-                      const speaker = isSideA ? sideA : sideB;
-
-                      return (
-                        <SurfaceCard
-                          key={entry.id}
-                          className={`border-l-2 ${isSideA ? "border-l-accent/50" : "border-l-accentSecondary/50"}`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div
-                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                                isSideA ? "bg-accent/20 text-accent" : "bg-accentSecondary/20 text-accentSecondary"
-                              }`}
-                            >
-                              {speaker?.avatar ?? (isSideA ? "A" : "B")}
-                            </div>
-                            <div className="flex-1">
-                              <div className="mb-1 flex items-center gap-2">
-                                <span className="text-sm font-bold">{speaker?.name ?? entry.playerSlug}</span>
-                                <span className={`text-xs ${isSideA ? "text-accent" : "text-accentSecondary"}`}>
-                                  {isSideA ? "正方" : "反方"}
-                                </span>
-                                <span className="text-xs text-muted">{entry.wordCount} 字</span>
-                              </div>
-                              <p className="whitespace-pre-wrap text-sm leading-relaxed">{entry.argument}</p>
-                            </div>
-                          </div>
-                        </SurfaceCard>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {debate.summary ? (
-              <SurfaceCard>
-                <h3 className="mb-2 text-sm font-bold uppercase tracking-wider">辩论总结</h3>
-                <p className="text-sm leading-relaxed">{debate.summary}</p>
-              </SurfaceCard>
-            ) : null}
-          </>
+          </section>
         ) : null}
 
         <section className="grid gap-4 md:grid-cols-2">

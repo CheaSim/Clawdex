@@ -315,6 +315,7 @@ export type PlayerWhereInput = {
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   wallet?: Prisma.XOR<Prisma.PlayerWalletNullableScalarRelationFilter, Prisma.PlayerWalletWhereInput> | null
   openClawAccount?: Prisma.XOR<Prisma.OpenClawAccountNullableScalarRelationFilter, Prisma.OpenClawAccountWhereInput> | null
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryListRelationFilter
   challengerMatches?: Prisma.ChallengeListRelationFilter
   defenderMatches?: Prisma.ChallengeListRelationFilter
   wonSettlements?: Prisma.ChallengeSettlementListRelationFilter
@@ -345,6 +346,7 @@ export type PlayerOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   wallet?: Prisma.PlayerWalletOrderByWithRelationInput
   openClawAccount?: Prisma.OpenClawAccountOrderByWithRelationInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryOrderByRelationAggregateInput
   challengerMatches?: Prisma.ChallengeOrderByRelationAggregateInput
   defenderMatches?: Prisma.ChallengeOrderByRelationAggregateInput
   wonSettlements?: Prisma.ChallengeSettlementOrderByRelationAggregateInput
@@ -378,6 +380,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   wallet?: Prisma.XOR<Prisma.PlayerWalletNullableScalarRelationFilter, Prisma.PlayerWalletWhereInput> | null
   openClawAccount?: Prisma.XOR<Prisma.OpenClawAccountNullableScalarRelationFilter, Prisma.OpenClawAccountWhereInput> | null
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryListRelationFilter
   challengerMatches?: Prisma.ChallengeListRelationFilter
   defenderMatches?: Prisma.ChallengeListRelationFilter
   wonSettlements?: Prisma.ChallengeSettlementListRelationFilter
@@ -454,6 +457,7 @@ export type PlayerCreateInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -484,6 +488,7 @@ export type PlayerUncheckedCreateInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -514,6 +519,7 @@ export type PlayerUpdateInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -544,6 +550,7 @@ export type PlayerUncheckedUpdateInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -910,6 +917,20 @@ export type PlayerUpdateOneRequiredWithoutDebatesAsSideBNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutDebatesAsSideBInput, Prisma.PlayerUpdateWithoutDebatesAsSideBInput>, Prisma.PlayerUncheckedUpdateWithoutDebatesAsSideBInput>
 }
 
+export type PlayerCreateNestedOneWithoutMatchmakingQueueEntriesInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutMatchmakingQueueEntriesInput, Prisma.PlayerUncheckedCreateWithoutMatchmakingQueueEntriesInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutMatchmakingQueueEntriesInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutMatchmakingQueueEntriesNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutMatchmakingQueueEntriesInput, Prisma.PlayerUncheckedCreateWithoutMatchmakingQueueEntriesInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutMatchmakingQueueEntriesInput
+  upsert?: Prisma.PlayerUpsertWithoutMatchmakingQueueEntriesInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutMatchmakingQueueEntriesInput, Prisma.PlayerUpdateWithoutMatchmakingQueueEntriesInput>, Prisma.PlayerUncheckedUpdateWithoutMatchmakingQueueEntriesInput>
+}
+
 export type PlayerCreateWithoutUserInput = {
   id?: string
   slug: string
@@ -929,6 +950,7 @@ export type PlayerCreateWithoutUserInput = {
   updatedAt?: Date | string
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -958,6 +980,7 @@ export type PlayerUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -1003,6 +1026,7 @@ export type PlayerUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -1032,6 +1056,7 @@ export type PlayerUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -1061,6 +1086,7 @@ export type PlayerCreateWithoutWalletInput = {
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -1090,6 +1116,7 @@ export type PlayerUncheckedCreateWithoutWalletInput = {
   updatedAt?: Date | string
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -1135,6 +1162,7 @@ export type PlayerUpdateWithoutWalletInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -1164,6 +1192,7 @@ export type PlayerUncheckedUpdateWithoutWalletInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -1193,6 +1222,7 @@ export type PlayerCreateWithoutOpenClawAccountInput = {
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -1222,6 +1252,7 @@ export type PlayerUncheckedCreateWithoutOpenClawAccountInput = {
   updatedAt?: Date | string
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -1267,6 +1298,7 @@ export type PlayerUpdateWithoutOpenClawAccountInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -1296,6 +1328,7 @@ export type PlayerUncheckedUpdateWithoutOpenClawAccountInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -1326,6 +1359,7 @@ export type PlayerCreateWithoutChallengerMatchesInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
   eventActors?: Prisma.ChallengeEventCreateNestedManyWithoutActorInput
@@ -1355,6 +1389,7 @@ export type PlayerUncheckedCreateWithoutChallengerMatchesInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
   eventActors?: Prisma.ChallengeEventUncheckedCreateNestedManyWithoutActorInput
@@ -1389,6 +1424,7 @@ export type PlayerCreateWithoutDefenderMatchesInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
   eventActors?: Prisma.ChallengeEventCreateNestedManyWithoutActorInput
@@ -1418,6 +1454,7 @@ export type PlayerUncheckedCreateWithoutDefenderMatchesInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
   eventActors?: Prisma.ChallengeEventUncheckedCreateNestedManyWithoutActorInput
@@ -1463,6 +1500,7 @@ export type PlayerUpdateWithoutChallengerMatchesInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
   eventActors?: Prisma.ChallengeEventUpdateManyWithoutActorNestedInput
@@ -1492,6 +1530,7 @@ export type PlayerUncheckedUpdateWithoutChallengerMatchesInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
   eventActors?: Prisma.ChallengeEventUncheckedUpdateManyWithoutActorNestedInput
@@ -1532,6 +1571,7 @@ export type PlayerUpdateWithoutDefenderMatchesInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
   eventActors?: Prisma.ChallengeEventUpdateManyWithoutActorNestedInput
@@ -1561,6 +1601,7 @@ export type PlayerUncheckedUpdateWithoutDefenderMatchesInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
   eventActors?: Prisma.ChallengeEventUncheckedUpdateManyWithoutActorNestedInput
@@ -1590,6 +1631,7 @@ export type PlayerCreateWithoutWonSettlementsInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   eventActors?: Prisma.ChallengeEventCreateNestedManyWithoutActorInput
@@ -1619,6 +1661,7 @@ export type PlayerUncheckedCreateWithoutWonSettlementsInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   eventActors?: Prisma.ChallengeEventUncheckedCreateNestedManyWithoutActorInput
@@ -1664,6 +1707,7 @@ export type PlayerUpdateWithoutWonSettlementsInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   eventActors?: Prisma.ChallengeEventUpdateManyWithoutActorNestedInput
@@ -1693,6 +1737,7 @@ export type PlayerUncheckedUpdateWithoutWonSettlementsInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   eventActors?: Prisma.ChallengeEventUncheckedUpdateManyWithoutActorNestedInput
@@ -1722,6 +1767,7 @@ export type PlayerCreateWithoutEventActorsInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -1751,6 +1797,7 @@ export type PlayerUncheckedCreateWithoutEventActorsInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -1796,6 +1843,7 @@ export type PlayerUpdateWithoutEventActorsInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -1825,6 +1873,7 @@ export type PlayerUncheckedUpdateWithoutEventActorsInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -1854,6 +1903,7 @@ export type PlayerCreateWithoutCastedVotesInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -1883,6 +1933,7 @@ export type PlayerUncheckedCreateWithoutCastedVotesInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -1917,6 +1968,7 @@ export type PlayerCreateWithoutSpectatorVotesInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -1946,6 +1998,7 @@ export type PlayerUncheckedCreateWithoutSpectatorVotesInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -1991,6 +2044,7 @@ export type PlayerUpdateWithoutCastedVotesInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -2020,6 +2074,7 @@ export type PlayerUncheckedUpdateWithoutCastedVotesInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -2060,6 +2115,7 @@ export type PlayerUpdateWithoutSpectatorVotesInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -2089,6 +2145,7 @@ export type PlayerUncheckedUpdateWithoutSpectatorVotesInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -2118,6 +2175,7 @@ export type PlayerCreateWithoutDebatesAsSideAInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -2147,6 +2205,7 @@ export type PlayerUncheckedCreateWithoutDebatesAsSideAInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -2181,6 +2240,7 @@ export type PlayerCreateWithoutDebatesAsSideBInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
@@ -2210,6 +2270,7 @@ export type PlayerUncheckedCreateWithoutDebatesAsSideBInput = {
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
   wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedCreateNestedManyWithoutPlayerInput
   challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
   defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
@@ -2255,6 +2316,7 @@ export type PlayerUpdateWithoutDebatesAsSideAInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -2284,6 +2346,7 @@ export type PlayerUncheckedUpdateWithoutDebatesAsSideAInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -2324,6 +2387,7 @@ export type PlayerUpdateWithoutDebatesAsSideBInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
@@ -2353,6 +2417,7 @@ export type PlayerUncheckedUpdateWithoutDebatesAsSideBInput = {
   user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
   wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
   openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  matchmakingQueueEntries?: Prisma.MatchmakingQueueEntryUncheckedUpdateManyWithoutPlayerNestedInput
   challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
   defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
   wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
@@ -2362,12 +2427,149 @@ export type PlayerUncheckedUpdateWithoutDebatesAsSideBInput = {
   debatesAsSideA?: Prisma.DebateUncheckedUpdateManyWithoutSideANestedInput
 }
 
+export type PlayerCreateWithoutMatchmakingQueueEntriesInput = {
+  id?: string
+  slug: string
+  name: string
+  title?: string | null
+  avatar?: string | null
+  elo?: number
+  fame?: number
+  streak?: number
+  winRate?: number
+  clawPoints?: number
+  preferredMode?: $Enums.MatchMode
+  bio?: string | null
+  tags?: Prisma.PlayerCreatetagsInput | string[]
+  recentMoments?: Prisma.PlayerCreaterecentMomentsInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutPlayerInput
+  wallet?: Prisma.PlayerWalletCreateNestedOneWithoutPlayerInput
+  openClawAccount?: Prisma.OpenClawAccountCreateNestedOneWithoutPlayerInput
+  challengerMatches?: Prisma.ChallengeCreateNestedManyWithoutChallengerInput
+  defenderMatches?: Prisma.ChallengeCreateNestedManyWithoutDefenderInput
+  wonSettlements?: Prisma.ChallengeSettlementCreateNestedManyWithoutWinnerInput
+  eventActors?: Prisma.ChallengeEventCreateNestedManyWithoutActorInput
+  spectatorVotes?: Prisma.SpectatorVoteCreateNestedManyWithoutPlayerInput
+  castedVotes?: Prisma.SpectatorVoteCreateNestedManyWithoutVoterInput
+  debatesAsSideA?: Prisma.DebateCreateNestedManyWithoutSideAInput
+  debatesAsSideB?: Prisma.DebateCreateNestedManyWithoutSideBInput
+}
+
+export type PlayerUncheckedCreateWithoutMatchmakingQueueEntriesInput = {
+  id?: string
+  slug: string
+  name: string
+  title?: string | null
+  avatar?: string | null
+  elo?: number
+  fame?: number
+  streak?: number
+  winRate?: number
+  clawPoints?: number
+  preferredMode?: $Enums.MatchMode
+  bio?: string | null
+  tags?: Prisma.PlayerCreatetagsInput | string[]
+  recentMoments?: Prisma.PlayerCreaterecentMomentsInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user?: Prisma.UserUncheckedCreateNestedOneWithoutPlayerInput
+  wallet?: Prisma.PlayerWalletUncheckedCreateNestedOneWithoutPlayerInput
+  openClawAccount?: Prisma.OpenClawAccountUncheckedCreateNestedOneWithoutPlayerInput
+  challengerMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutChallengerInput
+  defenderMatches?: Prisma.ChallengeUncheckedCreateNestedManyWithoutDefenderInput
+  wonSettlements?: Prisma.ChallengeSettlementUncheckedCreateNestedManyWithoutWinnerInput
+  eventActors?: Prisma.ChallengeEventUncheckedCreateNestedManyWithoutActorInput
+  spectatorVotes?: Prisma.SpectatorVoteUncheckedCreateNestedManyWithoutPlayerInput
+  castedVotes?: Prisma.SpectatorVoteUncheckedCreateNestedManyWithoutVoterInput
+  debatesAsSideA?: Prisma.DebateUncheckedCreateNestedManyWithoutSideAInput
+  debatesAsSideB?: Prisma.DebateUncheckedCreateNestedManyWithoutSideBInput
+}
+
+export type PlayerCreateOrConnectWithoutMatchmakingQueueEntriesInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutMatchmakingQueueEntriesInput, Prisma.PlayerUncheckedCreateWithoutMatchmakingQueueEntriesInput>
+}
+
+export type PlayerUpsertWithoutMatchmakingQueueEntriesInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutMatchmakingQueueEntriesInput, Prisma.PlayerUncheckedUpdateWithoutMatchmakingQueueEntriesInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutMatchmakingQueueEntriesInput, Prisma.PlayerUncheckedCreateWithoutMatchmakingQueueEntriesInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutMatchmakingQueueEntriesInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutMatchmakingQueueEntriesInput, Prisma.PlayerUncheckedUpdateWithoutMatchmakingQueueEntriesInput>
+}
+
+export type PlayerUpdateWithoutMatchmakingQueueEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  elo?: Prisma.IntFieldUpdateOperationsInput | number
+  fame?: Prisma.IntFieldUpdateOperationsInput | number
+  streak?: Prisma.IntFieldUpdateOperationsInput | number
+  winRate?: Prisma.FloatFieldUpdateOperationsInput | number
+  clawPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  preferredMode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.PlayerUpdatetagsInput | string[]
+  recentMoments?: Prisma.PlayerUpdaterecentMomentsInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
+  wallet?: Prisma.PlayerWalletUpdateOneWithoutPlayerNestedInput
+  openClawAccount?: Prisma.OpenClawAccountUpdateOneWithoutPlayerNestedInput
+  challengerMatches?: Prisma.ChallengeUpdateManyWithoutChallengerNestedInput
+  defenderMatches?: Prisma.ChallengeUpdateManyWithoutDefenderNestedInput
+  wonSettlements?: Prisma.ChallengeSettlementUpdateManyWithoutWinnerNestedInput
+  eventActors?: Prisma.ChallengeEventUpdateManyWithoutActorNestedInput
+  spectatorVotes?: Prisma.SpectatorVoteUpdateManyWithoutPlayerNestedInput
+  castedVotes?: Prisma.SpectatorVoteUpdateManyWithoutVoterNestedInput
+  debatesAsSideA?: Prisma.DebateUpdateManyWithoutSideANestedInput
+  debatesAsSideB?: Prisma.DebateUpdateManyWithoutSideBNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutMatchmakingQueueEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  elo?: Prisma.IntFieldUpdateOperationsInput | number
+  fame?: Prisma.IntFieldUpdateOperationsInput | number
+  streak?: Prisma.IntFieldUpdateOperationsInput | number
+  winRate?: Prisma.FloatFieldUpdateOperationsInput | number
+  clawPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  preferredMode?: Prisma.EnumMatchModeFieldUpdateOperationsInput | $Enums.MatchMode
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.PlayerUpdatetagsInput | string[]
+  recentMoments?: Prisma.PlayerUpdaterecentMomentsInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUncheckedUpdateOneWithoutPlayerNestedInput
+  wallet?: Prisma.PlayerWalletUncheckedUpdateOneWithoutPlayerNestedInput
+  openClawAccount?: Prisma.OpenClawAccountUncheckedUpdateOneWithoutPlayerNestedInput
+  challengerMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutChallengerNestedInput
+  defenderMatches?: Prisma.ChallengeUncheckedUpdateManyWithoutDefenderNestedInput
+  wonSettlements?: Prisma.ChallengeSettlementUncheckedUpdateManyWithoutWinnerNestedInput
+  eventActors?: Prisma.ChallengeEventUncheckedUpdateManyWithoutActorNestedInput
+  spectatorVotes?: Prisma.SpectatorVoteUncheckedUpdateManyWithoutPlayerNestedInput
+  castedVotes?: Prisma.SpectatorVoteUncheckedUpdateManyWithoutVoterNestedInput
+  debatesAsSideA?: Prisma.DebateUncheckedUpdateManyWithoutSideANestedInput
+  debatesAsSideB?: Prisma.DebateUncheckedUpdateManyWithoutSideBNestedInput
+}
+
 
 /**
  * Count Type PlayerCountOutputType
  */
 
 export type PlayerCountOutputType = {
+  matchmakingQueueEntries: number
   challengerMatches: number
   defenderMatches: number
   wonSettlements: number
@@ -2379,6 +2581,7 @@ export type PlayerCountOutputType = {
 }
 
 export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  matchmakingQueueEntries?: boolean | PlayerCountOutputTypeCountMatchmakingQueueEntriesArgs
   challengerMatches?: boolean | PlayerCountOutputTypeCountChallengerMatchesArgs
   defenderMatches?: boolean | PlayerCountOutputTypeCountDefenderMatchesArgs
   wonSettlements?: boolean | PlayerCountOutputTypeCountWonSettlementsArgs
@@ -2397,6 +2600,13 @@ export type PlayerCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
    * Select specific fields to fetch from the PlayerCountOutputType
    */
   select?: Prisma.PlayerCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountMatchmakingQueueEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MatchmakingQueueEntryWhereInput
 }
 
 /**
@@ -2476,6 +2686,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   user?: boolean | Prisma.Player$userArgs<ExtArgs>
   wallet?: boolean | Prisma.Player$walletArgs<ExtArgs>
   openClawAccount?: boolean | Prisma.Player$openClawAccountArgs<ExtArgs>
+  matchmakingQueueEntries?: boolean | Prisma.Player$matchmakingQueueEntriesArgs<ExtArgs>
   challengerMatches?: boolean | Prisma.Player$challengerMatchesArgs<ExtArgs>
   defenderMatches?: boolean | Prisma.Player$defenderMatchesArgs<ExtArgs>
   wonSettlements?: boolean | Prisma.Player$wonSettlementsArgs<ExtArgs>
@@ -2549,6 +2760,7 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   user?: boolean | Prisma.Player$userArgs<ExtArgs>
   wallet?: boolean | Prisma.Player$walletArgs<ExtArgs>
   openClawAccount?: boolean | Prisma.Player$openClawAccountArgs<ExtArgs>
+  matchmakingQueueEntries?: boolean | Prisma.Player$matchmakingQueueEntriesArgs<ExtArgs>
   challengerMatches?: boolean | Prisma.Player$challengerMatchesArgs<ExtArgs>
   defenderMatches?: boolean | Prisma.Player$defenderMatchesArgs<ExtArgs>
   wonSettlements?: boolean | Prisma.Player$wonSettlementsArgs<ExtArgs>
@@ -2568,6 +2780,7 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     user: Prisma.$UserPayload<ExtArgs> | null
     wallet: Prisma.$PlayerWalletPayload<ExtArgs> | null
     openClawAccount: Prisma.$OpenClawAccountPayload<ExtArgs> | null
+    matchmakingQueueEntries: Prisma.$MatchmakingQueueEntryPayload<ExtArgs>[]
     challengerMatches: Prisma.$ChallengePayload<ExtArgs>[]
     defenderMatches: Prisma.$ChallengePayload<ExtArgs>[]
     wonSettlements: Prisma.$ChallengeSettlementPayload<ExtArgs>[]
@@ -2991,6 +3204,7 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   user<T extends Prisma.Player$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   wallet<T extends Prisma.Player$walletArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$walletArgs<ExtArgs>>): Prisma.Prisma__PlayerWalletClient<runtime.Types.Result.GetResult<Prisma.$PlayerWalletPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   openClawAccount<T extends Prisma.Player$openClawAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$openClawAccountArgs<ExtArgs>>): Prisma.Prisma__OpenClawAccountClient<runtime.Types.Result.GetResult<Prisma.$OpenClawAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  matchmakingQueueEntries<T extends Prisma.Player$matchmakingQueueEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$matchmakingQueueEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchmakingQueueEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   challengerMatches<T extends Prisma.Player$challengerMatchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$challengerMatchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   defenderMatches<T extends Prisma.Player$defenderMatchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$defenderMatchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   wonSettlements<T extends Prisma.Player$wonSettlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$wonSettlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengeSettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3491,6 +3705,30 @@ export type Player$openClawAccountArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.OpenClawAccountInclude<ExtArgs> | null
   where?: Prisma.OpenClawAccountWhereInput
+}
+
+/**
+ * Player.matchmakingQueueEntries
+ */
+export type Player$matchmakingQueueEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MatchmakingQueueEntry
+   */
+  select?: Prisma.MatchmakingQueueEntrySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MatchmakingQueueEntry
+   */
+  omit?: Prisma.MatchmakingQueueEntryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MatchmakingQueueEntryInclude<ExtArgs> | null
+  where?: Prisma.MatchmakingQueueEntryWhereInput
+  orderBy?: Prisma.MatchmakingQueueEntryOrderByWithRelationInput | Prisma.MatchmakingQueueEntryOrderByWithRelationInput[]
+  cursor?: Prisma.MatchmakingQueueEntryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MatchmakingQueueEntryScalarFieldEnum | Prisma.MatchmakingQueueEntryScalarFieldEnum[]
 }
 
 /**

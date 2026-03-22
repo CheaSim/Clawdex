@@ -9,10 +9,16 @@ import {
   type AcceptChallengePayload,
   type CreateChallengePayload,
   type CreateDebatePayload,
+  type JoinMatchmakingPayload,
+  type LeaveMatchmakingPayload,
+  type MatchmakingFeedRecord,
+  type MatchmakingQueueEntry,
+  type MatchmakingStatusRecord,
   type MatchListing,
   type MockDatabase,
   type OpenClawIntegration,
   type PlayerProfile,
+  type ReadyChallengePayload,
   type SettleChallengePayload,
   type SubmitArgumentPayload,
   type UpdateOpenClawPayload,
@@ -29,6 +35,9 @@ async function getPrismaDb() {
 function cloneSeedDatabase() {
   return JSON.parse(JSON.stringify(seedDatabase)) as MockDatabase;
 }
+
+const MATCHMAKING_ELO_THRESHOLD = 150;
+const MATCHMAKING_WAIT_BASE_SECONDS = 45;
 
 function normalizeOpenClawIntegration(
   integration: Partial<OpenClawIntegration> | undefined,
@@ -102,6 +111,7 @@ async function readDatabase() {
   const normalizedDatabase: MockDatabase = {
     players: normalizedPlayers,
     challenges: parsed.challenges ?? seedDatabase.challenges,
+    matchmakingQueue: parsed.matchmakingQueue ?? seedDatabase.matchmakingQueue ?? [],
   };
 
   if (JSON.stringify(parsed) !== JSON.stringify(normalizedDatabase)) {
@@ -174,6 +184,57 @@ export async function getChallengeById(id: string) {
   return database.challenges.find((challenge) => challenge.id === id) ?? null;
 }
 
+function getPlayerActiveChallenge(database: MockDatabase, playerSlug: string) {
+  return database.challenges.find((challenge) => {
+    if (![challenge.challengerSlug, challenge.defenderSlug].includes(playerSlug)) {
+      return false;
+    }
+
+    return challenge.status === "pending" || challenge.status === "accepted" || challenge.status === "live";
+  }) ?? null;
+}
+
+function getActiveQueueEntry(database: MockDatabase, playerSlug: string) {
+  return (database.matchmakingQueue ?? []).find((entry) => entry.playerSlug === playerSlug && entry.status !== "cancelled") ?? null;
+}
+
+function getCompatibleQueueOpponent(
+  database: MockDatabase,
+  player: PlayerProfile,
+  payload: JoinMatchmakingPayload,
+) {
+  return (database.matchmakingQueue ?? []).find((entry) => {
+    if (entry.playerSlug === player.slug || entry.status !== "queued") {
+      return false;
+    }
+
+    if (entry.mode !== payload.mode || entry.stake !== payload.stake) {
+      return false;
+    }
+
+    const opponent = database.players.find((candidate) => candidate.slug === entry.playerSlug);
+
+    if (!opponent || !isPlayerOpenClawReady(opponent)) {
+      return false;
+    }
+
+    return Math.abs(opponent.elo - player.elo) <= MATCHMAKING_ELO_THRESHOLD;
+  }) ?? null;
+}
+
+function buildQueueEntry(payload: JoinMatchmakingPayload): MatchmakingQueueEntry {
+  return {
+    id: `queue-${Date.now()}-${payload.playerSlug}`,
+    playerSlug: payload.playerSlug,
+    mode: payload.mode,
+    stake: payload.stake,
+    status: "queued",
+    createdAt: new Date().toISOString(),
+    sourceChannel: payload.sourceChannel,
+    sourceSessionId: payload.sourceSessionId,
+  };
+}
+
 export async function createChallengeRecord(payload: CreateChallengePayload) {
   if (isPrismaBackendEnabled()) {
     const prismaDb = await getPrismaDb();
@@ -217,6 +278,200 @@ export async function createChallengeRecord(payload: CreateChallengePayload) {
   await writeDatabase(database);
 
   return { challenge, challenger, defender };
+}
+
+export async function joinMatchmakingQueueRecord(payload: JoinMatchmakingPayload): Promise<MatchmakingStatusRecord> {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.joinMatchmakingQueueRecordInPrisma(payload);
+  }
+
+  const database = await readDatabase();
+  const player = database.players.find((entry) => entry.slug === payload.playerSlug);
+
+  if (!player) {
+    throw new Error("Player not found");
+  }
+
+  assertPlayerReadyForBattle(player, "进入匹配");
+
+  if (player.clawPoints < payload.stake) {
+    throw new Error(`${player.name} wallet balance is too low for stake ${payload.stake}`);
+  }
+
+  if (getPlayerActiveChallenge(database, player.slug)) {
+    throw new Error(`${player.name} already has an active challenge`);
+  }
+
+  const existing = getActiveQueueEntry(database, player.slug);
+
+  if (existing?.status === "matched" && existing.challengeId) {
+    return {
+      playerSlug: player.slug,
+      status: "matched",
+      queueEntry: existing,
+      challenge: database.challenges.find((challenge) => challenge.id === existing.challengeId),
+    };
+  }
+
+  if (existing?.status === "queued") {
+    existing.mode = payload.mode;
+    existing.stake = payload.stake;
+    existing.sourceChannel = payload.sourceChannel ?? existing.sourceChannel;
+    existing.sourceSessionId = payload.sourceSessionId ?? existing.sourceSessionId;
+  } else if (!existing) {
+    (database.matchmakingQueue ??= []).push(buildQueueEntry(payload));
+  }
+
+  const queueEntry = getActiveQueueEntry(database, player.slug);
+
+  if (!queueEntry) {
+    throw new Error("Failed to create matchmaking queue entry");
+  }
+
+  const opponentEntry = getCompatibleQueueOpponent(database, player, payload);
+
+  if (!opponentEntry) {
+    await writeDatabase(database);
+    return {
+      playerSlug: player.slug,
+      status: "queued",
+      queueEntry,
+    };
+  }
+
+  const opponent = database.players.find((entry) => entry.slug === opponentEntry.playerSlug);
+
+  if (!opponent) {
+    throw new Error("Matched opponent not found");
+  }
+
+  const challengerSlug = queueEntry.createdAt <= opponentEntry.createdAt ? queueEntry.playerSlug : opponentEntry.playerSlug;
+  const defenderSlug = challengerSlug === queueEntry.playerSlug ? opponentEntry.playerSlug : queueEntry.playerSlug;
+  const sourceChannel = payload.sourceChannel ?? queueEntry.sourceChannel ?? opponentEntry.sourceChannel;
+  const sourceSessionId = payload.sourceSessionId ?? queueEntry.sourceSessionId ?? opponentEntry.sourceSessionId;
+
+  await writeDatabase(database);
+
+  const { challenge } = await createChallengeRecord({
+    challengerSlug,
+    defenderSlug,
+    mode: payload.mode,
+    stake: payload.stake,
+    scheduledFor: "Matchmaking ready now",
+    visibility: "public",
+    rulesNote: "Auto-created by OpenClaw matchmaking queue",
+  });
+
+  const accepted = await acceptChallengeFromPluginRecord(challenge.id, {
+    defenderSlug,
+    sourceChannel,
+    sourceSessionId,
+  });
+
+  const latestDatabase = await readDatabase();
+  const latestQueue = latestDatabase.matchmakingQueue ?? [];
+  const matchedAt = new Date().toISOString();
+
+  for (const entry of latestQueue) {
+    if (entry.id === queueEntry.id || entry.id === opponentEntry.id) {
+      entry.status = "matched";
+      entry.matchedAt = matchedAt;
+      entry.challengeId = accepted.challenge.id;
+      entry.sourceChannel = sourceChannel ?? entry.sourceChannel;
+      entry.sourceSessionId = sourceSessionId ?? entry.sourceSessionId;
+    }
+  }
+
+  await writeDatabase(latestDatabase);
+
+  return {
+    playerSlug: player.slug,
+    status: "matched",
+    queueEntry: latestQueue.find((entry) => entry.id === queueEntry.id),
+    challenge: accepted.challenge,
+  };
+}
+
+export async function leaveMatchmakingQueueRecord(payload: LeaveMatchmakingPayload) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.leaveMatchmakingQueueRecordInPrisma(payload);
+  }
+
+  const database = await readDatabase();
+  const queueEntry = getActiveQueueEntry(database, payload.playerSlug);
+
+  if (!queueEntry) {
+    return { playerSlug: payload.playerSlug, status: "idle" as const };
+  }
+
+  queueEntry.status = "cancelled";
+  queueEntry.cancelledAt = new Date().toISOString();
+
+  await writeDatabase(database);
+
+  return {
+    playerSlug: payload.playerSlug,
+    status: "cancelled" as const,
+    queueEntry,
+  };
+}
+
+export async function getMatchmakingStatusRecord(playerSlug: string): Promise<MatchmakingStatusRecord> {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.getMatchmakingStatusRecordFromPrisma(playerSlug);
+  }
+
+  const database = await readDatabase();
+  const queueEntry = getActiveQueueEntry(database, playerSlug);
+
+  if (!queueEntry) {
+    return { playerSlug, status: "idle" };
+  }
+
+  return {
+    playerSlug,
+    status: queueEntry.status,
+    queueEntry,
+    challenge: queueEntry.challengeId
+      ? database.challenges.find((challenge) => challenge.id === queueEntry.challengeId)
+      : undefined,
+  };
+}
+
+export async function getMatchmakingFeedRecord(): Promise<MatchmakingFeedRecord> {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.getMatchmakingFeedRecordFromPrisma();
+  }
+
+  const database = await readDatabase();
+  const queue = (database.matchmakingQueue ?? []).filter((entry) => entry.status === "queued");
+  const readyPlayers = database.players.filter((player) => player.openClaw.status === "ready");
+  const modes = ["public-arena", "rivalry", "ranked-1v1"] as const;
+
+  return {
+    generatedAt: new Date().toISOString(),
+    recommendedModes: readyPlayers
+      .slice()
+      .sort((left, right) => right.elo - left.elo)
+      .map((player) => player.preferredMode)
+      .filter((mode, index, list) => list.indexOf(mode) === index)
+      .slice(0, 3),
+    summaries: modes.map((mode) => {
+      const queueCount = queue.filter((entry) => entry.mode === mode).length;
+      const readyCount = readyPlayers.filter((player) => player.preferredMode === mode).length;
+
+      return {
+        mode,
+        queueCount,
+        readyPlayers: readyCount,
+        estimatedWaitSeconds: queueCount > 0 ? MATCHMAKING_WAIT_BASE_SECONDS : MATCHMAKING_WAIT_BASE_SECONDS * 2,
+      };
+    }),
+  };
 }
 
 export async function acceptChallengeRecord(id: string) {
@@ -384,6 +639,46 @@ export async function settleChallengeRecord(id: string, payload: SettleChallenge
   await writeDatabase(database);
 
   return challenge;
+}
+
+export async function markChallengeReadyFromPluginRecord(id: string, payload?: ReadyChallengePayload) {
+  if (isPrismaBackendEnabled()) {
+    const prismaDb = await getPrismaDb();
+    return prismaDb.markChallengeReadyFromPluginRecordInPrisma(id, payload);
+  }
+
+  const database = await readDatabase();
+  const challenge = database.challenges.find((item) => item.id === id);
+
+  if (!challenge) {
+    throw new Error("Challenge not found");
+  }
+
+  if (challenge.status !== "accepted") {
+    throw new Error("Challenge is not ready to start");
+  }
+
+  challenge.status = "live";
+  challenge.sourceChannel = payload?.sourceChannel ?? challenge.sourceChannel ?? "clawdex-channel";
+  challenge.sourceSessionId = payload?.sourceSessionId ?? challenge.sourceSessionId;
+
+  await writeDatabase(database);
+  return challenge;
+}
+
+export async function reportChallengeResultFromPluginRecord(id: string, payload: SettleChallengePayload) {
+  return settleChallengeRecord(id, payload);
+}
+
+export async function resetMockDatabaseForTests(options?: { emptyChallenges?: boolean }) {
+  const database = cloneSeedDatabase();
+
+  if (options?.emptyChallenges) {
+    database.challenges = [];
+    database.matchmakingQueue = [];
+  }
+
+  await writeDatabase(database);
 }
 
 export async function getDataStoreStatus() {

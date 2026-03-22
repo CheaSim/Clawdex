@@ -1,4 +1,12 @@
-import { ChallengeStatus, MatchMode, OpenClawConnectionStatus, OpenClawRegion, WalletLedgerType, type Prisma } from "@/generated/prisma/client";
+import {
+  ChallengeStatus,
+  MatchMode,
+  MatchmakingQueueStatus,
+  OpenClawConnectionStatus,
+  OpenClawRegion,
+  WalletLedgerType,
+  type Prisma,
+} from "@/generated/prisma/client";
 
 import {
   challengeStatusMeta,
@@ -6,9 +14,15 @@ import {
   isPlayerOpenClawReady,
   type AcceptChallengePayload,
   type CreateChallengePayload,
+  type JoinMatchmakingPayload,
+  type LeaveMatchmakingPayload,
+  type MatchmakingFeedRecord,
+  type MatchmakingQueueEntry,
+  type MatchmakingStatusRecord,
   type MatchListing,
   type OpenClawIntegration,
   type PlayerProfile,
+  type ReadyChallengePayload,
   type SettleChallengePayload,
   type UpdateOpenClawPayload,
 } from "@/data/product-data";
@@ -46,6 +60,21 @@ const openClawStatusToPrisma: Record<OpenClawIntegration["status"], OpenClawConn
   disconnected: OpenClawConnectionStatus.DISCONNECTED,
   configured: OpenClawConnectionStatus.CONFIGURED,
   ready: OpenClawConnectionStatus.READY,
+};
+
+type WalletSnapshot = {
+  id: string;
+  availableBalance: number;
+  lockedBalance: number;
+};
+
+const MATCHMAKING_ELO_THRESHOLD = 150;
+const MATCHMAKING_WAIT_BASE_SECONDS = 45;
+
+const matchmakingStatusFromPrisma: Record<MatchmakingQueueStatus, MatchmakingQueueEntry["status"]> = {
+  [MatchmakingQueueStatus.QUEUED]: "queued",
+  [MatchmakingQueueStatus.MATCHED]: "matched",
+  [MatchmakingQueueStatus.CANCELLED]: "cancelled",
 };
 
 function mapRegion(region: OpenClawRegion): OpenClawIntegration["region"] {
@@ -106,6 +135,24 @@ function buildMatchListing(challenge: Prisma.ChallengeGetPayload<{}>): MatchList
   };
 }
 
+function buildMatchmakingQueueEntry(
+  entry: Prisma.MatchmakingQueueEntryGetPayload<{ include: { player: true } }>,
+): MatchmakingQueueEntry {
+  return {
+    id: entry.id,
+    playerSlug: entry.player.slug,
+    mode: modeFromPrisma[entry.mode],
+    stake: entry.stake,
+    status: matchmakingStatusFromPrisma[entry.status],
+    createdAt: entry.createdAt.toISOString(),
+    matchedAt: entry.matchedAt?.toISOString(),
+    cancelledAt: entry.cancelledAt?.toISOString(),
+    challengeId: entry.challengeId ?? undefined,
+    sourceChannel: entry.sourceChannel ?? undefined,
+    sourceSessionId: entry.sourceSessionId ?? undefined,
+  };
+}
+
 function createStoryline(payload: CreateChallengePayload, challenger: PlayerProfile, defender: PlayerProfile) {
   const modeLabel = getModeLabel(payload.mode);
   return `${challenger.name} 发起一场${modeLabel}，目标是从 ${defender.name} 手里抢走更高曝光和奖励池。`;
@@ -115,6 +162,37 @@ function assertPlayerReadyForBattle(player: PlayerProfile, actionLabel: string) 
   if (!isPlayerOpenClawReady(player)) {
     throw new Error(`${player.name} 尚未完成 OpenClaw 通道校验，暂时不能${actionLabel}。`);
   }
+}
+
+async function ensureWalletSnapshot(
+  tx: Prisma.TransactionClient,
+  playerId: string,
+  currentClawPoints: number,
+  fallbackLockedBalance = 0,
+) {
+  const wallet = await tx.playerWallet.upsert({
+    where: { playerId },
+    create: {
+      playerId,
+      availableBalance: currentClawPoints,
+      lockedBalance: fallbackLockedBalance,
+      lastSyncedAt: new Date(),
+    },
+    update: fallbackLockedBalance > 0
+      ? {
+          lockedBalance: fallbackLockedBalance,
+          lastSyncedAt: new Date(),
+        }
+      : {
+          lastSyncedAt: new Date(),
+        },
+  });
+
+  return {
+    id: wallet.id,
+    availableBalance: wallet.availableBalance,
+    lockedBalance: wallet.lockedBalance,
+  } satisfies WalletSnapshot;
 }
 
 async function getChallengeWithParticipants(id: string) {
@@ -202,9 +280,22 @@ export async function createChallengeRecordInPrisma(payload: CreateChallengePayl
   const preview = buildSettlementPreview(payload);
 
   const challenge = await prisma.$transaction(async (tx) => {
+    const challengerWallet = await ensureWalletSnapshot(tx, challengerRecord.id, challenger.clawPoints);
+    const lockedBalanceAfter = challengerWallet.lockedBalance + payload.stake;
+    const availableBalanceAfter = challengerWallet.availableBalance - payload.stake;
+
     await tx.player.update({
       where: { id: challengerRecord.id },
       data: { clawPoints: { decrement: payload.stake } },
+    });
+
+    await tx.playerWallet.update({
+      where: { id: challengerWallet.id },
+      data: {
+        availableBalance: availableBalanceAfter,
+        lockedBalance: lockedBalanceAfter,
+        lastSyncedAt: new Date(),
+      },
     });
 
     const created = await tx.challenge.create({
@@ -224,6 +315,23 @@ export async function createChallengeRecordInPrisma(payload: CreateChallengePayl
       include: {
         challenger: { include: { openClawAccount: true } },
         defender: { include: { openClawAccount: true } },
+      },
+    });
+
+    await tx.walletLedger.create({
+      data: {
+        walletId: challengerWallet.id,
+        challengeId: created.id,
+        type: WalletLedgerType.CHALLENGE_LOCK,
+        delta: -payload.stake,
+        balanceAfter: availableBalanceAfter,
+        reason: `挑战创建锁定 (${payload.mode})`,
+        metadata: {
+          availableBalanceAfter,
+          lockedBalanceAfter,
+          playerSlug: challenger.slug,
+          stage: "challenge-created",
+        },
       },
     });
 
@@ -272,9 +380,22 @@ export async function acceptChallengeRecordInPrisma(id: string) {
   }
 
   const updated = await prisma.$transaction(async (tx) => {
+    const defenderWallet = await ensureWalletSnapshot(tx, challenge.defender.id, defender.clawPoints);
+    const lockedBalanceAfter = defenderWallet.lockedBalance + challenge.stake;
+    const availableBalanceAfter = defenderWallet.availableBalance - challenge.stake;
+
     await tx.player.update({
       where: { id: challenge.defender.id },
       data: { clawPoints: { decrement: challenge.stake } },
+    });
+
+    await tx.playerWallet.update({
+      where: { id: defenderWallet.id },
+      data: {
+        availableBalance: availableBalanceAfter,
+        lockedBalance: lockedBalanceAfter,
+        lastSyncedAt: new Date(),
+      },
     });
 
     const accepted = await tx.challenge.update({
@@ -288,6 +409,23 @@ export async function acceptChallengeRecordInPrisma(id: string) {
       include: {
         challenger: { include: { openClawAccount: true } },
         defender: { include: { openClawAccount: true } },
+      },
+    });
+
+    await tx.walletLedger.create({
+      data: {
+        walletId: defenderWallet.id,
+        challengeId: id,
+        type: WalletLedgerType.CHALLENGE_LOCK,
+        delta: -challenge.stake,
+        balanceAfter: availableBalanceAfter,
+        reason: `挑战接战锁定 (${modeFromPrisma[challenge.mode]})`,
+        metadata: {
+          availableBalanceAfter,
+          lockedBalanceAfter,
+          playerSlug: defender.slug,
+          stage: "challenge-accepted",
+        },
       },
     });
 
@@ -338,6 +476,249 @@ export async function acceptChallengeFromPluginRecordInPrisma(id: string, payloa
   }
 
   return result;
+}
+
+export async function joinMatchmakingQueueRecordInPrisma(payload: JoinMatchmakingPayload): Promise<MatchmakingStatusRecord> {
+  const player = await prisma.player.findUnique({
+    where: { slug: payload.playerSlug },
+    include: { openClawAccount: true },
+  });
+
+  if (!player) {
+    throw new Error("Player not found");
+  }
+
+  const playerProfile = buildPlayerProfile(player);
+  assertPlayerReadyForBattle(playerProfile, "进入匹配");
+
+  if (playerProfile.clawPoints < payload.stake) {
+    throw new Error(`${playerProfile.name} wallet balance is too low for stake ${payload.stake}`);
+  }
+
+  const activeChallenge = await prisma.challenge.findFirst({
+    where: {
+      OR: [{ challengerId: player.id }, { defenderId: player.id }],
+      status: { in: [ChallengeStatus.PENDING, ChallengeStatus.ACCEPTED, ChallengeStatus.LIVE] },
+    },
+  });
+
+  if (activeChallenge) {
+    throw new Error(`${playerProfile.name} already has an active challenge`);
+  }
+
+  let queueEntry = await prisma.matchmakingQueueEntry.findFirst({
+    where: {
+      playerId: player.id,
+      status: { not: MatchmakingQueueStatus.CANCELLED },
+    },
+    include: { player: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (queueEntry?.status === MatchmakingQueueStatus.MATCHED && queueEntry.challengeId) {
+    return {
+      playerSlug: payload.playerSlug,
+      status: "matched",
+      queueEntry: buildMatchmakingQueueEntry(queueEntry),
+      challenge: (await getChallengeByIdFromPrisma(queueEntry.challengeId)) ?? undefined,
+    };
+  }
+
+  if (queueEntry?.status === MatchmakingQueueStatus.QUEUED) {
+    queueEntry = await prisma.matchmakingQueueEntry.update({
+      where: { id: queueEntry.id },
+      data: {
+        mode: modeToPrisma[payload.mode],
+        stake: payload.stake,
+        sourceChannel: payload.sourceChannel ?? queueEntry.sourceChannel,
+        sourceSessionId: payload.sourceSessionId ?? queueEntry.sourceSessionId,
+      },
+      include: { player: true },
+    });
+  } else if (!queueEntry) {
+    queueEntry = await prisma.matchmakingQueueEntry.create({
+      data: {
+        playerId: player.id,
+        mode: modeToPrisma[payload.mode],
+        stake: payload.stake,
+        status: MatchmakingQueueStatus.QUEUED,
+        sourceChannel: payload.sourceChannel ?? "clawdex-channel",
+        sourceSessionId: payload.sourceSessionId,
+      },
+      include: { player: true },
+    });
+  }
+
+  const opponentEntry = await prisma.matchmakingQueueEntry.findFirst({
+    where: {
+      id: { not: queueEntry.id },
+      mode: modeToPrisma[payload.mode],
+      stake: payload.stake,
+      status: MatchmakingQueueStatus.QUEUED,
+      player: {
+        openClawAccount: {
+          status: OpenClawConnectionStatus.READY,
+        },
+      },
+    },
+    include: {
+      player: {
+        include: { openClawAccount: true },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  if (!opponentEntry || Math.abs(opponentEntry.player.elo - player.elo) > MATCHMAKING_ELO_THRESHOLD) {
+    return {
+      playerSlug: payload.playerSlug,
+      status: "queued",
+      queueEntry: buildMatchmakingQueueEntry(queueEntry),
+    };
+  }
+
+  const challengerSlug = queueEntry.createdAt <= opponentEntry.createdAt ? queueEntry.player.slug : opponentEntry.player.slug;
+  const defenderSlug = challengerSlug === queueEntry.player.slug ? opponentEntry.player.slug : queueEntry.player.slug;
+  const sourceChannel = payload.sourceChannel ?? queueEntry.sourceChannel ?? opponentEntry.sourceChannel ?? "clawdex-channel";
+  const sourceSessionId = payload.sourceSessionId ?? queueEntry.sourceSessionId ?? opponentEntry.sourceSessionId ?? undefined;
+
+  const created = await createChallengeRecordInPrisma({
+    challengerSlug,
+    defenderSlug,
+    mode: payload.mode,
+    stake: payload.stake,
+    scheduledFor: "Matchmaking ready now",
+    visibility: "public",
+    rulesNote: "Auto-created by OpenClaw matchmaking queue",
+  });
+
+  const accepted = await acceptChallengeFromPluginRecordInPrisma(created.challenge.id, {
+    defenderSlug,
+    sourceChannel,
+    sourceSessionId,
+  });
+
+  await prisma.matchmakingQueueEntry.updateMany({
+    where: { id: { in: [queueEntry.id, opponentEntry.id] } },
+    data: {
+      status: MatchmakingQueueStatus.MATCHED,
+      matchedAt: new Date(),
+      challengeId: accepted.challenge.id,
+      sourceChannel,
+      sourceSessionId,
+    },
+  });
+
+  const updatedQueueEntry = await prisma.matchmakingQueueEntry.findUnique({
+    where: { id: queueEntry.id },
+    include: { player: true },
+  });
+
+  return {
+    playerSlug: payload.playerSlug,
+    status: "matched",
+    queueEntry: updatedQueueEntry ? buildMatchmakingQueueEntry(updatedQueueEntry) : undefined,
+    challenge: accepted.challenge,
+  };
+}
+
+export async function leaveMatchmakingQueueRecordInPrisma(payload: LeaveMatchmakingPayload) {
+  const player = await prisma.player.findUnique({ where: { slug: payload.playerSlug } });
+
+  if (!player) {
+    return { playerSlug: payload.playerSlug, status: "idle" as const };
+  }
+
+  const queueEntry = await prisma.matchmakingQueueEntry.findFirst({
+    where: {
+      playerId: player.id,
+      status: { not: MatchmakingQueueStatus.CANCELLED },
+    },
+    include: { player: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (!queueEntry) {
+    return { playerSlug: payload.playerSlug, status: "idle" as const };
+  }
+
+  const cancelled = await prisma.matchmakingQueueEntry.update({
+    where: { id: queueEntry.id },
+    data: {
+      status: MatchmakingQueueStatus.CANCELLED,
+      cancelledAt: new Date(),
+    },
+    include: { player: true },
+  });
+
+  return {
+    playerSlug: payload.playerSlug,
+    status: "cancelled" as const,
+    queueEntry: buildMatchmakingQueueEntry(cancelled),
+  };
+}
+
+export async function getMatchmakingStatusRecordFromPrisma(playerSlug: string): Promise<MatchmakingStatusRecord> {
+  const player = await prisma.player.findUnique({ where: { slug: playerSlug } });
+
+  if (!player) {
+    return { playerSlug, status: "idle" };
+  }
+
+  const queueEntry = await prisma.matchmakingQueueEntry.findFirst({
+    where: {
+      playerId: player.id,
+      status: { not: MatchmakingQueueStatus.CANCELLED },
+    },
+    include: { player: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (!queueEntry) {
+    return { playerSlug, status: "idle" };
+  }
+
+  return {
+    playerSlug,
+    status: buildMatchmakingQueueEntry(queueEntry).status,
+    queueEntry: buildMatchmakingQueueEntry(queueEntry),
+    challenge: queueEntry.challengeId ? (await getChallengeByIdFromPrisma(queueEntry.challengeId)) ?? undefined : undefined,
+  };
+}
+
+export async function getMatchmakingFeedRecordFromPrisma(): Promise<MatchmakingFeedRecord> {
+  const [queueEntries, players] = await Promise.all([
+    prisma.matchmakingQueueEntry.findMany({
+      where: { status: MatchmakingQueueStatus.QUEUED },
+      include: { player: true },
+    }),
+    prisma.player.findMany({
+      include: { openClawAccount: true },
+      orderBy: { elo: "desc" },
+    }),
+  ]);
+
+  const modes = ["public-arena", "rivalry", "ranked-1v1"] as const;
+  const readyPlayers = players.filter((player) => player.openClawAccount?.status === OpenClawConnectionStatus.READY);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    recommendedModes: readyPlayers
+      .map((player) => modeFromPrisma[player.preferredMode])
+      .filter((mode, index, list) => list.indexOf(mode) === index)
+      .slice(0, 3),
+    summaries: modes.map((mode) => {
+      const queueCount = queueEntries.filter((entry) => modeFromPrisma[entry.mode] === mode).length;
+      const readyCount = readyPlayers.filter((player) => modeFromPrisma[player.preferredMode] === mode).length;
+
+      return {
+        mode,
+        queueCount,
+        readyPlayers: readyCount,
+        estimatedWaitSeconds: queueCount > 0 ? MATCHMAKING_WAIT_BASE_SECONDS : MATCHMAKING_WAIT_BASE_SECONDS * 2,
+      };
+    }),
+  };
 }
 
 export async function updatePlayerOpenClawRecordInPrisma(slug: string, payload: UpdateOpenClawPayload) {
@@ -455,6 +836,9 @@ export async function settleChallengeRecordInPrisma(id: string, payload: SettleC
     await tx.player.update({
       where: { id: loser.id },
       data: {
+        ...(Math.max(0, nums.loserClawPoints - challenge.stake) > 0
+          ? { clawPoints: { decrement: Math.max(0, nums.loserClawPoints - challenge.stake) } }
+          : {}),
         elo: { decrement: nums.eloLose },
         streak: 0,
         winRate: Math.round(loserNewWinRate * 100) / 100,
@@ -462,20 +846,45 @@ export async function settleChallengeRecordInPrisma(id: string, payload: SettleC
     });
 
     // --- wallet ledger ---
-    const winnerWallet = await tx.playerWallet.upsert({
-      where: { playerId: winner.id },
-      create: { playerId: winner.id, availableBalance: 0, lockedBalance: 0 },
-      update: {},
-    });
-    const loserWallet = await tx.playerWallet.upsert({
-      where: { playerId: loser.id },
-      create: { playerId: loser.id, availableBalance: 0, lockedBalance: 0 },
-      update: {},
-    });
+    const winnerWallet = await ensureWalletSnapshot(tx, winner.id, winner.clawPoints, challenge.stake);
+    const loserWallet = await ensureWalletSnapshot(tx, loser.id, loser.clawPoints, challenge.stake);
+    const winnerLockedBalanceAfter = Math.max(0, winnerWallet.lockedBalance - challenge.stake);
+    const loserLockedBalanceAfter = Math.max(0, loserWallet.lockedBalance - challenge.stake);
+    const winnerAvailableBalanceAfter = winnerWallet.availableBalance + nums.winnerClawPoints;
+    const loserPenaltyDelta = Math.max(0, nums.loserClawPoints - challenge.stake);
+    const loserAvailableBalanceAfter = loserWallet.availableBalance - loserPenaltyDelta;
 
     await tx.playerWallet.update({
       where: { id: winnerWallet.id },
-      data: { availableBalance: { increment: nums.winnerClawPoints }, lastSyncedAt: new Date() },
+      data: {
+        availableBalance: winnerAvailableBalanceAfter,
+        lockedBalance: winnerLockedBalanceAfter,
+        lastSyncedAt: new Date(),
+      },
+    });
+    await tx.playerWallet.update({
+      where: { id: loserWallet.id },
+      data: {
+        availableBalance: loserAvailableBalanceAfter,
+        lockedBalance: loserLockedBalanceAfter,
+        lastSyncedAt: new Date(),
+      },
+    });
+    await tx.walletLedger.create({
+      data: {
+        walletId: winnerWallet.id,
+        challengeId: id,
+        type: WalletLedgerType.CHALLENGE_UNLOCK,
+        delta: challenge.stake,
+        balanceAfter: winnerAvailableBalanceAfter,
+        reason: `挑战解锁返还 (${mode})`,
+        metadata: {
+          availableBalanceAfter: winnerAvailableBalanceAfter,
+          lockedBalanceAfter: winnerLockedBalanceAfter,
+          playerSlug: winner.slug,
+          stage: "settlement-unlock",
+        },
+      },
     });
     await tx.walletLedger.create({
       data: {
@@ -483,8 +892,19 @@ export async function settleChallengeRecordInPrisma(id: string, payload: SettleC
         challengeId: id,
         type: WalletLedgerType.CHALLENGE_REWARD,
         delta: nums.winnerClawPoints,
-        balanceAfter: winnerWallet.availableBalance + nums.winnerClawPoints,
+        balanceAfter: winnerAvailableBalanceAfter,
         reason: `胜场奖励 (${mode})`,
+      },
+    });
+
+    await tx.walletLedger.create({
+      data: {
+        walletId: loserWallet.id,
+        challengeId: id,
+        type: WalletLedgerType.CHALLENGE_UNLOCK,
+        delta: challenge.stake,
+        balanceAfter: loserAvailableBalanceAfter,
+        reason: `败场扣除 (${mode})`,
       },
     });
 
@@ -494,8 +914,16 @@ export async function settleChallengeRecordInPrisma(id: string, payload: SettleC
         challengeId: id,
         type: WalletLedgerType.CHALLENGE_PENALTY,
         delta: -nums.loserClawPoints,
-        balanceAfter: loserWallet.availableBalance - nums.loserClawPoints,
+        balanceAfter: loserAvailableBalanceAfter,
         reason: `败场扣除 (${mode})`,
+        metadata: {
+          availableBalanceAfter: loserAvailableBalanceAfter,
+          lockedBalanceAfter: loserLockedBalanceAfter,
+          playerSlug: loser.slug,
+          stakeLocked: challenge.stake,
+          extraPenalty: loserPenaltyDelta,
+          stage: "settlement-penalty",
+        },
       },
     });
 
@@ -571,6 +999,42 @@ export async function settleChallengeRecordInPrisma(id: string, payload: SettleC
     defenderSlug: updated.defender.slug,
     winnerSlug: winner.slug,
   };
+}
+
+export async function markChallengeReadyFromPluginRecordInPrisma(id: string, payload?: ReadyChallengePayload) {
+  const challenge = await getChallengeWithParticipants(id);
+
+  if (!challenge) {
+    throw new Error("Challenge not found");
+  }
+
+  if (statusFromPrisma[challenge.status] !== "accepted") {
+    throw new Error("Challenge is not ready to start");
+  }
+
+  const updated = await prisma.challenge.update({
+    where: { id },
+    data: {
+      status: ChallengeStatus.LIVE,
+      sourceChannel: payload?.sourceChannel ?? challenge.sourceChannel ?? "clawdex-channel",
+      sourceSessionId: payload?.sourceSessionId ?? challenge.sourceSessionId,
+    },
+    include: {
+      challenger: { include: { openClawAccount: true } },
+      defender: { include: { openClawAccount: true } },
+      settlement: true,
+    },
+  });
+
+  return {
+    ...buildMatchListing(updated),
+    challengerSlug: updated.challenger.slug,
+    defenderSlug: updated.defender.slug,
+  };
+}
+
+export async function reportChallengeResultFromPluginRecordInPrisma(id: string, payload: SettleChallengePayload) {
+  return settleChallengeRecordInPrisma(id, payload);
 }
 
 export async function getDataStoreStatusFromPrisma() {

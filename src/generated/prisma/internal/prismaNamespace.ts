@@ -399,7 +399,8 @@ export const ModelName = {
   SpectatorVote: 'SpectatorVote',
   DebateTopic: 'DebateTopic',
   Debate: 'Debate',
-  DebateRound: 'DebateRound'
+  DebateRound: 'DebateRound',
+  MatchmakingQueueEntry: 'MatchmakingQueueEntry'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "player" | "user" | "account" | "session" | "verificationToken" | "playerWallet" | "walletLedger" | "openClawAccount" | "openClawBinding" | "challenge" | "challengeSettlement" | "challengeEvent" | "spectatorVote" | "debateTopic" | "debate" | "debateRound"
+    modelProps: "player" | "user" | "account" | "session" | "verificationToken" | "playerWallet" | "walletLedger" | "openClawAccount" | "openClawBinding" | "challenge" | "challengeSettlement" | "challengeEvent" | "spectatorVote" | "debateTopic" | "debate" | "debateRound" | "matchmakingQueueEntry"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1603,6 +1604,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MatchmakingQueueEntry: {
+      payload: Prisma.$MatchmakingQueueEntryPayload<ExtArgs>
+      fields: Prisma.MatchmakingQueueEntryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MatchmakingQueueEntryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MatchmakingQueueEntryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>
+        }
+        findFirst: {
+          args: Prisma.MatchmakingQueueEntryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MatchmakingQueueEntryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>
+        }
+        findMany: {
+          args: Prisma.MatchmakingQueueEntryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>[]
+        }
+        create: {
+          args: Prisma.MatchmakingQueueEntryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>
+        }
+        createMany: {
+          args: Prisma.MatchmakingQueueEntryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MatchmakingQueueEntryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>[]
+        }
+        delete: {
+          args: Prisma.MatchmakingQueueEntryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>
+        }
+        update: {
+          args: Prisma.MatchmakingQueueEntryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>
+        }
+        deleteMany: {
+          args: Prisma.MatchmakingQueueEntryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MatchmakingQueueEntryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MatchmakingQueueEntryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>[]
+        }
+        upsert: {
+          args: Prisma.MatchmakingQueueEntryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchmakingQueueEntryPayload>
+        }
+        aggregate: {
+          args: Prisma.MatchmakingQueueEntryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMatchmakingQueueEntry>
+        }
+        groupBy: {
+          args: Prisma.MatchmakingQueueEntryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchmakingQueueEntryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MatchmakingQueueEntryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchmakingQueueEntryCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1910,6 +1985,24 @@ export const DebateRoundScalarFieldEnum = {
 export type DebateRoundScalarFieldEnum = (typeof DebateRoundScalarFieldEnum)[keyof typeof DebateRoundScalarFieldEnum]
 
 
+export const MatchmakingQueueEntryScalarFieldEnum = {
+  id: 'id',
+  playerId: 'playerId',
+  mode: 'mode',
+  stake: 'stake',
+  status: 'status',
+  sourceChannel: 'sourceChannel',
+  sourceSessionId: 'sourceSessionId',
+  challengeId: 'challengeId',
+  createdAt: 'createdAt',
+  matchedAt: 'matchedAt',
+  cancelledAt: 'cancelledAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MatchmakingQueueEntryScalarFieldEnum = (typeof MatchmakingQueueEntryScalarFieldEnum)[keyof typeof MatchmakingQueueEntryScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2208,6 +2301,20 @@ export type EnumDebateSideFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
 export type ListEnumDebateSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DebateSide[]'>
     
 
+
+/**
+ * Reference to a field of type 'MatchmakingQueueStatus'
+ */
+export type EnumMatchmakingQueueStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchmakingQueueStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'MatchmakingQueueStatus[]'
+ */
+export type ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchmakingQueueStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2319,6 +2426,7 @@ export type GlobalOmitConfig = {
   debateTopic?: Prisma.DebateTopicOmit
   debate?: Prisma.DebateOmit
   debateRound?: Prisma.DebateRoundOmit
+  matchmakingQueueEntry?: Prisma.MatchmakingQueueEntryOmit
 }
 
 /* Types for Logging */

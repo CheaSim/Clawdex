@@ -97,6 +97,59 @@ export type AcceptChallengePayload = {
   sourceSessionId?: string;
 };
 
+export type MatchmakingStatus = "queued" | "matched" | "cancelled";
+
+export type MatchmakingQueueEntry = {
+  id: string;
+  playerSlug: string;
+  mode: MatchMode;
+  stake: number;
+  status: MatchmakingStatus;
+  createdAt: string;
+  matchedAt?: string;
+  cancelledAt?: string;
+  challengeId?: string;
+  sourceChannel?: string;
+  sourceSessionId?: string;
+};
+
+export type JoinMatchmakingPayload = {
+  playerSlug: string;
+  mode: MatchMode;
+  stake: number;
+  sourceChannel?: string;
+  sourceSessionId?: string;
+};
+
+export type LeaveMatchmakingPayload = {
+  playerSlug: string;
+};
+
+export type MatchmakingFeedSummary = {
+  mode: MatchMode;
+  queueCount: number;
+  readyPlayers: number;
+  estimatedWaitSeconds: number;
+};
+
+export type MatchmakingStatusRecord = {
+  playerSlug: string;
+  status: "idle" | MatchmakingStatus;
+  queueEntry?: MatchmakingQueueEntry;
+  challenge?: MatchListing;
+};
+
+export type MatchmakingFeedRecord = {
+  generatedAt: string;
+  recommendedModes: MatchMode[];
+  summaries: MatchmakingFeedSummary[];
+};
+
+export type ReadyChallengePayload = {
+  sourceChannel?: string;
+  sourceSessionId?: string;
+};
+
 // ─── Debate PK Types ──────────────────────────────────
 
 export type DebateStatus = "topic-set" | "started" | "round-a" | "round-b" | "closing" | "judging" | "settled";
@@ -168,6 +221,7 @@ export type SubmitArgumentPayload = {
 export type MockDatabase = {
   players: PlayerProfile[];
   challenges: MatchListing[];
+  matchmakingQueue?: MatchmakingQueueEntry[];
 };
 
 export const matchModes: Array<{ value: MatchMode; label: string; description: string }> = [
@@ -362,6 +416,7 @@ export const liveMatches: MatchListing[] = [
 export const seedDatabase: MockDatabase = {
   players,
   challenges: liveMatches,
+  matchmakingQueue: [],
 };
 
 export const challengeStatusMeta: Record<ChallengeStatus, { label: string; tone: string }> = {

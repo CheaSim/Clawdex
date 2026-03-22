@@ -97,3 +97,8 @@ export type Debate = Prisma.DebateModel
  * 
  */
 export type DebateRound = Prisma.DebateRoundModel
+/**
+ * Model MatchmakingQueueEntry
+ * 
+ */
+export type MatchmakingQueueEntry = Prisma.MatchmakingQueueEntryModel

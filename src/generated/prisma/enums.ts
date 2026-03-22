@@ -36,6 +36,15 @@ export const ChallengeStatus = {
 export type ChallengeStatus = (typeof ChallengeStatus)[keyof typeof ChallengeStatus]
 
 
+export const MatchmakingQueueStatus = {
+  QUEUED: 'QUEUED',
+  MATCHED: 'MATCHED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type MatchmakingQueueStatus = (typeof MatchmakingQueueStatus)[keyof typeof MatchmakingQueueStatus]
+
+
 export const OpenClawRegion = {
   CN: 'CN',
   SEA: 'SEA',

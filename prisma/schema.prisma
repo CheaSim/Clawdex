@@ -25,6 +25,12 @@ enum ChallengeStatus {
   SETTLEMENT @map("settlement")
 }
 
+enum MatchmakingQueueStatus {
+  QUEUED @map("queued")
+  MATCHED @map("matched")
+  CANCELLED @map("cancelled")
+}
+
 enum OpenClawRegion {
   CN
   SEA
@@ -95,6 +101,7 @@ model Player {
   user              User?
   wallet            PlayerWallet?
   openClawAccount   OpenClawAccount?
+  matchmakingQueueEntries MatchmakingQueueEntry[]
   challengerMatches Challenge[]         @relation("ChallengeChallenger")
   defenderMatches   Challenge[]         @relation("ChallengeDefender")
   wonSettlements    ChallengeSettlement[] @relation("SettlementWinner")
@@ -259,6 +266,7 @@ model Challenge {
   events            ChallengeEvent[]
   spectatorVotes    SpectatorVote[]
   debate            Debate?
+  matchmakingQueueEntries MatchmakingQueueEntry[]
 
   @@index([status, createdAt])
   @@index([challengerId, createdAt])
@@ -393,4 +401,24 @@ model DebateRound {
 
   @@unique([debateId, roundNumber, side])
   @@index([debateId, roundNumber])
+}
+
+model MatchmakingQueueEntry {
+  id              String                 @id @default(cuid())
+  playerId        String
+  mode            MatchMode
+  stake           Int
+  status          MatchmakingQueueStatus @default(QUEUED)
+  sourceChannel   String?                @default("clawdex-channel")
+  sourceSessionId String?
+  challengeId     String?
+  createdAt       DateTime               @default(now())
+  matchedAt       DateTime?
+  cancelledAt     DateTime?
+  updatedAt       DateTime               @updatedAt
+  player          Player                 @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  challenge       Challenge?             @relation(fields: [challengeId], references: [id], onDelete: SetNull)
+
+  @@index([playerId, status])
+  @@index([mode, status, createdAt])
 }

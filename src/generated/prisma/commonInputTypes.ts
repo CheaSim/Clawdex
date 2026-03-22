@@ -552,6 +552,23 @@ export type EnumDebateSideWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumDebateSideFilter<$PrismaModel>
 }
 
+export type EnumMatchmakingQueueStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.MatchmakingQueueStatus | Prisma.EnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MatchmakingQueueStatus[] | Prisma.ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MatchmakingQueueStatus[] | Prisma.ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMatchmakingQueueStatusFilter<$PrismaModel> | $Enums.MatchmakingQueueStatus
+}
+
+export type EnumMatchmakingQueueStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MatchmakingQueueStatus | Prisma.EnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MatchmakingQueueStatus[] | Prisma.ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MatchmakingQueueStatus[] | Prisma.ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMatchmakingQueueStatusWithAggregatesFilter<$PrismaModel> | $Enums.MatchmakingQueueStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMatchmakingQueueStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMatchmakingQueueStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1036,6 +1053,23 @@ export type NestedEnumDebateSideWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumDebateSideFilter<$PrismaModel>
   _max?: Prisma.NestedEnumDebateSideFilter<$PrismaModel>
+}
+
+export type NestedEnumMatchmakingQueueStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.MatchmakingQueueStatus | Prisma.EnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MatchmakingQueueStatus[] | Prisma.ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MatchmakingQueueStatus[] | Prisma.ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMatchmakingQueueStatusFilter<$PrismaModel> | $Enums.MatchmakingQueueStatus
+}
+
+export type NestedEnumMatchmakingQueueStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MatchmakingQueueStatus | Prisma.EnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MatchmakingQueueStatus[] | Prisma.ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MatchmakingQueueStatus[] | Prisma.ListEnumMatchmakingQueueStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMatchmakingQueueStatusWithAggregatesFilter<$PrismaModel> | $Enums.MatchmakingQueueStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMatchmakingQueueStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMatchmakingQueueStatusFilter<$PrismaModel>
 }
 
 

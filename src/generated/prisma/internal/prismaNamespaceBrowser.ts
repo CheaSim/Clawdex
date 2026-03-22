@@ -66,7 +66,8 @@ export const ModelName = {
   SpectatorVote: 'SpectatorVote',
   DebateTopic: 'DebateTopic',
   Debate: 'Debate',
-  DebateRound: 'DebateRound'
+  DebateRound: 'DebateRound',
+  MatchmakingQueueEntry: 'MatchmakingQueueEntry'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -351,6 +352,24 @@ export const DebateRoundScalarFieldEnum = {
 } as const
 
 export type DebateRoundScalarFieldEnum = (typeof DebateRoundScalarFieldEnum)[keyof typeof DebateRoundScalarFieldEnum]
+
+
+export const MatchmakingQueueEntryScalarFieldEnum = {
+  id: 'id',
+  playerId: 'playerId',
+  mode: 'mode',
+  stake: 'stake',
+  status: 'status',
+  sourceChannel: 'sourceChannel',
+  sourceSessionId: 'sourceSessionId',
+  challengeId: 'challengeId',
+  createdAt: 'createdAt',
+  matchedAt: 'matchedAt',
+  cancelledAt: 'cancelledAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MatchmakingQueueEntryScalarFieldEnum = (typeof MatchmakingQueueEntryScalarFieldEnum)[keyof typeof MatchmakingQueueEntryScalarFieldEnum]
 
 
 export const SortOrder = {

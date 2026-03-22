@@ -153,6 +153,24 @@ function buildMatchmakingQueueEntry(
   };
 }
 
+function buildWinnerSlug(
+  winnerPlayerId: string | null | undefined,
+  challengerId: string,
+  challengerSlug: string,
+  defenderId: string,
+  defenderSlug: string,
+) {
+  if (winnerPlayerId === challengerId) {
+    return challengerSlug;
+  }
+
+  if (winnerPlayerId === defenderId) {
+    return defenderSlug;
+  }
+
+  return undefined;
+}
+
 function createStoryline(payload: CreateChallengePayload, challenger: PlayerProfile, defender: PlayerProfile) {
   const modeLabel = getModeLabel(payload.mode);
   return `${challenger.name} 发起一场${modeLabel}，目标是从 ${defender.name} 手里抢走更高曝光和奖励池。`;
@@ -230,11 +248,13 @@ export async function listChallengesFromPrisma() {
     const listing = buildMatchListing(challenge);
     listing.challengerSlug = challenge.challenger.slug;
     listing.defenderSlug = challenge.defender.slug;
-    listing.winnerSlug = challenge.settlement?.winnerPlayerId === challenge.challenger.id
-      ? challenge.challenger.slug
-      : challenge.settlement?.winnerPlayerId === challenge.defender.id
-        ? challenge.defender.slug
-        : undefined;
+    listing.winnerSlug = buildWinnerSlug(
+      challenge.winnerPlayerId,
+      challenge.challenger.id,
+      challenge.challenger.slug,
+      challenge.defender.id,
+      challenge.defender.slug,
+    );
     return listing;
   });
 }
@@ -249,11 +269,13 @@ export async function getChallengeByIdFromPrisma(id: string) {
   const listing = buildMatchListing(challenge);
   listing.challengerSlug = challenge.challenger.slug;
   listing.defenderSlug = challenge.defender.slug;
-  listing.winnerSlug = challenge.settlement?.winnerPlayerId === challenge.challenger.id
-    ? challenge.challenger.slug
-    : challenge.settlement?.winnerPlayerId === challenge.defender.id
-      ? challenge.defender.slug
-      : undefined;
+  listing.winnerSlug = buildWinnerSlug(
+    challenge.winnerPlayerId,
+    challenge.challenger.id,
+    challenge.challenger.slug,
+    challenge.defender.id,
+    challenge.defender.slug,
+  );
   return listing;
 }
 
@@ -539,6 +561,7 @@ export async function joinMatchmakingQueueRecordInPrisma(payload: JoinMatchmakin
     queueEntry = await prisma.matchmakingQueueEntry.create({
       data: {
         playerId: player.id,
+        activeKey: player.id,
         mode: modeToPrisma[payload.mode],
         stake: payload.stake,
         status: MatchmakingQueueStatus.QUEUED,
@@ -604,6 +627,7 @@ export async function joinMatchmakingQueueRecordInPrisma(payload: JoinMatchmakin
       status: MatchmakingQueueStatus.MATCHED,
       matchedAt: new Date(),
       challengeId: accepted.challenge.id,
+      activeKey: player.id,
       sourceChannel,
       sourceSessionId,
     },
@@ -646,6 +670,7 @@ export async function leaveMatchmakingQueueRecordInPrisma(payload: LeaveMatchmak
     where: { id: queueEntry.id },
     data: {
       status: MatchmakingQueueStatus.CANCELLED,
+      activeKey: null,
       cancelledAt: new Date(),
     },
     include: { player: true },

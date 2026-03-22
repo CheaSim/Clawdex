@@ -257,6 +257,7 @@ export type SpectatorVoteOrderByWithRelationInput = {
 
 export type SpectatorVoteWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  challengeId_voterId_voteType?: Prisma.SpectatorVoteChallengeIdVoterIdVoteTypeCompoundUniqueInput
   AND?: Prisma.SpectatorVoteWhereInput | Prisma.SpectatorVoteWhereInput[]
   OR?: Prisma.SpectatorVoteWhereInput[]
   NOT?: Prisma.SpectatorVoteWhereInput | Prisma.SpectatorVoteWhereInput[]
@@ -270,7 +271,7 @@ export type SpectatorVoteWhereUniqueInput = Prisma.AtLeast<{
   challenge?: Prisma.XOR<Prisma.ChallengeScalarRelationFilter, Prisma.ChallengeWhereInput>
   voter?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
   player?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
-}, "id">
+}, "id" | "challengeId_voterId_voteType">
 
 export type SpectatorVoteOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -384,6 +385,12 @@ export type SpectatorVoteListRelationFilter = {
 
 export type SpectatorVoteOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type SpectatorVoteChallengeIdVoterIdVoteTypeCompoundUniqueInput = {
+  challengeId: string
+  voterId: string
+  voteType: $Enums.SpectatorVoteType
 }
 
 export type SpectatorVoteCountOrderByAggregateInput = {

@@ -137,4 +137,25 @@ describe("openclaw matchmaking control plane", () => {
     assert.ok(feed.recommendedModes.length > 0);
     assert.ok(feed.summaries.some((summary) => summary.mode === "public-arena" && summary.queueCount >= 1));
   });
+
+  test("rejoining the queue updates the same active queue entry instead of creating duplicates", async () => {
+    const first = await joinMatchmakingQueueRecord({
+      playerSlug: "ghosthook",
+      mode: "ranked-1v1",
+      stake: 20,
+      sourceSessionId: "first-session",
+    });
+
+    const second = await joinMatchmakingQueueRecord({
+      playerSlug: "ghosthook",
+      mode: "ranked-1v1",
+      stake: 20,
+      sourceSessionId: "second-session",
+    });
+
+    assert.equal(first.status, "queued");
+    assert.equal(second.status, "queued");
+    assert.equal(first.queueEntry?.id, second.queueEntry?.id);
+    assert.equal(second.queueEntry?.sourceSessionId, "second-session");
+  });
 });

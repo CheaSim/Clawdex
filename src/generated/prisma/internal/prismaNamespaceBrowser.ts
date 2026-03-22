@@ -357,6 +357,7 @@ export type DebateRoundScalarFieldEnum = (typeof DebateRoundScalarFieldEnum)[key
 export const MatchmakingQueueEntryScalarFieldEnum = {
   id: 'id',
   playerId: 'playerId',
+  activeKey: 'activeKey',
   mode: 'mode',
   stake: 'stake',
   status: 'status',
